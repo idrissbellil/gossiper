@@ -26,7 +26,9 @@ steps:
     image: docker:latest
     commands:
       - apk add --no-cache py-pip python3-dev libffi-dev openssl-dev gcc libc-dev rust cargo make  # Depend on the build system
-      - pip install docker-compose
+      - apk add pipx
+      - pipx ensurepath
+      - pipx install docker-compose
       - docker-compose -f docker-compose-test.yml up --build -d
       - docker-compose -f docker-compose-test.yml run app
       - docker-compose -f docker-compose-test.yml down
