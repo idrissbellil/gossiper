@@ -26,5 +26,5 @@ services:
   worker:
     image: gitea.risky.info/risky-info/gossip-worker:{tag}
     depends_on:
-      - redis
-      - postgres
+      - db
+      - cache
