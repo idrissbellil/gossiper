@@ -2,6 +2,9 @@ kind: pipeline
 type: docker
 name: default
 
+clone:
+  disable: true
+
 trigger:
   event:
     - push
@@ -10,14 +13,17 @@ trigger:
     - main
 
 steps:
-  - name: checkout
+  - name: clone
     image: alpine/git
+    environment:
+      GIT_ORIGIN_WITH_AUTH:
+        from_secret: GIT_ORIGIN
     commands:
-      - git clone ssh://git@gitea.risky.info:222/risky-info/${DRONE_REPO}.git .
-      - git checkout ${DRONE_COMMIT}
+    - git clone $GIT_ORIGIN_WITH_AUTH .
+    - git checkout $DRONE_COMMIT
 
   - name: set up Go
-    image: golang:1.19
+    image: golang:1.22
     commands:
       - go version
     environment:
@@ -43,18 +49,18 @@ steps:
         path: /tmp/cache
 
   - name: start containers
-    image: docker/compose:alpine-1.29.2
+    image: docker/compose
     commands:
-      - docker-compose up -d
+      - docker-compose -f docker-compose-test.yml up -d
       - sleep 3
     volumes:
       - name: docker_socket
         path: /var/run/docker.sock
 
   - name: test
-    image: golang:1.19
+    image: golang:1.22
     commands:
-      - go test -p 1 ./...
+      - go test ./...
     environment:
       GOCACHE: /root/.cache/go-build
       GOPATH: /root/go
@@ -63,6 +69,38 @@ steps:
         path: /root/go/pkg/mod
       - name: go-build-cache
         path: /root/.cache/go-build
+
+  - name: build-web
+    image: plugins/docker
+    settings:
+      repo: gitea.risky.info/risky-info/gossip-web:{tag}
+      tags: latest
+      dockerfile: ./web.dockerfile
+      context: .
+    when:
+      branch:
+        - main
+
+  - name: build-worker
+    image: plugins/docker
+    settings:
+      repo: gitea.risky.info/risky-info/gossip-worker:{tag}
+      tags: latest
+      dockerfile: ./worker.dockerfile
+      context: .
+    when:
+      branch:
+        - main
+
+  - name: deploy
+    image: docker
+    commands:
+      - docker stack deploy --compose-file docker-compose.yml gossip-stack
+    environment:
+      DOCKER_HOST: tcp://173.249.23.177:2376
+    when:
+      branch:
+        - main
 
 volumes:
   - name: go-modules
@@ -75,4 +113,3 @@ volumes:
   - name: docker_socket
     host:
       path: /var/run/docker.sock
-
