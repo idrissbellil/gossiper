@@ -23,11 +23,9 @@ steps:
     - git checkout $DRONE_COMMIT
 
   - name: test
-    image: golang:1.22
+    image: docker:latest
     commands:
-      - apt-get update
-      - apt-get install -y python3-pip libffi-dev libssl-dev gcc libc-dev make
-      - pip3 install docker-compose
+      - apk add --no-cache py-pip python3-dev libffi-dev openssl-dev gcc libc-dev rust cargo make  # Depend on the build system
       - pip install docker-compose
       - docker-compose -f docker-compose-test.yml up --build -d
       - docker-compose -f docker-compose-test.yml run app
