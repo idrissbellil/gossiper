@@ -51,6 +51,7 @@ steps:
     settings:
       repo: gitea.risky.info/risky-info/gossip-web
       tags: latest
+      registry: gitea.risky.info
       dockerfile: ./web.dockerfile
       context: .
       username:
@@ -66,6 +67,7 @@ steps:
     settings:
       repo: gitea.risky.info/risky-info/gossip-worker
       tags: latest
+      registry: gitea.risky.info
       dockerfile: ./worker.dockerfile
       context: .
       username:
