@@ -23,7 +23,7 @@ steps:
     - git checkout $DRONE_COMMIT
 
   - name: test
-    image: docker-compoe:latest
+    image: alpinelinux/docker-compoe:latest
     commands:
       - docker-compose -f docker-compose-test.yml up --build -d
       - docker-compose -f docker-compose-test.yml run app
