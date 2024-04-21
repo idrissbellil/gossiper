@@ -49,10 +49,14 @@ steps:
   - name: build-web
     image: plugins/docker
     settings:
-      repo: gitea.risky.info/risky-info/gossip-web:{tag}
+      repo: gitea.risky.info/risky-info/gossip-web
       tags: latest
       dockerfile: ./web.dockerfile
       context: .
+      username:
+        from_secret: docker_registry_username
+      password:
+        from_secret: docker_registry_password
     when:
       branch:
         - main
@@ -60,10 +64,14 @@ steps:
   - name: build-worker
     image: plugins/docker
     settings:
-      repo: gitea.risky.info/risky-info/gossip-worker:{tag}
+      repo: gitea.risky.info/risky-info/gossip-worker
       tags: latest
       dockerfile: ./worker.dockerfile
       context: .
+      username:
+        from_secret: docker_registry_username
+      password:
+        from_secret: docker_registry_password
     when:
       branch:
         - main
