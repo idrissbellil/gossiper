@@ -12,6 +12,21 @@ trigger:
   branch:
     - main
 
+services:
+  - name: redis
+    image: redis:alpine
+    ports:
+      - 6379
+
+  - name: postgres
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: app
+    ports:
+      - 5432
+
 steps:
   - name: clone
     image: alpine/git
@@ -23,15 +38,10 @@ steps:
     - git checkout $DRONE_COMMIT
 
   - name: test
-    image: docker:latest
-    volumes:
-      - name: docker_sock
-        path: /var/run/docker.sock
+    image: golang:1.22
     commands:
-      - apk add --no-cache docker-compose
-      - docker-compose -f docker-compose-test.yml up --build -d
-      - docker-compose -f docker-compose-test.yml run app
-      - docker-compose -f docker-compose-test.yml down
+      - sleep 10
+      - go test ./...
 
   - name: build-web
     image: plugins/docker
@@ -64,8 +74,3 @@ steps:
     when:
       branch:
         - main
-
-volumes:
-  - name: docker_sock
-    host:
-      path: /var/run/docker.sock
