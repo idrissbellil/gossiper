@@ -41,7 +41,7 @@ steps:
     image: golang:1.22
     commands:
       - sleep 10
-      - go test ./...
+      - go test -count=1 -p 1 ./...
     environment:
       PAGODA_CACHE_HOSTNAME: redis
       PAGODA_DATABASE_HOSTNAME: postgres
