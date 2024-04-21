@@ -23,14 +23,11 @@ steps:
     - git checkout $DRONE_COMMIT
 
   - name: test
-    image: docker:latest
+    image: docker-compoe:latest
     commands:
-      - apk add --no-cache py-pip python3-dev pipx bash yaml-dev libffi-dev gcc libc-dev make yaml
-      - pipx ensurepath
-      - pipx install docker-compose
-      - /root/.local/bin/docker-compose -f docker-compose-test.yml up --build -d
-      - /root/.local/bin/docker-compose -f docker-compose-test.yml run app
-      - /root/.local/bin/docker-compose -f docker-compose-test.yml down
+      - docker-compose -f docker-compose-test.yml up --build -d
+      - docker-compose -f docker-compose-test.yml run app
+      - docker-compose -f docker-compose-test.yml down
 
   - name: build-web
     image: plugins/docker
