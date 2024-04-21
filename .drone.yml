@@ -25,12 +25,12 @@ steps:
   - name: test
     image: docker:latest
     commands:
-      - apk add --no-cache py-pip python3-dev pipx bash
+      - apk add --no-cache py-pip python3-dev pipx bash yaml-dev libffi-dev libssl-dev gcc libc-dev make
       - pipx ensurepath
       - pipx install docker-compose
-      - docker-compose -f docker-compose-test.yml up --build -d
-      - docker-compose -f docker-compose-test.yml run app
-      - docker-compose -f docker-compose-test.yml down
+      - /root/.local/bin/docker-compose -f docker-compose-test.yml up --build -d
+      - /root/.local/bin/docker-compose -f docker-compose-test.yml run app
+      - /root/.local/bin/docker-compose -f docker-compose-test.yml down
 
   - name: build-web
     image: plugins/docker
