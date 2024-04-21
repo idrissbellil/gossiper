@@ -42,6 +42,9 @@ steps:
     commands:
       - sleep 10
       - go test ./...
+    environment:
+      PAGODA_CACHE_HOSTNAME: redis
+      PAGODA_DATABASE_HOSTNAME: postgres
 
   - name: build-web
     image: plugins/docker
