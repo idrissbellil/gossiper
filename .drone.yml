@@ -101,7 +101,3 @@ steps:
       port: 7777
       script:
         - docker stack deploy -c /tmp/docker-compose.yml gossip-stack
-
-volumes:
-  - name: workspace
-    temp: {}
