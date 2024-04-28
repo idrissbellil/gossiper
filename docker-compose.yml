@@ -10,7 +10,7 @@ services:
       - POSTGRES_DB=app
 
   web:
-    image: gitea.risky.info/risky-info/gossip-web
+    image: gitea.risky.info/risky-info/gossip-web:latest
     ports:
       - "8090:8080"
     environment:
@@ -21,7 +21,7 @@ services:
       - db
 
   worker:
-    image: gitea.risky.info/risky-info/gossip-worker
+    image: gitea.risky.info/risky-info/gossip-worker:latest
     environment:
       PAGODA_CACHE_HOSTNAME: cache
       PAGODA_DATABASE_HOSTNAME: db
