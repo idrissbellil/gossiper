@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/mikestefanello/pagoda/ent"
-	"github.com/mikestefanello/pagoda/pkg/context"
-	"github.com/mikestefanello/pagoda/pkg/tests"
+	"gitea.risky.info/risky-info/gossiper/ent"
+	"gitea.risky.info/risky-info/gossiper/pkg/context"
+	"gitea.risky.info/risky-info/gossiper/pkg/tests"
 
 	"github.com/stretchr/testify/require"
 

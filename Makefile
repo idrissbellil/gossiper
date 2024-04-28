@@ -5,27 +5,27 @@ DCO_BIN := $(shell { command -v docker-compose || command -v docker compose; } 2
 # Connect to the primary database
 .PHONY: db
 db:
-	docker exec -it pagoda_db psql postgresql://admin:admin@localhost:5432/app
+	docker exec -it gossip_db psql postgresql://admin:admin@localhost:5432/app
 
 # Connect to the test database (you must run tests first before running this)
 .PHONY: db-test
 db-test:
-	docker exec -it pagoda_db psql postgresql://admin:admin@localhost:5432/app_test
+	docker exec -it gossip_db psql postgresql://admin:admin@localhost:5432/app_test
 
 # Connect to the primary cache
 .PHONY: cache
 cache:
-	docker exec -it pagoda_cache redis-cli
+	docker exec -it gossip_cache redis-cli
 
 # Clear the primary cache
 .PHONY: cache-clear
 cache-clear:
-	docker exec -it pagoda_cache redis-cli flushall
+	docker exec -it gossip_cache redis-cli flushall
 
  # Connect to the test cache
 .PHONY: cache-test
 cache-test:
-	docker exec -it pagoda_cache redis-cli -n 1
+	docker exec -it gossip_cache redis-cli -n 1
 
 # Install Ent code-generation module
 .PHONY: ent-install
@@ -45,7 +45,7 @@ ent-new:
 # Start the Docker containers
 .PHONY: up
 up:
-	$(DCO_BIN) up -d
+	$(DCO_BIN) -f docker-compose-test.yml  up -d
 	sleep 3
 
 # Stop the Docker containers

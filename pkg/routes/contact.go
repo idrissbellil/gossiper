@@ -3,9 +3,9 @@ package routes
 import (
 	"fmt"
 
-	"github.com/mikestefanello/pagoda/pkg/context"
-	"github.com/mikestefanello/pagoda/pkg/controller"
-	"github.com/mikestefanello/pagoda/templates"
+	"gitea.risky.info/risky-info/gossiper/pkg/context"
+	"gitea.risky.info/risky-info/gossiper/pkg/controller"
+	"gitea.risky.info/risky-info/gossiper/templates"
 
 	"github.com/labstack/echo/v4"
 )

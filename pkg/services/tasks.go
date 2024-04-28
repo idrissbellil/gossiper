@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/hibiken/asynq"
-	"github.com/mikestefanello/pagoda/config"
+	"gitea.risky.info/risky-info/gossiper/config"
 )
 
 type (

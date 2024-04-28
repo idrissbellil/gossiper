@@ -10,8 +10,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/mikestefanello/pagoda/ent/passwordtoken"
-	"github.com/mikestefanello/pagoda/ent/user"
+	"gitea.risky.info/risky-info/gossiper/ent/passwordtoken"
+	"gitea.risky.info/risky-info/gossiper/ent/user"
 )
 
 // UserCreate is the builder for creating a User entity.

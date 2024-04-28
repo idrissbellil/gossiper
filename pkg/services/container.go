@@ -14,11 +14,11 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 
-	"github.com/mikestefanello/pagoda/config"
-	"github.com/mikestefanello/pagoda/ent"
+	"gitea.risky.info/risky-info/gossiper/config"
+	"gitea.risky.info/risky-info/gossiper/ent"
 
 	// Require by ent
-	_ "github.com/mikestefanello/pagoda/ent/runtime"
+	_ "gitea.risky.info/risky-info/gossiper/ent/runtime"
 )
 
 // Container contains all services used by the application and provides an easy way to handle dependency

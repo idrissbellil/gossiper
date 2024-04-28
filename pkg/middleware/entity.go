@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/mikestefanello/pagoda/ent"
-	"github.com/mikestefanello/pagoda/ent/user"
-	"github.com/mikestefanello/pagoda/pkg/context"
+	"gitea.risky.info/risky-info/gossiper/ent"
+	"gitea.risky.info/risky-info/gossiper/ent/user"
+	"gitea.risky.info/risky-info/gossiper/pkg/context"
 
 	"github.com/labstack/echo/v4"
 )

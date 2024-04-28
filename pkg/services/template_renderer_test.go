@@ -3,8 +3,8 @@ package services
 import (
 	"testing"
 
-	"github.com/mikestefanello/pagoda/config"
-	"github.com/mikestefanello/pagoda/templates"
+	"gitea.risky.info/risky-info/gossiper/config"
+	"gitea.risky.info/risky-info/gossiper/templates"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

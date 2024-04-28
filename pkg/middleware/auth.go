@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/mikestefanello/pagoda/ent"
-	"github.com/mikestefanello/pagoda/pkg/context"
-	"github.com/mikestefanello/pagoda/pkg/msg"
-	"github.com/mikestefanello/pagoda/pkg/services"
+	"gitea.risky.info/risky-info/gossiper/ent"
+	"gitea.risky.info/risky-info/gossiper/pkg/context"
+	"gitea.risky.info/risky-info/gossiper/pkg/msg"
+	"gitea.risky.info/risky-info/gossiper/pkg/services"
 
 	"github.com/labstack/echo/v4"
 )

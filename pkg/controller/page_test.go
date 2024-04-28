@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/mikestefanello/pagoda/pkg/context"
-	"github.com/mikestefanello/pagoda/pkg/msg"
-	"github.com/mikestefanello/pagoda/pkg/tests"
+	"gitea.risky.info/risky-info/gossiper/pkg/context"
+	"gitea.risky.info/risky-info/gossiper/pkg/msg"
+	"gitea.risky.info/risky-info/gossiper/pkg/tests"
 
 	echomw "github.com/labstack/echo/v4/middleware"
 	"github.com/stretchr/testify/assert"

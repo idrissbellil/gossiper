@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/mikestefanello/pagoda/ent"
-	"github.com/mikestefanello/pagoda/ent/user"
-	"github.com/mikestefanello/pagoda/pkg/context"
-	"github.com/mikestefanello/pagoda/pkg/controller"
-	"github.com/mikestefanello/pagoda/pkg/msg"
-	"github.com/mikestefanello/pagoda/templates"
+	"gitea.risky.info/risky-info/gossiper/ent"
+	"gitea.risky.info/risky-info/gossiper/ent/user"
+	"gitea.risky.info/risky-info/gossiper/pkg/context"
+	"gitea.risky.info/risky-info/gossiper/pkg/controller"
+	"gitea.risky.info/risky-info/gossiper/pkg/msg"
+	"gitea.risky.info/risky-info/gossiper/templates"
 
 	"github.com/labstack/echo/v4"
 )

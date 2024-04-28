@@ -12,8 +12,8 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/mikestefanello/pagoda/ent/passwordtoken"
-	"github.com/mikestefanello/pagoda/ent/user"
+	"gitea.risky.info/risky-info/gossiper/ent/passwordtoken"
+	"gitea.risky.info/risky-info/gossiper/ent/user"
 )
 
 // ent aliases to avoid import conflicts in user's code.

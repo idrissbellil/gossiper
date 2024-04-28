@@ -5,9 +5,9 @@ package runtime
 import (
 	"time"
 
-	"github.com/mikestefanello/pagoda/ent/passwordtoken"
-	"github.com/mikestefanello/pagoda/ent/schema"
-	"github.com/mikestefanello/pagoda/ent/user"
+	"gitea.risky.info/risky-info/gossiper/ent/passwordtoken"
+	"gitea.risky.info/risky-info/gossiper/ent/schema"
+	"gitea.risky.info/risky-info/gossiper/ent/user"
 )
 
 // The init function reads all schema descriptors with runtime code

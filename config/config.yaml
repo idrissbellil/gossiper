@@ -10,7 +10,7 @@ http:
     key: ""
 
 app:
-  name: "Pagoda"
+  name: "Gossip"
   environment: "local"
   # Change this on any live environments
   encryptionKey: "?E(G+KbPeShVmYq3t6w9z$C&F)J@McQf"

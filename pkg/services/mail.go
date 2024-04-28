@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/mikestefanello/pagoda/config"
+	"gitea.risky.info/risky-info/gossiper/config"
 
 	"github.com/labstack/echo/v4"
 )

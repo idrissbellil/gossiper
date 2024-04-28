@@ -8,11 +8,11 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/mikestefanello/pagoda/config"
-	"github.com/mikestefanello/pagoda/ent"
-	"github.com/mikestefanello/pagoda/ent/passwordtoken"
-	"github.com/mikestefanello/pagoda/ent/user"
-	"github.com/mikestefanello/pagoda/pkg/context"
+	"gitea.risky.info/risky-info/gossiper/config"
+	"gitea.risky.info/risky-info/gossiper/ent"
+	"gitea.risky.info/risky-info/gossiper/ent/passwordtoken"
+	"gitea.risky.info/risky-info/gossiper/ent/user"
+	"gitea.risky.info/risky-info/gossiper/pkg/context"
 
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"

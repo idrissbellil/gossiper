@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"github.com/mikestefanello/pagoda/pkg/controller"
-	"github.com/mikestefanello/pagoda/pkg/msg"
+	"gitea.risky.info/risky-info/gossiper/pkg/controller"
+	"gitea.risky.info/risky-info/gossiper/pkg/msg"
 
 	"github.com/labstack/echo/v4"
 )

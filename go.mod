@@ -1,4 +1,4 @@
-module github.com/mikestefanello/pagoda
+module gitea.risky.info/risky-info/gossiper
 
 go 1.22
 

@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	ge "github.com/mikestefanello/pagoda/ent"
-	"github.com/mikestefanello/pagoda/ent/hook"
+	ge "gitea.risky.info/risky-info/gossiper/ent"
+	"gitea.risky.info/risky-info/gossiper/ent/hook"
 
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"

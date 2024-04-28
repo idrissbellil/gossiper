@@ -14,8 +14,8 @@ services:
     ports:
       - "9311:8000"
     environment:
-      PAGODA_CACHE_HOSTNAME: cache
-      PAGODA_DATABASE_HOSTNAME: db
+      GOSSIP_CACHE_HOSTNAME: cache
+      GOSSIP_DATABASE_HOSTNAME: db
     depends_on:
       - cache
       - db
@@ -23,8 +23,8 @@ services:
   worker:
     image: gitea.risky.info/risky-info/gossip-worker:latest
     environment:
-      PAGODA_CACHE_HOSTNAME: cache
-      PAGODA_DATABASE_HOSTNAME: db
+      GOSSIP_CACHE_HOSTNAME: cache
+      GOSSIP_DATABASE_HOSTNAME: db
     depends_on:
       - db
       - cache

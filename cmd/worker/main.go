@@ -5,8 +5,8 @@ import (
 	"log"
 
 	"github.com/hibiken/asynq"
-	"github.com/mikestefanello/pagoda/config"
-	"github.com/mikestefanello/pagoda/pkg/tasks"
+	"gitea.risky.info/risky-info/gossiper/config"
+	"gitea.risky.info/risky-info/gossiper/pkg/tasks"
 )
 
 func main() {

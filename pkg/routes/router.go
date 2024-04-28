@@ -3,10 +3,10 @@ package routes
 import (
 	"net/http"
 
-	"github.com/mikestefanello/pagoda/config"
-	"github.com/mikestefanello/pagoda/pkg/controller"
-	"github.com/mikestefanello/pagoda/pkg/middleware"
-	"github.com/mikestefanello/pagoda/pkg/services"
+	"gitea.risky.info/risky-info/gossiper/config"
+	"gitea.risky.info/risky-info/gossiper/pkg/controller"
+	"gitea.risky.info/risky-info/gossiper/pkg/middleware"
+	"gitea.risky.info/risky-info/gossiper/pkg/services"
 
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"

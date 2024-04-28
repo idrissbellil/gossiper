@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/mikestefanello/pagoda/ent"
+	"gitea.risky.info/risky-info/gossiper/ent"
 )
 
 // The PasswordTokenFunc type is an adapter to allow the use of ordinary

@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/mikestefanello/pagoda/ent"
-	"github.com/mikestefanello/pagoda/pkg/context"
-	"github.com/mikestefanello/pagoda/pkg/htmx"
-	"github.com/mikestefanello/pagoda/pkg/msg"
-	"github.com/mikestefanello/pagoda/templates"
+	"gitea.risky.info/risky-info/gossiper/ent"
+	"gitea.risky.info/risky-info/gossiper/pkg/context"
+	"gitea.risky.info/risky-info/gossiper/pkg/htmx"
+	"gitea.risky.info/risky-info/gossiper/pkg/msg"
+	"gitea.risky.info/risky-info/gossiper/templates"
 
 	echomw "github.com/labstack/echo/v4/middleware"
 

@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/mikestefanello/pagoda/pkg/context"
-	"github.com/mikestefanello/pagoda/pkg/services"
+	"gitea.risky.info/risky-info/gossiper/pkg/context"
+	"gitea.risky.info/risky-info/gossiper/pkg/services"
 
 	libstore "github.com/eko/gocache/lib/v4/store"
 	"github.com/labstack/echo/v4"

@@ -8,9 +8,9 @@ import (
 	"io/fs"
 	"sync"
 
-	"github.com/mikestefanello/pagoda/config"
-	"github.com/mikestefanello/pagoda/pkg/funcmap"
-	"github.com/mikestefanello/pagoda/templates"
+	"gitea.risky.info/risky-info/gossiper/config"
+	"gitea.risky.info/risky-info/gossiper/pkg/funcmap"
+	"gitea.risky.info/risky-info/gossiper/templates"
 )
 
 type (

@@ -10,7 +10,7 @@ import (
 	"github.com/eko/gocache/lib/v4/marshaler"
 	libstore "github.com/eko/gocache/lib/v4/store"
 	redisstore "github.com/eko/gocache/store/redis/v4"
-	"github.com/mikestefanello/pagoda/config"
+	"gitea.risky.info/risky-info/gossiper/config"
 	"github.com/redis/go-redis/v9"
 )
 

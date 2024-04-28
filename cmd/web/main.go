@@ -9,8 +9,8 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/mikestefanello/pagoda/pkg/routes"
-	"github.com/mikestefanello/pagoda/pkg/services"
+	"gitea.risky.info/risky-info/gossiper/pkg/routes"
+	"gitea.risky.info/risky-info/gossiper/pkg/services"
 )
 
 func main() {
