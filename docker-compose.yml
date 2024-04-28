@@ -12,10 +12,10 @@ services:
   web:
     image: gitea.risky.info/risky-info/gossip-web:latest
     ports:
-      - "8090:8080"
+      - "9311:8000"
     environment:
-      PAGODA_CACHE_HOSTNAME: redis
-      PAGODA_DATABASE_HOSTNAME: postgres
+      PAGODA_CACHE_HOSTNAME: cache
+      PAGODA_DATABASE_HOSTNAME: db
     depends_on:
       - cache
       - db
