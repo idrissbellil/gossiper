@@ -43,8 +43,8 @@ steps:
       - sleep 10
       - go test -count=1 -p 1 ./...
     environment:
-      PAGODA_CACHE_HOSTNAME: redis
-      PAGODA_DATABASE_HOSTNAME: postgres
+      GOSSIP_CACHE_HOSTNAME: redis
+      GOSSIP_DATABASE_HOSTNAME: postgres
 
   - name: build-web
     image: plugins/docker
