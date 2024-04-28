@@ -78,12 +78,30 @@ steps:
       branch:
         - main
 
+  - name: copy-compose
+    image: appleboy/drone-scp
+    settings:
+      host: 173.249.23.177
+      username: idriss
+      key:
+        from_secret: DOCKER_DEPLOY_SSH_KEY
+      port: 7777
+      source:
+        - docker-compose.yml
+      target: /tmp/
+      strip_components: 0
+
   - name: deploy
-    image: docker
-    commands:
-      - docker stack deploy --compose-file docker-compose.yml gossip-stack
-    environment:
-      DOCKER_HOST: tcp://173.249.23.177:2376
-    when:
-      branch:
-        - main
+    image: appleboy/drone-ssh
+    settings:
+      host: 173.249.23.177
+      username: idriss
+      key:
+        from_secret: DOCKER_DEPLOY_SSH_KEY
+      port: 7777
+      script:
+        - docker stack deploy -c /tmp/docker-compose.yml gossip-stack
+
+volumes:
+  - name: workspace
+    temp: {}
