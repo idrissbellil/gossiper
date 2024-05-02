@@ -52,7 +52,7 @@ steps:
 # Test, Release & Deploy
 kind: pipeline
 type: docker
-name: default
+name: release-deploy
 
 services:
   - name: redis
