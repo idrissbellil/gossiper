@@ -1,3 +1,5 @@
+# Run the following on push & pull request
+# Test only
 kind: pipeline
 type: docker
 name: default
@@ -9,8 +11,6 @@ trigger:
   event:
     - push
     - pull_request
-  branch:
-    - main
 
 services:
   - name: redis
@@ -46,6 +46,57 @@ steps:
       GOSSIP_CACHE_HOSTNAME: redis
       GOSSIP_DATABASE_HOSTNAME: postgres
 
+
+---
+# Run the following on `promote`
+# Test, Release & Deploy
+kind: pipeline
+type: docker
+name: default
+
+services:
+  - name: redis
+    image: redis:alpine
+    ports:
+      - 6379
+
+  - name: postgres
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: app
+    ports:
+      - 5432
+
+trigger:
+  event:
+  - promote
+  target:
+  - production
+
+clone:
+  disable: true
+
+steps:
+  - name: clone
+    image: alpine/git
+    environment:
+      GIT_ORIGIN_WITH_AUTH:
+        from_secret: GIT_ORIGIN
+    commands:
+    - git clone $GIT_ORIGIN_WITH_AUTH .
+    - git checkout $DRONE_COMMIT
+
+  - name: test
+    image: golang:1.22
+    commands:
+      - sleep 10
+      - go test -count=1 -p 1 ./...
+    environment:
+      GOSSIP_CACHE_HOSTNAME: redis
+      GOSSIP_DATABASE_HOSTNAME: postgres
+
   - name: build-web
     image: plugins/docker
     settings:
@@ -58,9 +109,6 @@ steps:
         from_secret: docker_registry_username
       password:
         from_secret: docker_registry_password
-    when:
-      branch:
-        - main
 
   - name: build-worker
     image: plugins/docker
@@ -74,9 +122,6 @@ steps:
         from_secret: docker_registry_username
       password:
         from_secret: docker_registry_password
-    when:
-      branch:
-        - main
 
   - name: copy-compose
     image: appleboy/drone-scp
