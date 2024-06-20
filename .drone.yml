@@ -106,9 +106,9 @@ steps:
       dockerfile: ./web.dockerfile
       context: .
       username:
-        from_secret: docker_registry_username
+        from_secret: DOCKER_REGISTRY_USERNAME
       password:
-        from_secret: docker_registry_password
+        from_secret: DOCKER_REGISTRY_PASSWORD
 
   - name: build-worker
     image: plugins/docker
@@ -119,9 +119,9 @@ steps:
       dockerfile: ./worker.dockerfile
       context: .
       username:
-        from_secret: docker_registry_username
+        from_secret: DOCKER_REGISTRY_USERNAME
       password:
-        from_secret: docker_registry_password
+        from_secret: DOCKER_REGISTRY_PASSWORD
 
   - name: copy-compose
     image: appleboy/drone-scp
