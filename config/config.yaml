@@ -13,7 +13,7 @@ app:
   name: "Gossip"
   environment: "local"
   # Change this on any live environments
-  encryptionKey: "?E(G+KbPeShVmYq3t6w9z$C&F)J@McQf"
+  encryptionKey: "A,hrAZU}_;cN-}K]e5NcgRtjE}E^[]v~o"
   timeout: "20s"
   passwordToken:
       expiration: "60m"
