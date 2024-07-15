@@ -7,6 +7,7 @@ import (
 
 	"gitea.risky.info/risky-info/gossiper/ent"
 	"gitea.risky.info/risky-info/gossiper/pkg/context"
+	"gitea.risky.info/risky-info/gossiper/pkg/log"
 	"gitea.risky.info/risky-info/gossiper/pkg/msg"
 	"gitea.risky.info/risky-info/gossiper/pkg/services"
 
@@ -20,11 +21,10 @@ func LoadAuthenticatedUser(authClient *services.AuthClient) echo.MiddlewareFunc 
 			u, err := authClient.GetAuthenticatedUser(c)
 			switch err.(type) {
 			case *ent.NotFoundError:
-				c.Logger().Warn("auth user not found")
+				log.Ctx(c).Warn("auth user not found")
 			case services.NotAuthenticatedError:
 			case nil:
 				c.Set(context.AuthenticatedUserKey, u)
-				c.Logger().Infof("auth user loaded in to context: %d", u.ID)
 			default:
 				return echo.NewHTTPError(
 					http.StatusInternalServerError,

@@ -1,30 +1,18 @@
 services:
-  cache:
-    image: "redis:alpine"
   db:
-    # PG 16 is currenly not supported https://github.com/ent/ent/issues/3750
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
-      - POSTGRES_DB=app
+      - POSTGRES_DB=app_test
 
   web:
     image: gitea.risky.info/risky-info/gossip-web:latest
     ports:
       - "9311:8000"
     environment:
-      GOSSIP_CACHE_HOSTNAME: cache
-      GOSSIP_DATABASE_HOSTNAME: db
-    depends_on:
-      - cache
-      - db
-
-  worker:
-    image: gitea.risky.info/risky-info/gossip-worker:latest
-    environment:
-      GOSSIP_CACHE_HOSTNAME: cache
-      GOSSIP_DATABASE_HOSTNAME: db
+      GOSSIP_DATABASE_DRIVER: postgres
+      GOSSIP_DATABASE_TESTCONNECTION: host=postgres port=5432 user=admin dbname=app_test password=admin sslmode=disable
+      GOSSIP_DATABASE_CONNECTION: host=postgres port=5432 user=admin dbname=app_test password=admin sslmode=disable
     depends_on:
       - db
-      - cache

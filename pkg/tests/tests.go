@@ -11,12 +11,12 @@ import (
 	"time"
 
 	"gitea.risky.info/risky-info/gossiper/ent"
+	"gitea.risky.info/risky-info/gossiper/pkg/session"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/gorilla/sessions"
-	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 )
 
@@ -29,8 +29,7 @@ func NewContext(e *echo.Echo, url string) (echo.Context, *httptest.ResponseRecor
 
 // InitSession initializes a session for a given Echo context
 func InitSession(ctx echo.Context) {
-	mw := session.Middleware(sessions.NewCookieStore([]byte("secret")))
-	_ = ExecuteMiddleware(ctx, mw)
+	session.Store(ctx, sessions.NewCookieStore([]byte("secret")))
 }
 
 // ExecuteMiddleware executes a middleware function on a given Echo context
@@ -39,6 +38,21 @@ func ExecuteMiddleware(ctx echo.Context, mw echo.MiddlewareFunc) error {
 		return nil
 	})
 	return handler(ctx)
+}
+
+// ExecuteHandler executes a handler with an optional stack of middleware
+func ExecuteHandler(ctx echo.Context, handler echo.HandlerFunc, mw ...echo.MiddlewareFunc) error {
+	return ExecuteMiddleware(ctx, func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(ctx echo.Context) error {
+			run := handler
+
+			for _, w := range mw {
+				run = w(run)
+			}
+
+			return run(ctx)
+		}
+	})
 }
 
 // AssertHTTPErrorCode asserts an HTTP status code on a given Echo HTTP error

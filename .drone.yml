@@ -13,17 +13,12 @@ trigger:
     - pull_request
 
 services:
-  - name: redis
-    image: redis:alpine
-    ports:
-      - 6379
-
   - name: postgres
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: app
+      POSTGRES_DB: app_test
     ports:
       - 5432
 
@@ -43,8 +38,9 @@ steps:
       - sleep 10
       - go test -count=1 -p 1 ./...
     environment:
-      GOSSIP_CACHE_HOSTNAME: redis
-      GOSSIP_DATABASE_HOSTNAME: postgres
+      GOSSIP_DATABASE_DRIVER: postgres
+      GOSSIP_DATABASE_TESTCONNECTION: host=postgres port=5432 user=admin dbname=app_test password=admin sslmode=disable
+      GOSSIP_DATABASE_CONNECTION: host=postgres port=5432 user=admin dbname=app_test password=admin sslmode=disable
 
 
 ---
@@ -55,13 +51,8 @@ type: docker
 name: release-deploy
 
 services:
-  - name: redis
-    image: redis:alpine
-    ports:
-      - 6379
-
   - name: postgres
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
@@ -94,8 +85,9 @@ steps:
       - sleep 10
       - go test -count=1 -p 1 ./...
     environment:
-      GOSSIP_CACHE_HOSTNAME: redis
-      GOSSIP_DATABASE_HOSTNAME: postgres
+      GOSSIP_DATABASE_DRIVER: postgres
+      GOSSIP_DATABASE_TESTCONNECTION: host=postgres port=5432 user=admin dbname=app_test password=admin sslmode=disable
+      GOSSIP_DATABASE_CONNECTION: host=postgres port=5432 user=admin dbname=app_test password=admin sslmode=disable
 
   - name: build-web
     image: plugins/docker
@@ -104,19 +96,6 @@ steps:
       tags: latest
       registry: gitea.risky.info
       dockerfile: ./web.dockerfile
-      context: .
-      username:
-        from_secret: DOCKER_REGISTRY_USERNAME
-      password:
-        from_secret: DOCKER_REGISTRY_PASSWORD
-
-  - name: build-worker
-    image: plugins/docker
-    settings:
-      repo: gitea.risky.info/risky-info/gossip-worker
-      tags: latest
-      registry: gitea.risky.info
-      dockerfile: ./worker.dockerfile
       context: .
       username:
         from_secret: DOCKER_REGISTRY_USERNAME

@@ -2,8 +2,9 @@ package msg
 
 import (
 	"github.com/gorilla/sessions"
-	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+	"gitea.risky.info/risky-info/gossiper/pkg/log"
+	"gitea.risky.info/risky-info/gossiper/pkg/session"
 )
 
 // Type is a message type
@@ -48,8 +49,8 @@ func Danger(ctx echo.Context, message string) {
 	Set(ctx, TypeDanger, message)
 }
 
-// Set adds a new flash message of a given type into the session storage
-// Errors will logged and not returned
+// Set adds a new flash message of a given type into the session storage.
+// Errors will be logged and not returned.
 func Set(ctx echo.Context, typ Type, message string) {
 	if sess, err := getSession(ctx); err == nil {
 		sess.AddFlash(message, string(typ))
@@ -57,8 +58,8 @@ func Set(ctx echo.Context, typ Type, message string) {
 	}
 }
 
-// Get gets flash messages of a given type from the session storage
-// Errors will logged and not returned
+// Get gets flash messages of a given type from the session storage.
+// Errors will be logged and not returned.
 func Get(ctx echo.Context, typ Type) []string {
 	var msgs []string
 
@@ -77,9 +78,11 @@ func Get(ctx echo.Context, typ Type) []string {
 
 // getSession gets the flash message session
 func getSession(ctx echo.Context) (*sessions.Session, error) {
-	sess, err := session.Get(sessionName, ctx)
+	sess, err := session.Get(ctx, sessionName)
 	if err != nil {
-		ctx.Logger().Errorf("cannot load flash message session: %v", err)
+		log.Ctx(ctx).Error("cannot load flash message session",
+			"error", err,
+		)
 	}
 	return sess, err
 }
@@ -87,6 +90,8 @@ func getSession(ctx echo.Context) (*sessions.Session, error) {
 // save saves the flash message session
 func save(ctx echo.Context, sess *sessions.Session) {
 	if err := sess.Save(ctx.Request(), ctx.Response()); err != nil {
-		ctx.Logger().Errorf("failed to set flash message: %v", err)
+		log.Ctx(ctx).Error("failed to set flash message",
+			"error", err,
+		)
 	}
 }

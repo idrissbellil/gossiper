@@ -1,9 +1,4 @@
 services:
-  cache:
-    image: "redis:alpine"
-    container_name: gossip_cache
-    ports:
-      - "127.0.0.1:6379:6379"
   db:
     # PG 16 is currenly not supported https://github.com/ent/ent/issues/3750
     image: postgres:15-alpine
@@ -13,4 +8,4 @@ services:
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
-      - POSTGRES_DB=app
+      - POSTGRES_DB=app_test

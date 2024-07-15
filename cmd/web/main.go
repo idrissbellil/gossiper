@@ -3,14 +3,17 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
-	"gitea.risky.info/risky-info/gossiper/pkg/routes"
+	"gitea.risky.info/risky-info/gossiper/pkg/handlers"
 	"gitea.risky.info/risky-info/gossiper/pkg/services"
+	"gitea.risky.info/risky-info/gossiper/pkg/tasks"
 )
 
 func main() {
@@ -18,12 +21,14 @@ func main() {
 	c := services.NewContainer()
 	defer func() {
 		if err := c.Shutdown(); err != nil {
-			c.Web.Logger.Fatal(err)
+			log.Fatal(err)
 		}
 	}()
 
 	// Build the router
-	routes.BuildRouter(c)
+	if err := handlers.BuildRouter(c); err != nil {
+		log.Fatalf("failed to build the router: %v", err)
+	}
 
 	// Start the server
 	go func() {
@@ -38,7 +43,7 @@ func main() {
 		if c.Config.HTTP.TLS.Enabled {
 			certs, err := tls.LoadX509KeyPair(c.Config.HTTP.TLS.Certificate, c.Config.HTTP.TLS.Key)
 			if err != nil {
-				c.Web.Logger.Fatalf("cannot load TLS certificate: %v", err)
+				log.Fatalf("cannot load TLS certificate: %v", err)
 			}
 
 			srv.TLSConfig = &tls.Config{
@@ -46,26 +51,27 @@ func main() {
 			}
 		}
 
-		if err := c.Web.StartServer(&srv); err != http.ErrServerClosed {
-			c.Web.Logger.Fatalf("shutting down the server: %v", err)
+		if err := c.Web.StartServer(&srv); errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("shutting down the server: %v", err)
 		}
 	}()
 
-	// Start the scheduler service to queue periodic tasks
-	go func() {
-		if err := c.Tasks.StartScheduler(); err != nil {
-			c.Web.Logger.Fatalf("scheduler shutdown: %v", err)
-		}
-	}()
+	// Register all task queues
+	tasks.Register(c)
 
-	// Wait for interrupt signal to gracefully shutdown the server with a timeout of 10 seconds.
+	// Start the task runner to execute queued tasks
+	ctx, cancel := context.WithCancel(context.Background())
+	go c.Tasks.StartRunner(ctx)
+
+	// Wait for interrupt signal to gracefully shut down the server with a timeout of 10 seconds.
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	signal.Notify(quit, os.Kill)
 	<-quit
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	cancel()
+	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := c.Web.Shutdown(ctx); err != nil {
-		c.Web.Logger.Fatal(err)
+		log.Fatal(err)
 	}
 }

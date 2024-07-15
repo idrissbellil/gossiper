@@ -1,4 +1,4 @@
-package controller
+package page
 
 import (
 	"html/template"
@@ -16,9 +16,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// Page consists of all data that will be used to render a page response for a given controller.
-// While it's not required for a controller to render a Page on a route, this is the common data
-// object that will be passed to the templates, making it easy for all controllers to share
+// Page consists of all data that will be used to render a page response for a given route.
+// While it's not required for a handler to render a Page on a route, this is the common data
+// object that will be passed to the templates, making it easy for all handlers to share
 // functionality both on the back and frontend. The Page can be expanded to include anything else
 // your app wants to support.
 // Methods on this page also then become available in the templates, which can be more useful than
@@ -34,9 +34,6 @@ type Page struct {
 	// Context stores the request context
 	Context echo.Context
 
-	// ToURL is a function to convert a route name and optional route parameters to a URL
-	ToURL func(name string, params ...any) string
-
 	// Path stores the path of the current request
 	Path string
 
@@ -44,13 +41,13 @@ type Page struct {
 	URL string
 
 	// Data stores whatever additional data that needs to be passed to the templates.
-	// This is what the controller uses to pass the content of the page.
+	// This is what the handler uses to pass the content of the page.
 	Data any
 
 	// Form stores a struct that represents a form on the page.
 	// This should be a struct with fields for each form field, using both "form" and "validate" tags
-	// It should also contain a Submission field of type FormSubmission if you wish to have validation
-	// messagesa and markup presented to the user
+	// It should also contain form.FormSubmission if you wish to have validation
+	// messages and markup presented to the user
 	Form any
 
 	// Layout stores the name of the layout base template file which will be used when the page is rendered.
@@ -67,7 +64,7 @@ type Page struct {
 	// IsHome stores whether the requested page is the home page or not
 	IsHome bool
 
-	// IsAuth stores whether or not the user is authenticated
+	// IsAuth stores whether the user is authenticated
 	IsAuth bool
 
 	// AuthUser stores the authenticated user
@@ -100,8 +97,12 @@ type Page struct {
 	// This will only be populated if the request ID middleware is in effect for the given request.
 	RequestID string
 
+	// HTMX provides the ability to interact with the HTMX library
 	HTMX struct {
-		Request  htmx.Request
+		// Request contains the information provided by HTMX about the current request
+		Request htmx.Request
+
+		// Response contains values to pass back to HTMX
 		Response *htmx.Response
 	}
 
@@ -121,11 +122,10 @@ type Page struct {
 	}
 }
 
-// NewPage creates and initiatizes a new Page for a given request context
-func NewPage(ctx echo.Context) Page {
+// New creates and initiatizes a new Page for a given request context
+func New(ctx echo.Context) Page {
 	p := Page{
 		Context:    ctx,
-		ToURL:      ctx.Echo().Reverse,
 		Path:       ctx.Request().URL.Path,
 		URL:        ctx.Request().URL.String(),
 		StatusCode: http.StatusOK,
