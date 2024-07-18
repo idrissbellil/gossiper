@@ -44,13 +44,17 @@ func init() {
 	userDescVerified := userFields[3].Descriptor()
 	// user.DefaultVerified holds the default value on creation for the verified field.
 	user.DefaultVerified = userDescVerified.Default.(bool)
+	// userDescCredit is the schema descriptor for credit field.
+	userDescCredit := userFields[4].Descriptor()
+	// user.DefaultCredit holds the default value on creation for the credit field.
+	user.DefaultCredit = userDescCredit.Default.(float64)
 	// userDescCreatedAt is the schema descriptor for created_at field.
-	userDescCreatedAt := userFields[4].Descriptor()
+	userDescCreatedAt := userFields[5].Descriptor()
 	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
 	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
 }
 
 const (
-	Version = "v0.12.5"                                         // Version of ent codegen.
-	Sum     = "h1:KREM5E4CSoej4zeGa88Ou/gfturAnpUv0mzAjch1sj4=" // Sum of ent codegen.
+	Version = "v0.13.1"                                         // Version of ent codegen.
+	Sum     = "h1:uD8QwN1h6SNphdCCzmkMN3feSUzNnVvV/WIkHKMbzOE=" // Sum of ent codegen.
 )

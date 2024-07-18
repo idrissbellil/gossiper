@@ -75,6 +75,11 @@ func Verified(v bool) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldVerified, v))
 }
 
+// Credit applies equality check predicate on the "credit" field. It's identical to CreditEQ.
+func Credit(v float64) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldCredit, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldCreatedAt, v))
@@ -283,6 +288,46 @@ func VerifiedEQ(v bool) predicate.User {
 // VerifiedNEQ applies the NEQ predicate on the "verified" field.
 func VerifiedNEQ(v bool) predicate.User {
 	return predicate.User(sql.FieldNEQ(FieldVerified, v))
+}
+
+// CreditEQ applies the EQ predicate on the "credit" field.
+func CreditEQ(v float64) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldCredit, v))
+}
+
+// CreditNEQ applies the NEQ predicate on the "credit" field.
+func CreditNEQ(v float64) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldCredit, v))
+}
+
+// CreditIn applies the In predicate on the "credit" field.
+func CreditIn(vs ...float64) predicate.User {
+	return predicate.User(sql.FieldIn(FieldCredit, vs...))
+}
+
+// CreditNotIn applies the NotIn predicate on the "credit" field.
+func CreditNotIn(vs ...float64) predicate.User {
+	return predicate.User(sql.FieldNotIn(FieldCredit, vs...))
+}
+
+// CreditGT applies the GT predicate on the "credit" field.
+func CreditGT(v float64) predicate.User {
+	return predicate.User(sql.FieldGT(FieldCredit, v))
+}
+
+// CreditGTE applies the GTE predicate on the "credit" field.
+func CreditGTE(v float64) predicate.User {
+	return predicate.User(sql.FieldGTE(FieldCredit, v))
+}
+
+// CreditLT applies the LT predicate on the "credit" field.
+func CreditLT(v float64) predicate.User {
+	return predicate.User(sql.FieldLT(FieldCredit, v))
+}
+
+// CreditLTE applies the LTE predicate on the "credit" field.
+func CreditLTE(v float64) predicate.User {
+	return predicate.User(sql.FieldLTE(FieldCredit, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

@@ -53,6 +53,20 @@ func (uc *UserCreate) SetNillableVerified(b *bool) *UserCreate {
 	return uc
 }
 
+// SetCredit sets the "credit" field.
+func (uc *UserCreate) SetCredit(f float64) *UserCreate {
+	uc.mutation.SetCredit(f)
+	return uc
+}
+
+// SetNillableCredit sets the "credit" field if the given value is not nil.
+func (uc *UserCreate) SetNillableCredit(f *float64) *UserCreate {
+	if f != nil {
+		uc.SetCredit(*f)
+	}
+	return uc
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (uc *UserCreate) SetCreatedAt(t time.Time) *UserCreate {
 	uc.mutation.SetCreatedAt(t)
@@ -123,6 +137,10 @@ func (uc *UserCreate) defaults() error {
 		v := user.DefaultVerified
 		uc.mutation.SetVerified(v)
 	}
+	if _, ok := uc.mutation.Credit(); !ok {
+		v := user.DefaultCredit
+		uc.mutation.SetCredit(v)
+	}
 	if _, ok := uc.mutation.CreatedAt(); !ok {
 		if user.DefaultCreatedAt == nil {
 			return fmt.Errorf("ent: uninitialized user.DefaultCreatedAt (forgotten import ent/runtime?)")
@@ -161,6 +179,9 @@ func (uc *UserCreate) check() error {
 	}
 	if _, ok := uc.mutation.Verified(); !ok {
 		return &ValidationError{Name: "verified", err: errors.New(`ent: missing required field "User.verified"`)}
+	}
+	if _, ok := uc.mutation.Credit(); !ok {
+		return &ValidationError{Name: "credit", err: errors.New(`ent: missing required field "User.credit"`)}
 	}
 	if _, ok := uc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "User.created_at"`)}
@@ -206,6 +227,10 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Verified(); ok {
 		_spec.SetField(user.FieldVerified, field.TypeBool, value)
 		_node.Verified = value
+	}
+	if value, ok := uc.mutation.Credit(); ok {
+		_spec.SetField(user.FieldCredit, field.TypeFloat64, value)
+		_node.Credit = value
 	}
 	if value, ok := uc.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)

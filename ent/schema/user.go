@@ -31,6 +31,7 @@ func (User) Fields() []ent.Field {
 			NotEmpty(),
 		field.Bool("verified").
 			Default(false),
+		field.Float("credit").Default(0),
 		field.Time("created_at").
 			Default(time.Now).
 			Immutable(),

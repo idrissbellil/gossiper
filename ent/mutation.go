@@ -486,6 +486,8 @@ type UserMutation struct {
 	email         *string
 	password      *string
 	verified      *bool
+	credit        *float64
+	addcredit     *float64
 	created_at    *time.Time
 	clearedFields map[string]struct{}
 	owner         map[int]struct{}
@@ -738,6 +740,62 @@ func (m *UserMutation) ResetVerified() {
 	m.verified = nil
 }
 
+// SetCredit sets the "credit" field.
+func (m *UserMutation) SetCredit(f float64) {
+	m.credit = &f
+	m.addcredit = nil
+}
+
+// Credit returns the value of the "credit" field in the mutation.
+func (m *UserMutation) Credit() (r float64, exists bool) {
+	v := m.credit
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCredit returns the old "credit" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldCredit(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCredit is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCredit requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCredit: %w", err)
+	}
+	return oldValue.Credit, nil
+}
+
+// AddCredit adds f to the "credit" field.
+func (m *UserMutation) AddCredit(f float64) {
+	if m.addcredit != nil {
+		*m.addcredit += f
+	} else {
+		m.addcredit = &f
+	}
+}
+
+// AddedCredit returns the value that was added to the "credit" field in this mutation.
+func (m *UserMutation) AddedCredit() (r float64, exists bool) {
+	v := m.addcredit
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCredit resets all changes to the "credit" field.
+func (m *UserMutation) ResetCredit() {
+	m.credit = nil
+	m.addcredit = nil
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *UserMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -862,7 +920,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.name != nil {
 		fields = append(fields, user.FieldName)
 	}
@@ -874,6 +932,9 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.verified != nil {
 		fields = append(fields, user.FieldVerified)
+	}
+	if m.credit != nil {
+		fields = append(fields, user.FieldCredit)
 	}
 	if m.created_at != nil {
 		fields = append(fields, user.FieldCreatedAt)
@@ -894,6 +955,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.Password()
 	case user.FieldVerified:
 		return m.Verified()
+	case user.FieldCredit:
+		return m.Credit()
 	case user.FieldCreatedAt:
 		return m.CreatedAt()
 	}
@@ -913,6 +976,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldPassword(ctx)
 	case user.FieldVerified:
 		return m.OldVerified(ctx)
+	case user.FieldCredit:
+		return m.OldCredit(ctx)
 	case user.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	}
@@ -952,6 +1017,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetVerified(v)
 		return nil
+	case user.FieldCredit:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCredit(v)
+		return nil
 	case user.FieldCreatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -966,13 +1038,21 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *UserMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addcredit != nil {
+		fields = append(fields, user.FieldCredit)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *UserMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case user.FieldCredit:
+		return m.AddedCredit()
+	}
 	return nil, false
 }
 
@@ -981,6 +1061,13 @@ func (m *UserMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *UserMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case user.FieldCredit:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCredit(v)
+		return nil
 	}
 	return fmt.Errorf("unknown User numeric field %s", name)
 }
@@ -1019,6 +1106,9 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldVerified:
 		m.ResetVerified()
+		return nil
+	case user.FieldCredit:
+		m.ResetCredit()
 		return nil
 	case user.FieldCreatedAt:
 		m.ResetCreatedAt()

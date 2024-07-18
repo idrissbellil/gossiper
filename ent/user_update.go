@@ -84,6 +84,27 @@ func (uu *UserUpdate) SetNillableVerified(b *bool) *UserUpdate {
 	return uu
 }
 
+// SetCredit sets the "credit" field.
+func (uu *UserUpdate) SetCredit(f float64) *UserUpdate {
+	uu.mutation.ResetCredit()
+	uu.mutation.SetCredit(f)
+	return uu
+}
+
+// SetNillableCredit sets the "credit" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableCredit(f *float64) *UserUpdate {
+	if f != nil {
+		uu.SetCredit(*f)
+	}
+	return uu
+}
+
+// AddCredit adds f to the "credit" field.
+func (uu *UserUpdate) AddCredit(f float64) *UserUpdate {
+	uu.mutation.AddCredit(f)
+	return uu
+}
+
 // AddOwnerIDs adds the "owner" edge to the PasswordToken entity by IDs.
 func (uu *UserUpdate) AddOwnerIDs(ids ...int) *UserUpdate {
 	uu.mutation.AddOwnerIDs(ids...)
@@ -195,6 +216,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.Verified(); ok {
 		_spec.SetField(user.FieldVerified, field.TypeBool, value)
+	}
+	if value, ok := uu.mutation.Credit(); ok {
+		_spec.SetField(user.FieldCredit, field.TypeFloat64, value)
+	}
+	if value, ok := uu.mutation.AddedCredit(); ok {
+		_spec.AddField(user.FieldCredit, field.TypeFloat64, value)
 	}
 	if uu.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -314,6 +341,27 @@ func (uuo *UserUpdateOne) SetNillableVerified(b *bool) *UserUpdateOne {
 	if b != nil {
 		uuo.SetVerified(*b)
 	}
+	return uuo
+}
+
+// SetCredit sets the "credit" field.
+func (uuo *UserUpdateOne) SetCredit(f float64) *UserUpdateOne {
+	uuo.mutation.ResetCredit()
+	uuo.mutation.SetCredit(f)
+	return uuo
+}
+
+// SetNillableCredit sets the "credit" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableCredit(f *float64) *UserUpdateOne {
+	if f != nil {
+		uuo.SetCredit(*f)
+	}
+	return uuo
+}
+
+// AddCredit adds f to the "credit" field.
+func (uuo *UserUpdateOne) AddCredit(f float64) *UserUpdateOne {
+	uuo.mutation.AddCredit(f)
 	return uuo
 }
 
@@ -458,6 +506,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.Verified(); ok {
 		_spec.SetField(user.FieldVerified, field.TypeBool, value)
+	}
+	if value, ok := uuo.mutation.Credit(); ok {
+		_spec.SetField(user.FieldCredit, field.TypeFloat64, value)
+	}
+	if value, ok := uuo.mutation.AddedCredit(); ok {
+		_spec.AddField(user.FieldCredit, field.TypeFloat64, value)
 	}
 	if uuo.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
