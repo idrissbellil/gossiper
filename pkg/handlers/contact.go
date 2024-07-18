@@ -2,12 +2,14 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/go-playground/validator/v10"
-	"github.com/labstack/echo/v4"
+
 	"gitea.risky.info/risky-info/gossiper/pkg/form"
+	"gitea.risky.info/risky-info/gossiper/pkg/middleware"
 	"gitea.risky.info/risky-info/gossiper/pkg/page"
 	"gitea.risky.info/risky-info/gossiper/pkg/services"
 	"gitea.risky.info/risky-info/gossiper/templates"
+	"github.com/go-playground/validator/v10"
+	"github.com/labstack/echo/v4"
 )
 
 const (
@@ -40,8 +42,8 @@ func (h *Contact) Init(c *services.Container) error {
 }
 
 func (h *Contact) Routes(g *echo.Group) {
-	g.GET("/contact", h.Page).Name = routeNameContact
-	g.POST("/contact", h.Submit).Name = routeNameContactSubmit
+	g.GET("/contact", h.Page, middleware.RequireAuthentication()).Name = routeNameContact
+	g.POST("/contact", h.Submit, middleware.RequireAuthentication()).Name = routeNameContactSubmit
 }
 
 func (h *Contact) Page(ctx echo.Context) error {
@@ -73,7 +75,6 @@ func (h *Contact) Submit(ctx echo.Context) error {
 		Subject("Contact form submitted").
 		Body(fmt.Sprintf("The message is: %s", input.Message)).
 		Send(ctx)
-
 	if err != nil {
 		return fail(err, "unable to send email")
 	}

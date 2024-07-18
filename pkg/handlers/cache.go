@@ -2,12 +2,14 @@ package handlers
 
 import (
 	"errors"
-	"github.com/labstack/echo/v4"
+	"time"
+
 	"gitea.risky.info/risky-info/gossiper/pkg/form"
+	"gitea.risky.info/risky-info/gossiper/pkg/middleware"
 	"gitea.risky.info/risky-info/gossiper/pkg/page"
 	"gitea.risky.info/risky-info/gossiper/pkg/services"
 	"gitea.risky.info/risky-info/gossiper/templates"
-	"time"
+	"github.com/labstack/echo/v4"
 )
 
 const (
@@ -38,8 +40,8 @@ func (h *Cache) Init(c *services.Container) error {
 }
 
 func (h *Cache) Routes(g *echo.Group) {
-	g.GET("/cache", h.Page).Name = routeNameCache
-	g.POST("/cache", h.Submit).Name = routeNameCacheSubmit
+	g.GET("/cache", h.Page, middleware.RequireAuthentication()).Name = routeNameCache
+	g.POST("/cache", h.Submit, middleware.RequireAuthentication()).Name = routeNameCacheSubmit
 }
 
 func (h *Cache) Page(ctx echo.Context) error {
@@ -81,7 +83,6 @@ func (h *Cache) Submit(ctx echo.Context) error {
 		Data(input.Value).
 		Expiration(30 * time.Minute).
 		Save(ctx.Request().Context())
-
 	if err != nil {
 		return fail(err, "unable to set cache")
 	}

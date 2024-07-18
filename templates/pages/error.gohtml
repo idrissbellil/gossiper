@@ -2,7 +2,7 @@
     {{if ge .StatusCode 500}}
         <p>Please try again.</p>
     {{else if  or (eq .StatusCode 403) (eq .StatusCode 401)}}
-        <p>You are not authorized to view the requested page.</p>
+        <p>You are not authorized to view the requested page. Please Login first.</p>
     {{else if eq .StatusCode 404}}
         <p>Click {{link (url "home") "here" .Path}} to return home</p>
     {{else}}

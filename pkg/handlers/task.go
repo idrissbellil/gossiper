@@ -2,16 +2,18 @@ package handlers
 
 import (
 	"fmt"
-	"gitea.risky.info/risky-info/gossiper/pkg/msg"
 	"time"
 
-	"github.com/go-playground/validator/v10"
-	"github.com/labstack/echo/v4"
+	"gitea.risky.info/risky-info/gossiper/pkg/middleware"
+	"gitea.risky.info/risky-info/gossiper/pkg/msg"
+
 	"gitea.risky.info/risky-info/gossiper/pkg/form"
 	"gitea.risky.info/risky-info/gossiper/pkg/page"
 	"gitea.risky.info/risky-info/gossiper/pkg/services"
 	"gitea.risky.info/risky-info/gossiper/pkg/tasks"
 	"gitea.risky.info/risky-info/gossiper/templates"
+	"github.com/go-playground/validator/v10"
+	"github.com/labstack/echo/v4"
 )
 
 const (
@@ -43,8 +45,8 @@ func (h *Task) Init(c *services.Container) error {
 }
 
 func (h *Task) Routes(g *echo.Group) {
-	g.GET("/task", h.Page).Name = routeNameTask
-	g.POST("/task", h.Submit).Name = routeNameTaskSubmit
+	g.GET("/task", h.Page, middleware.RequireAuthentication()).Name = routeNameTask
+	g.POST("/task", h.Submit, middleware.RequireAuthentication()).Name = routeNameTaskSubmit
 }
 
 func (h *Task) Page(ctx echo.Context) error {
@@ -76,7 +78,6 @@ func (h *Task) Submit(ctx echo.Context) error {
 	}).
 		Wait(time.Duration(input.Delay) * time.Second).
 		Save()
-
 	if err != nil {
 		return fail(err, "unable to create a task")
 	}

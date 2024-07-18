@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/labstack/echo/v4"
+	"gitea.risky.info/risky-info/gossiper/pkg/middleware"
 	"gitea.risky.info/risky-info/gossiper/pkg/page"
 	"gitea.risky.info/risky-info/gossiper/pkg/services"
 	"gitea.risky.info/risky-info/gossiper/templates"
+	"github.com/labstack/echo/v4"
 )
 
 const routeNameSearch = "search"
@@ -33,7 +34,7 @@ func (h *Search) Init(c *services.Container) error {
 }
 
 func (h *Search) Routes(g *echo.Group) {
-	g.GET("/search", h.Page).Name = routeNameSearch
+	g.GET("/search", h.Page, middleware.RequireAuthentication()).Name = routeNameSearch
 }
 
 func (h *Search) Page(ctx echo.Context) error {

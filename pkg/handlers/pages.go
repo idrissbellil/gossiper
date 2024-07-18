@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"html/template"
 
-	"github.com/labstack/echo/v4"
+	"gitea.risky.info/risky-info/gossiper/pkg/middleware"
 	"gitea.risky.info/risky-info/gossiper/pkg/page"
 	"gitea.risky.info/risky-info/gossiper/pkg/services"
 	"gitea.risky.info/risky-info/gossiper/templates"
+	"github.com/labstack/echo/v4"
 )
 
 const (
@@ -47,8 +48,8 @@ func (h *Pages) Init(c *services.Container) error {
 }
 
 func (h *Pages) Routes(g *echo.Group) {
-	g.GET("/", h.Home).Name = routeNameHome
-	g.GET("/about", h.About).Name = routeNameAbout
+	g.GET("/", h.Home, middleware.RequireAuthentication()).Name = routeNameHome
+	g.GET("/about", h.About, middleware.RequireAuthentication()).Name = routeNameAbout
 }
 
 func (h *Pages) Home(ctx echo.Context) error {
