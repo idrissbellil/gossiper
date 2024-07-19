@@ -23,14 +23,16 @@
             <div class="columns">
                 <div class="column is-2">
                     <aside class="menu" hx-boost="true">
-                        <p class="menu-label">General</p>
-                        <ul class="menu-list">
-                            <li>{{link (url "home") "Dashboard" .Path}}</li>
-                            <li>{{link (url "about") "About" .Path}}</li>
-                            <li>{{link (url "contact") "Contact" .Path}}</li>
-                            <li>{{link (url "cache") "Cache" .Path}}</li>
-                            <li>{{link (url "task") "Task" .Path}}</li>
-                        </ul>
+                        {{- if .IsAuth}}
+                            <p class="menu-label">General</p>
+                            <ul class="menu-list">
+                                <li>{{link (url "home") "Dashboard" .Path}}</li>
+                                <li>{{link (url "about") "About" .Path}}</li>
+                                <li>{{link (url "contact") "Contact" .Path}}</li>
+                                <li>{{link (url "cache") "Cache" .Path}}</li>
+                                <li>{{link (url "task") "Task" .Path}}</li>
+                            </ul>
+                        {{- end}}
 
                         <p class="menu-label">Account</p>
                         <ul class="menu-list">
@@ -38,7 +40,6 @@
                                 <li>{{link (url "logout") "Logout" .Path}}</li>
                             {{- else}}
                                 <li>{{link (url "login") "Login" .Path}}</li>
-                                <li>{{link (url "register") "Register" .Path}}</li>
                                 <li>{{link (url "forgot_password") "Forgot password" .Path}}</li>
                             {{- end}}
                         </ul>
