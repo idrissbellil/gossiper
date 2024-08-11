@@ -134,3 +134,4 @@ steps:
         - docker image prune -f
         - docker compose -f /tmp/docker-compose.yml pull
         - docker stack deploy -c /tmp/docker-compose.yml gossip-stack
+        - docker image prune -f
