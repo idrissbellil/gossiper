@@ -46,3 +46,4 @@ mail:
   user: "admin"
   password: "admin"
   fromAddress: "admin@localhost"
+  skipTlsVerify: false

@@ -1,11 +1,13 @@
 package services
 
 import (
+	"crypto/tls"
 	"errors"
 	"fmt"
 
 	"gitea.risky.info/risky-info/gossiper/config"
 	"gitea.risky.info/risky-info/gossiper/pkg/log"
+	gomail "github.com/go-mail/mail"
 
 	"github.com/labstack/echo/v4"
 )
@@ -75,7 +77,6 @@ func (m *MailClient) send(email *mail, ctx echo.Context) error {
 			Base(email.template).
 			Files(fmt.Sprintf("emails/%s", email.template)).
 			Execute(email.templateData)
-
 		if err != nil {
 			return err
 		}
@@ -90,8 +91,28 @@ func (m *MailClient) send(email *mail, ctx echo.Context) error {
 		)
 		return nil
 	}
+	port := int(m.config.Mail.Port)
+	if port < 0 || port > 65535 {
+		return fmt.Errorf("invalid port number: %d", m.config.Mail.Port)
+	}
+	d := gomail.NewDialer(m.config.Mail.Hostname, port, m.config.Mail.User, m.config.Mail.Password)
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: m.config.Mail.SkipTlsVerify}
 
-	// TODO: Finish based on your mail sender of choice!
+	msg := gomail.NewMessage()
+	msg.SetHeader("From", m.config.Mail.FromAddress)
+	msg.SetHeader("To", email.to)
+	msg.SetHeader("Subject", email.subject)
+	msg.SetBody("text/html", email.body)
+
+	if err := d.DialAndSend(msg); err != nil {
+		return fmt.Errorf("failed to send email: %w", err)
+	}
+
+	log.Ctx(ctx).Info("Email sent successfully",
+		"to", email.to,
+		"subject", email.subject,
+	)
+
 	return nil
 }
 

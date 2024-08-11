@@ -14,5 +14,11 @@ services:
       GOSSIP_DATABASE_DRIVER: postgres
       GOSSIP_DATABASE_TESTCONNECTION: host=db port=5432 user=admin dbname=app_test password=admin sslmode=disable
       GOSSIP_DATABASE_CONNECTION: host=db port=5432 user=admin dbname=app_test password=admin sslmode=disable
+      GOSSIP_MAIL_HOSTNAME: risky.info
+      GOSSIP_MAIL_PORT: 587
+      GOSSIP_MAIL_USER: noreply@risky.info
+      GOSSIP_MAIL_PASSWORD: ${GOSSIP_MAIL_PASSWORD}
+      GOSSIP_MAIL_FROMADDRESS: noreply@risky.info
+      GOSSIP_MAIL_SKIPTLSVERIFY: "true"
     depends_on:
       - db

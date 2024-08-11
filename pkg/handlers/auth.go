@@ -85,8 +85,8 @@ func (h *Auth) Routes(g *echo.Group) {
 	noAuth := g.Group("/user", middleware.RequireNoAuthentication())
 	noAuth.GET("/login", h.LoginPage).Name = routeNameLogin
 	noAuth.POST("/login", h.LoginSubmit).Name = routeNameLoginSubmit
-	// noAuth.GET("/register", h.RegisterPage).Name = routeNameRegister
-	// noAuth.POST("/register", h.RegisterSubmit).Name = routeNameRegisterSubmit
+	noAuth.GET("/register", h.RegisterPage).Name = routeNameRegister
+	noAuth.POST("/register", h.RegisterSubmit).Name = routeNameRegisterSubmit
 	noAuth.GET("/password", h.ForgotPasswordPage).Name = routeNameForgotPassword
 	noAuth.POST("/password", h.ForgotPasswordSubmit).Name = routeNameForgotPasswordSubmit
 

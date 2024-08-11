@@ -117,13 +117,18 @@ steps:
 
   - name: deploy
     image: appleboy/drone-ssh
+    environment:
+      GOSSIP_MAIL_PASSWORD:
+        from_secret: MAIL_PASSWORD
     settings:
       host: 173.249.23.177
       username: idriss
       key:
         from_secret: DOCKER_DEPLOY_SSH_KEY
       port: 7777
+      envs: [GOSSIP_MAIL_PASSWORD]
       script:
+        - export GOSSIP_MAIL_PASSWORD=$GOSSIP_MAIL_PASSWORD
         - docker stack rm gossip-stack
         - docker container prune -f
         - docker image prune -f
