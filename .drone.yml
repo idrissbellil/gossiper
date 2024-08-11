@@ -125,6 +125,6 @@ steps:
       port: 7777
       script:
         - docker stack rm gossip-stack
-        - docker containner prune -f
+        - docker container prune -f
         - docker image prune -f
         - docker stack deploy -c /tmp/docker-compose.yml gossip-stack
