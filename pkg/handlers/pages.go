@@ -93,30 +93,7 @@ func (h *Pages) About(ctx echo.Context) error {
 	// even though you wouldn't normally send markup like this
 	p.Data = aboutData{
 		ShowCacheWarning: true,
-		FrontendTabs: []aboutTab{
-			{
-				Title: "HTMX",
-				Body:  template.HTML(`Completes HTML as a hypertext by providing attributes to AJAXify anything and much more. Visit <a href="https://htmx.org/">htmx.org</a> to learn more.`),
-			},
-			{
-				Title: "Alpine.js",
-				Body:  template.HTML(`Drop-in, Vue-like functionality written directly in your markup. Visit <a href="https://alpinejs.dev/">alpinejs.dev</a> to learn more.`),
-			},
-			{
-				Title: "Bulma",
-				Body:  template.HTML(`Ready-to-use frontend components that you can easily combine to build responsive web interfaces with no JavaScript requirements. Visit <a href="https://bulma.io/">bulma.io</a> to learn more.`),
-			},
-		},
-		BackendTabs: []aboutTab{
-			{
-				Title: "Echo",
-				Body:  template.HTML(`High performance, extensible, minimalist Go web framework. Visit <a href="https://echo.labstack.com/">echo.labstack.com</a> to learn more.`),
-			},
-			{
-				Title: "Ent",
-				Body:  template.HTML(`Simple, yet powerful ORM for modeling and querying data. Visit <a href="https://entgo.io/">entgo.io</a> to learn more.`),
-			},
-		},
+		FrontendTabs:     []aboutTab{},
 	}
 
 	return h.RenderPage(ctx, p)
