@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"gitea.risky.info/risky-info/gossiper/ent/job"
 	"gitea.risky.info/risky-info/gossiper/ent/passwordtoken"
 	"gitea.risky.info/risky-info/gossiper/ent/predicate"
 	"gitea.risky.info/risky-info/gossiper/ent/user"
@@ -105,19 +106,34 @@ func (uu *UserUpdate) AddCredit(f float64) *UserUpdate {
 	return uu
 }
 
-// AddOwnerIDs adds the "owner" edge to the PasswordToken entity by IDs.
-func (uu *UserUpdate) AddOwnerIDs(ids ...int) *UserUpdate {
-	uu.mutation.AddOwnerIDs(ids...)
+// AddAuthtokenIDs adds the "authtokens" edge to the PasswordToken entity by IDs.
+func (uu *UserUpdate) AddAuthtokenIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddAuthtokenIDs(ids...)
 	return uu
 }
 
-// AddOwner adds the "owner" edges to the PasswordToken entity.
-func (uu *UserUpdate) AddOwner(p ...*PasswordToken) *UserUpdate {
+// AddAuthtokens adds the "authtokens" edges to the PasswordToken entity.
+func (uu *UserUpdate) AddAuthtokens(p ...*PasswordToken) *UserUpdate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return uu.AddOwnerIDs(ids...)
+	return uu.AddAuthtokenIDs(ids...)
+}
+
+// AddJobIDs adds the "jobs" edge to the Job entity by IDs.
+func (uu *UserUpdate) AddJobIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddJobIDs(ids...)
+	return uu
+}
+
+// AddJobs adds the "jobs" edges to the Job entity.
+func (uu *UserUpdate) AddJobs(j ...*Job) *UserUpdate {
+	ids := make([]int, len(j))
+	for i := range j {
+		ids[i] = j[i].ID
+	}
+	return uu.AddJobIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -125,25 +141,46 @@ func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
 }
 
-// ClearOwner clears all "owner" edges to the PasswordToken entity.
-func (uu *UserUpdate) ClearOwner() *UserUpdate {
-	uu.mutation.ClearOwner()
+// ClearAuthtokens clears all "authtokens" edges to the PasswordToken entity.
+func (uu *UserUpdate) ClearAuthtokens() *UserUpdate {
+	uu.mutation.ClearAuthtokens()
 	return uu
 }
 
-// RemoveOwnerIDs removes the "owner" edge to PasswordToken entities by IDs.
-func (uu *UserUpdate) RemoveOwnerIDs(ids ...int) *UserUpdate {
-	uu.mutation.RemoveOwnerIDs(ids...)
+// RemoveAuthtokenIDs removes the "authtokens" edge to PasswordToken entities by IDs.
+func (uu *UserUpdate) RemoveAuthtokenIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveAuthtokenIDs(ids...)
 	return uu
 }
 
-// RemoveOwner removes "owner" edges to PasswordToken entities.
-func (uu *UserUpdate) RemoveOwner(p ...*PasswordToken) *UserUpdate {
+// RemoveAuthtokens removes "authtokens" edges to PasswordToken entities.
+func (uu *UserUpdate) RemoveAuthtokens(p ...*PasswordToken) *UserUpdate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return uu.RemoveOwnerIDs(ids...)
+	return uu.RemoveAuthtokenIDs(ids...)
+}
+
+// ClearJobs clears all "jobs" edges to the Job entity.
+func (uu *UserUpdate) ClearJobs() *UserUpdate {
+	uu.mutation.ClearJobs()
+	return uu
+}
+
+// RemoveJobIDs removes the "jobs" edge to Job entities by IDs.
+func (uu *UserUpdate) RemoveJobIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveJobIDs(ids...)
+	return uu
+}
+
+// RemoveJobs removes "jobs" edges to Job entities.
+func (uu *UserUpdate) RemoveJobs(j ...*Job) *UserUpdate {
+	ids := make([]int, len(j))
+	for i := range j {
+		ids[i] = j[i].ID
+	}
+	return uu.RemoveJobIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -223,12 +260,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.AddedCredit(); ok {
 		_spec.AddField(user.FieldCredit, field.TypeFloat64, value)
 	}
-	if uu.mutation.OwnerCleared() {
+	if uu.mutation.AuthtokensCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.OwnerTable,
-			Columns: []string{user.OwnerColumn},
+			Table:   user.AuthtokensTable,
+			Columns: []string{user.AuthtokensColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(passwordtoken.FieldID, field.TypeInt),
@@ -236,12 +273,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedOwnerIDs(); len(nodes) > 0 && !uu.mutation.OwnerCleared() {
+	if nodes := uu.mutation.RemovedAuthtokensIDs(); len(nodes) > 0 && !uu.mutation.AuthtokensCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.OwnerTable,
-			Columns: []string{user.OwnerColumn},
+			Table:   user.AuthtokensTable,
+			Columns: []string{user.AuthtokensColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(passwordtoken.FieldID, field.TypeInt),
@@ -252,15 +289,60 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.OwnerIDs(); len(nodes) > 0 {
+	if nodes := uu.mutation.AuthtokensIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.OwnerTable,
-			Columns: []string{user.OwnerColumn},
+			Table:   user.AuthtokensTable,
+			Columns: []string{user.AuthtokensColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(passwordtoken.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.JobsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.JobsTable,
+			Columns: []string{user.JobsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedJobsIDs(); len(nodes) > 0 && !uu.mutation.JobsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.JobsTable,
+			Columns: []string{user.JobsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.JobsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.JobsTable,
+			Columns: []string{user.JobsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -365,19 +447,34 @@ func (uuo *UserUpdateOne) AddCredit(f float64) *UserUpdateOne {
 	return uuo
 }
 
-// AddOwnerIDs adds the "owner" edge to the PasswordToken entity by IDs.
-func (uuo *UserUpdateOne) AddOwnerIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.AddOwnerIDs(ids...)
+// AddAuthtokenIDs adds the "authtokens" edge to the PasswordToken entity by IDs.
+func (uuo *UserUpdateOne) AddAuthtokenIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddAuthtokenIDs(ids...)
 	return uuo
 }
 
-// AddOwner adds the "owner" edges to the PasswordToken entity.
-func (uuo *UserUpdateOne) AddOwner(p ...*PasswordToken) *UserUpdateOne {
+// AddAuthtokens adds the "authtokens" edges to the PasswordToken entity.
+func (uuo *UserUpdateOne) AddAuthtokens(p ...*PasswordToken) *UserUpdateOne {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return uuo.AddOwnerIDs(ids...)
+	return uuo.AddAuthtokenIDs(ids...)
+}
+
+// AddJobIDs adds the "jobs" edge to the Job entity by IDs.
+func (uuo *UserUpdateOne) AddJobIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddJobIDs(ids...)
+	return uuo
+}
+
+// AddJobs adds the "jobs" edges to the Job entity.
+func (uuo *UserUpdateOne) AddJobs(j ...*Job) *UserUpdateOne {
+	ids := make([]int, len(j))
+	for i := range j {
+		ids[i] = j[i].ID
+	}
+	return uuo.AddJobIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -385,25 +482,46 @@ func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
 }
 
-// ClearOwner clears all "owner" edges to the PasswordToken entity.
-func (uuo *UserUpdateOne) ClearOwner() *UserUpdateOne {
-	uuo.mutation.ClearOwner()
+// ClearAuthtokens clears all "authtokens" edges to the PasswordToken entity.
+func (uuo *UserUpdateOne) ClearAuthtokens() *UserUpdateOne {
+	uuo.mutation.ClearAuthtokens()
 	return uuo
 }
 
-// RemoveOwnerIDs removes the "owner" edge to PasswordToken entities by IDs.
-func (uuo *UserUpdateOne) RemoveOwnerIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.RemoveOwnerIDs(ids...)
+// RemoveAuthtokenIDs removes the "authtokens" edge to PasswordToken entities by IDs.
+func (uuo *UserUpdateOne) RemoveAuthtokenIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveAuthtokenIDs(ids...)
 	return uuo
 }
 
-// RemoveOwner removes "owner" edges to PasswordToken entities.
-func (uuo *UserUpdateOne) RemoveOwner(p ...*PasswordToken) *UserUpdateOne {
+// RemoveAuthtokens removes "authtokens" edges to PasswordToken entities.
+func (uuo *UserUpdateOne) RemoveAuthtokens(p ...*PasswordToken) *UserUpdateOne {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return uuo.RemoveOwnerIDs(ids...)
+	return uuo.RemoveAuthtokenIDs(ids...)
+}
+
+// ClearJobs clears all "jobs" edges to the Job entity.
+func (uuo *UserUpdateOne) ClearJobs() *UserUpdateOne {
+	uuo.mutation.ClearJobs()
+	return uuo
+}
+
+// RemoveJobIDs removes the "jobs" edge to Job entities by IDs.
+func (uuo *UserUpdateOne) RemoveJobIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveJobIDs(ids...)
+	return uuo
+}
+
+// RemoveJobs removes "jobs" edges to Job entities.
+func (uuo *UserUpdateOne) RemoveJobs(j ...*Job) *UserUpdateOne {
+	ids := make([]int, len(j))
+	for i := range j {
+		ids[i] = j[i].ID
+	}
+	return uuo.RemoveJobIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -513,12 +631,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	if value, ok := uuo.mutation.AddedCredit(); ok {
 		_spec.AddField(user.FieldCredit, field.TypeFloat64, value)
 	}
-	if uuo.mutation.OwnerCleared() {
+	if uuo.mutation.AuthtokensCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.OwnerTable,
-			Columns: []string{user.OwnerColumn},
+			Table:   user.AuthtokensTable,
+			Columns: []string{user.AuthtokensColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(passwordtoken.FieldID, field.TypeInt),
@@ -526,12 +644,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedOwnerIDs(); len(nodes) > 0 && !uuo.mutation.OwnerCleared() {
+	if nodes := uuo.mutation.RemovedAuthtokensIDs(); len(nodes) > 0 && !uuo.mutation.AuthtokensCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.OwnerTable,
-			Columns: []string{user.OwnerColumn},
+			Table:   user.AuthtokensTable,
+			Columns: []string{user.AuthtokensColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(passwordtoken.FieldID, field.TypeInt),
@@ -542,15 +660,60 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.OwnerIDs(); len(nodes) > 0 {
+	if nodes := uuo.mutation.AuthtokensIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.OwnerTable,
-			Columns: []string{user.OwnerColumn},
+			Table:   user.AuthtokensTable,
+			Columns: []string{user.AuthtokensColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(passwordtoken.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.JobsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.JobsTable,
+			Columns: []string{user.JobsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedJobsIDs(); len(nodes) > 0 && !uuo.mutation.JobsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.JobsTable,
+			Columns: []string{user.JobsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.JobsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.JobsTable,
+			Columns: []string{user.JobsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

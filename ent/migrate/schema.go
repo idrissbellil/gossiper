@@ -8,6 +8,34 @@ import (
 )
 
 var (
+	// JobsColumns holds the columns for the "jobs" table.
+	JobsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "url", Type: field.TypeString},
+		{Name: "method", Type: field.TypeEnum, Enums: []string{"get", "post"}, Default: "get"},
+		{Name: "headers", Type: field.TypeJSON},
+		{Name: "data", Type: field.TypeString, Nullable: true},
+		{Name: "email", Type: field.TypeString},
+		{Name: "password", Type: field.TypeString},
+		{Name: "smtp_host", Type: field.TypeString, Nullable: true},
+		{Name: "smtp_port", Type: field.TypeInt, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "job_user", Type: field.TypeInt},
+	}
+	// JobsTable holds the schema information for the "jobs" table.
+	JobsTable = &schema.Table{
+		Name:       "jobs",
+		Columns:    JobsColumns,
+		PrimaryKey: []*schema.Column{JobsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "jobs_users_user",
+				Columns:    []*schema.Column{JobsColumns[10]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// PasswordTokensColumns holds the columns for the "password_tokens" table.
 	PasswordTokensColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -47,11 +75,13 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		JobsTable,
 		PasswordTokensTable,
 		UsersTable,
 	}
 )
 
 func init() {
+	JobsTable.ForeignKeys[0].RefTable = UsersTable
 	PasswordTokensTable.ForeignKeys[0].RefTable = UsersTable
 }

@@ -370,21 +370,44 @@ func CreatedAtLTE(v time.Time) predicate.User {
 	return predicate.User(sql.FieldLTE(FieldCreatedAt, v))
 }
 
-// HasOwner applies the HasEdge predicate on the "owner" edge.
-func HasOwner() predicate.User {
+// HasAuthtokens applies the HasEdge predicate on the "authtokens" edge.
+func HasAuthtokens() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, OwnerTable, OwnerColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, AuthtokensTable, AuthtokensColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasOwnerWith applies the HasEdge predicate on the "owner" edge with a given conditions (other predicates).
-func HasOwnerWith(preds ...predicate.PasswordToken) predicate.User {
+// HasAuthtokensWith applies the HasEdge predicate on the "authtokens" edge with a given conditions (other predicates).
+func HasAuthtokensWith(preds ...predicate.PasswordToken) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := newOwnerStep()
+		step := newAuthtokensStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasJobs applies the HasEdge predicate on the "jobs" edge.
+func HasJobs() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, JobsTable, JobsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasJobsWith applies the HasEdge predicate on the "jobs" edge with a given conditions (other predicates).
+func HasJobsWith(preds ...predicate.Job) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newJobsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
