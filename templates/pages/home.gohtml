@@ -23,9 +23,9 @@
     </section>
 
     <section class="section">
-        <h1 class="title">Recent posts</h1>
+        <h1 class="title">Active Jobs</h1>
         <h2 class="subtitle">
-            Below is an example of both paging and AJAX fetching using HTMX
+            Below is the list of active jobs.
         </h2>
     </section>
 {{end}}
@@ -34,12 +34,6 @@
     <div id="posts">
         {{- range .Data}}
             <article class="media">
-                <figure class="media-left">
-                    <p class="image is-64x64">
-                        <img src="{{file "gopher.png"}}" alt="Gopher"/>
-                    </p>
-                </figure>
-                <div class="media-content">
                     <div class="content">
                         <p>
                             <strong>{{.Title}}</strong>
@@ -47,7 +41,6 @@
                             {{.Body}}
                         </p>
                     </div>
-                </div>
             </article>
         {{- end}}
 
@@ -70,13 +63,11 @@
     <div class="block"></div>
     <article class="message is-small is-warning" x-data="{show: true}" x-show="show">
         <div class="message-header">
-            <p>Serving files</p>
+            <p>Jobs Review</p>
             <button class="delete is-small" aria-label="delete" @click="show = false"></button>
         </div>
         <div class="message-body">
-            In the example posts above, check how the file URL contains a cache-buster query parameter which changes only when the app is restarted.
-            Static files also contain cache-control headers which are configured via middleware.
-            You can also use AlpineJS to dismiss this message.
+            Review the saved jobs and make sure to keep them updated.
         </div>
     </article>
 {{end}}
