@@ -32,31 +32,148 @@
 
 {{define "posts"}}
     <div id="posts">
+        <table class="table is-fullwidth is-striped is-narrow is-hoverable">
+        <thead>
+            <tr class="has-text-centered">
+                <th>Email</th>
+                <th>URL</th>
+                <th style="width: 50px;">Method</th>
+                <th style="width: 50px;"></th>
+                <th style="width: 50px;"></th>
+            </tr>
+        </thead>
+        <tbody>
         {{- range .Data}}
-            <article class="media">
-                    <div class="content">
-                        <p>
-                            <strong>{{.Title}}</strong>
-                            <br>
-                            {{.Body}}
-                        </p>
+            <tr>
+                <td>{{ .Email }}</td>
+                <td>{{ .URL }}</td>
+                <td>{{ .Method }}</td>
+                <td>
+                    <button class="button is-danger is-small" hx-delete="/jobs/{{ .ID }}" hx-target="#posts">delete</button>
+                    </td>
+                    <td>
+                        <div class="insert" x-data="{modal:false}">
+                            <button @click="modal = true" class="button is-link is-small">edit</button>
+                        <div class="modal" :class="modal ? 'is-active' : ''" x-show="modal == true">
+                            <div class="modal-background"></div>
+                            <div class="modal-content" @click.away="modal = false;">
+                                <div class="box">
+                                <form hx-put="/jobs/{{ .ID }}" hx-target="#posts">
+                                    <table class="table is-fullwidth">
+                                    <tr>
+                                        <td><label class="label" for="email">Email</label></td>
+                                        <td><input class="input" type="text" id="email" name="email" value="{{ .Email }}" required></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label class="label" for="password">Password</label></td>
+                                        <td><input class="input" type="password" id="password" name="password" value="{{ .Password }}" required></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label class="label" for="host">SMTP Host</label></td>
+                                        <td><input class="input" type="text" id="host" name="host" value="{{ .SMTPHost }}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label class="label" for="port">SMTP Port</label></td>
+                                        <td><input class="input" type="text" id="port" name="port" value="{{ .SMTPPort }}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label class="label" for="url">URL to call</label></td>
+                                        <td><input class="input" type="text" id="url" name="url" required value="{{ .URL }}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label class="label" for="method">HTTP Method</label></td>
+                                        <td><input class="input" type="text" id="port" name="method" default="get" value="{{ .Method }}" required></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label class="label" for="headers">JSON Headers</label></td>
+                                        <td><textarea class="textarea" id="headers" name="headers" value="{{ .Headers }}"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label class="label" for="data">Post Data</label></td>
+                                        <td><textarea class="textarea" id="data" name="data" value="{{ .Data }}"></textarea></td>
+                                    </tr>
+                                    </table>
+                                    <button class="button is-primary">Submit</button>
+                                </form>
+                                </div>
+                            </div>
+                            <button class="modal-close is-large" aria-label="close"></button>
+                        </div>
                     </div>
-            </article>
+                    </td>
+                </td>
+            </tr>
         {{- end}}
+        </tbody>
+        </table>
 
+            {{ template "insert"}}
         <div class="field is-grouped is-grouped-centered">
             {{- if not $.Pager.IsBeginning}}
                 <p class="control">
-                    <button class="button is-primary" hx-swap="outerHTML" hx-get="/?page={{sub $.Pager.Page 1}}" hx-target="#posts">Previous page</button>
+                    <button class="button is-primary" hx-swap="outerHTML" hx-get="/?page={{sub $.Pager.Page 1}}" hx-target="#posts">&lt;</button>
                 </p>
             {{- end}}
             {{- if not $.Pager.IsEnd}}
                 <p class="control">
-                    <button class="button is-primary" hx-swap="outerHTML" hx-get="/?page={{add $.Pager.Page 1}}" hx-target="#posts">Next page</button>
+                    <button class="button is-primary" hx-swap="outerHTML" hx-get="/?page={{add $.Pager.Page 1}}" hx-target="#posts">&gt;</button>
                 </p>
             {{- end}}
         </div>
     </div>
+{{end}}
+
+{{define "insert"}}
+<div class="insert mr-2 mt-1" x-data="{modal:false}">
+    <p class="control">
+        <button @click="modal = true" class="button is-primary">Add New</button>
+    </p>
+    <div class="modal" :class="modal ? 'is-active' : ''" x-show="modal == true">
+        <div class="modal-background"></div>
+        <div class="modal-content" @click.away="modal = false;">
+            <div class="box">
+            <form hx-post="/jobs" hx-target="#posts">
+                <table class="table is-fullwidth">
+                <tr>
+                    <td><label class="label" for="email">Email</label></td>
+                    <td><input class="input" type="text" id="email" name="email" required></td>
+                </tr>
+                <tr>
+                    <td><label class="label" for="password">Password</label></td>
+                    <td><input class="input" type="password" id="password" name="password" required></td>
+                </tr>
+                <tr>
+                    <td><label class="label" for="host">SMTP Host</label></td>
+                    <td><input class="input" type="text" id="host" name="host"></td>
+                </tr>
+                <tr>
+                    <td><label class="label" for="port">SMTP Port</label></td>
+                    <td><input class="input" type="text" id="port" name="port"></td>
+                </tr>
+                <tr>
+                    <td><label class="label" for="url">URL to call</label></td>
+                    <td><input class="input" type="text" id="url" name="url" required></td>
+                </tr>
+                <tr>
+                    <td><label class="label" for="method">HTTP Method</label></td>
+                    <td><input class="input" type="text" id="port" name="method" default="get" required></td>
+                </tr>
+                <tr>
+                    <td><label class="label" for="headers">JSON Headers</label></td>
+                    <td><textarea class="textarea" id="headers" name="headers"></textarea></td>
+                </tr>
+                <tr>
+                    <td><label class="label" for="data">Post Data</label></td>
+                    <td><textarea class="textarea" id="data" name="data"></textarea></td>
+                </tr>
+                </table>
+                <button class="button is-primary">Submit</button>
+            </form>
+            </div>
+        </div>
+        <button class="modal-close is-large" aria-label="close"></button>
+    </div>
+</div>
 {{end}}
 
 {{define "file-msg"}}

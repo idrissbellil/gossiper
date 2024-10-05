@@ -1,9 +1,11 @@
 package handlers
 
 import (
-	"fmt"
+	"context"
 	"html/template"
+	"log"
 
+	"gitea.risky.info/risky-info/gossiper/ent"
 	"gitea.risky.info/risky-info/gossiper/pkg/middleware"
 	"gitea.risky.info/risky-info/gossiper/pkg/page"
 	"gitea.risky.info/risky-info/gossiper/pkg/services"
@@ -49,8 +51,26 @@ func (h *Pages) Init(c *services.Container) error {
 
 func (h *Pages) Routes(g *echo.Group) {
 	g.GET("/", h.Home, middleware.RequireAuthentication()).Name = routeNameHome
+	g.POST("/jobs", h.JobAdd, middleware.RequireAuthentication()).Name = "jobadd"
+	g.PUT("/jobs/:id", h.JobUpdate, middleware.RequireAuthentication()).Name = "jobupdate"
+	g.DELETE("/jobs/:id", h.JobDelete, middleware.RequireAuthentication()).Name = "jobdelete"
 	// Require authentication on the following once the testing is figured out
 	g.GET("/about", h.About).Name = routeNameAbout
+}
+
+func (h *Pages) JobAdd(ctx echo.Context) error {
+	// Add ..
+	return h.Home(ctx)
+}
+
+func (h *Pages) JobDelete(ctx echo.Context) error {
+	// Delete ..
+	return h.Home(ctx)
+}
+
+func (h *Pages) JobUpdate(ctx echo.Context) error {
+	// Update ..
+	return h.Home(ctx)
 }
 
 func (h *Pages) Home(ctx echo.Context) error {
@@ -58,25 +78,30 @@ func (h *Pages) Home(ctx echo.Context) error {
 	p.Layout = templates.LayoutMain
 	p.Name = templates.PageHome
 	p.Metatags.Description = "Welcome to the homepage."
-	p.Metatags.Keywords = []string{"Go", "MVC", "Web", "Software"}
+	p.Metatags.Keywords = []string{"gossip", "email", "api"}
 	p.Pager = page.NewPager(ctx, 4)
-	p.Data = h.fetchPosts(&p.Pager)
+	p.Data = h.fetchPosts(&p.Pager, p.AuthUser)
 
 	return h.RenderPage(ctx, p)
 }
 
 // fetchPosts is an mock example of fetching posts to illustrate how paging works
-func (h *Pages) fetchPosts(pager *page.Pager) []post {
+func (h *Pages) fetchPosts(pager *page.Pager, user *ent.User) []*ent.Job {
 	pager.SetItems(20)
-	posts := make([]post, 20)
 
-	for k := range posts {
-		posts[k] = post{
-			Title: fmt.Sprintf("Post example #%d", k+1),
-			Body:  fmt.Sprintf("Lorem ipsum example #%d ddolor sit amet, consectetur adipiscing elit. Nam elementum vulputate tristique.", k+1),
-		}
+	// Query jobs for the user
+	jobs, err := user.QueryJobs().
+		Order(ent.Desc("created_at")).
+		Limit(pager.ItemsPerPage).
+		Offset(pager.GetOffset()).
+		All(context.Background())
+	if err != nil {
+		// Handle error appropriately in your application
+		log.Printf("Error fetching jobs: %v", err)
+		return []*ent.Job{}
 	}
-	return posts[pager.GetOffset() : pager.GetOffset()+pager.ItemsPerPage]
+
+	return jobs
 }
 
 func (h *Pages) About(ctx echo.Context) error {
