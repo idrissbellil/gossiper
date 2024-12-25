@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"gitea.risky.info/risky-info/gossiper/ent"
+	gocontext "gitea.risky.info/risky-info/gossiper/pkg/context"
 	"gitea.risky.info/risky-info/gossiper/pkg/middleware"
 	"gitea.risky.info/risky-info/gossiper/pkg/page"
 	"gitea.risky.info/risky-info/gossiper/pkg/services"
@@ -59,7 +60,7 @@ func (h *Pages) Routes(g *echo.Group) {
 }
 
 func (h *Pages) JobAdd(ctx echo.Context) error {
-	// Add ..
+	user := ctx.Get(gocontext.AuthenticatedUserKey).(*ent.User)
 	return h.Home(ctx)
 }
 
