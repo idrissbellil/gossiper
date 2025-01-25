@@ -34,25 +34,23 @@ const (
 // JobMutation represents an operation that mutates the Job nodes in the graph.
 type JobMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	url           *string
-	method        *job.Method
-	headers       *map[string]string
-	data          *string
-	email         *string
-	password      *string
-	smtp_host     *string
-	smtp_port     *int
-	addsmtp_port  *int
-	created_at    *time.Time
-	clearedFields map[string]struct{}
-	user          *int
-	cleareduser   bool
-	done          bool
-	oldValue      func(context.Context) (*Job, error)
-	predicates    []predicate.Job
+	op               Op
+	typ              string
+	id               *int
+	email            *string
+	from_regex       *string
+	url              *string
+	method           *job.Method
+	headers          *map[string]string
+	payload_template *string
+	is_active        *bool
+	created_at       *time.Time
+	clearedFields    map[string]struct{}
+	user             *int
+	cleareduser      bool
+	done             bool
+	oldValue         func(context.Context) (*Job, error)
+	predicates       []predicate.Job
 }
 
 var _ ent.Mutation = (*JobMutation)(nil)
@@ -151,6 +149,78 @@ func (m *JobMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetEmail sets the "email" field.
+func (m *JobMutation) SetEmail(s string) {
+	m.email = &s
+}
+
+// Email returns the value of the "email" field in the mutation.
+func (m *JobMutation) Email() (r string, exists bool) {
+	v := m.email
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEmail returns the old "email" field's value of the Job entity.
+// If the Job object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *JobMutation) OldEmail(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEmail is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEmail requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEmail: %w", err)
+	}
+	return oldValue.Email, nil
+}
+
+// ResetEmail resets all changes to the "email" field.
+func (m *JobMutation) ResetEmail() {
+	m.email = nil
+}
+
+// SetFromRegex sets the "from_regex" field.
+func (m *JobMutation) SetFromRegex(s string) {
+	m.from_regex = &s
+}
+
+// FromRegex returns the value of the "from_regex" field in the mutation.
+func (m *JobMutation) FromRegex() (r string, exists bool) {
+	v := m.from_regex
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFromRegex returns the old "from_regex" field's value of the Job entity.
+// If the Job object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *JobMutation) OldFromRegex(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFromRegex is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFromRegex requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFromRegex: %w", err)
+	}
+	return oldValue.FromRegex, nil
+}
+
+// ResetFromRegex resets all changes to the "from_regex" field.
+func (m *JobMutation) ResetFromRegex() {
+	m.from_regex = nil
 }
 
 // SetURL sets the "url" field.
@@ -256,249 +326,107 @@ func (m *JobMutation) OldHeaders(ctx context.Context) (v map[string]string, err 
 	return oldValue.Headers, nil
 }
 
+// ClearHeaders clears the value of the "headers" field.
+func (m *JobMutation) ClearHeaders() {
+	m.headers = nil
+	m.clearedFields[job.FieldHeaders] = struct{}{}
+}
+
+// HeadersCleared returns if the "headers" field was cleared in this mutation.
+func (m *JobMutation) HeadersCleared() bool {
+	_, ok := m.clearedFields[job.FieldHeaders]
+	return ok
+}
+
 // ResetHeaders resets all changes to the "headers" field.
 func (m *JobMutation) ResetHeaders() {
 	m.headers = nil
+	delete(m.clearedFields, job.FieldHeaders)
 }
 
-// SetData sets the "data" field.
-func (m *JobMutation) SetData(s string) {
-	m.data = &s
+// SetPayloadTemplate sets the "payload_template" field.
+func (m *JobMutation) SetPayloadTemplate(s string) {
+	m.payload_template = &s
 }
 
-// Data returns the value of the "data" field in the mutation.
-func (m *JobMutation) Data() (r string, exists bool) {
-	v := m.data
+// PayloadTemplate returns the value of the "payload_template" field in the mutation.
+func (m *JobMutation) PayloadTemplate() (r string, exists bool) {
+	v := m.payload_template
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldData returns the old "data" field's value of the Job entity.
+// OldPayloadTemplate returns the old "payload_template" field's value of the Job entity.
 // If the Job object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *JobMutation) OldData(ctx context.Context) (v string, err error) {
+func (m *JobMutation) OldPayloadTemplate(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldData is only allowed on UpdateOne operations")
+		return v, errors.New("OldPayloadTemplate is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldData requires an ID field in the mutation")
+		return v, errors.New("OldPayloadTemplate requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldData: %w", err)
+		return v, fmt.Errorf("querying old value for OldPayloadTemplate: %w", err)
 	}
-	return oldValue.Data, nil
+	return oldValue.PayloadTemplate, nil
 }
 
-// ClearData clears the value of the "data" field.
-func (m *JobMutation) ClearData() {
-	m.data = nil
-	m.clearedFields[job.FieldData] = struct{}{}
+// ClearPayloadTemplate clears the value of the "payload_template" field.
+func (m *JobMutation) ClearPayloadTemplate() {
+	m.payload_template = nil
+	m.clearedFields[job.FieldPayloadTemplate] = struct{}{}
 }
 
-// DataCleared returns if the "data" field was cleared in this mutation.
-func (m *JobMutation) DataCleared() bool {
-	_, ok := m.clearedFields[job.FieldData]
+// PayloadTemplateCleared returns if the "payload_template" field was cleared in this mutation.
+func (m *JobMutation) PayloadTemplateCleared() bool {
+	_, ok := m.clearedFields[job.FieldPayloadTemplate]
 	return ok
 }
 
-// ResetData resets all changes to the "data" field.
-func (m *JobMutation) ResetData() {
-	m.data = nil
-	delete(m.clearedFields, job.FieldData)
+// ResetPayloadTemplate resets all changes to the "payload_template" field.
+func (m *JobMutation) ResetPayloadTemplate() {
+	m.payload_template = nil
+	delete(m.clearedFields, job.FieldPayloadTemplate)
 }
 
-// SetEmail sets the "email" field.
-func (m *JobMutation) SetEmail(s string) {
-	m.email = &s
+// SetIsActive sets the "is_active" field.
+func (m *JobMutation) SetIsActive(b bool) {
+	m.is_active = &b
 }
 
-// Email returns the value of the "email" field in the mutation.
-func (m *JobMutation) Email() (r string, exists bool) {
-	v := m.email
+// IsActive returns the value of the "is_active" field in the mutation.
+func (m *JobMutation) IsActive() (r bool, exists bool) {
+	v := m.is_active
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldEmail returns the old "email" field's value of the Job entity.
+// OldIsActive returns the old "is_active" field's value of the Job entity.
 // If the Job object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *JobMutation) OldEmail(ctx context.Context) (v string, err error) {
+func (m *JobMutation) OldIsActive(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEmail is only allowed on UpdateOne operations")
+		return v, errors.New("OldIsActive is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEmail requires an ID field in the mutation")
+		return v, errors.New("OldIsActive requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEmail: %w", err)
+		return v, fmt.Errorf("querying old value for OldIsActive: %w", err)
 	}
-	return oldValue.Email, nil
+	return oldValue.IsActive, nil
 }
 
-// ResetEmail resets all changes to the "email" field.
-func (m *JobMutation) ResetEmail() {
-	m.email = nil
-}
-
-// SetPassword sets the "password" field.
-func (m *JobMutation) SetPassword(s string) {
-	m.password = &s
-}
-
-// Password returns the value of the "password" field in the mutation.
-func (m *JobMutation) Password() (r string, exists bool) {
-	v := m.password
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPassword returns the old "password" field's value of the Job entity.
-// If the Job object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *JobMutation) OldPassword(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPassword is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPassword requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPassword: %w", err)
-	}
-	return oldValue.Password, nil
-}
-
-// ResetPassword resets all changes to the "password" field.
-func (m *JobMutation) ResetPassword() {
-	m.password = nil
-}
-
-// SetSMTPHost sets the "smtp_host" field.
-func (m *JobMutation) SetSMTPHost(s string) {
-	m.smtp_host = &s
-}
-
-// SMTPHost returns the value of the "smtp_host" field in the mutation.
-func (m *JobMutation) SMTPHost() (r string, exists bool) {
-	v := m.smtp_host
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSMTPHost returns the old "smtp_host" field's value of the Job entity.
-// If the Job object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *JobMutation) OldSMTPHost(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSMTPHost is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSMTPHost requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSMTPHost: %w", err)
-	}
-	return oldValue.SMTPHost, nil
-}
-
-// ClearSMTPHost clears the value of the "smtp_host" field.
-func (m *JobMutation) ClearSMTPHost() {
-	m.smtp_host = nil
-	m.clearedFields[job.FieldSMTPHost] = struct{}{}
-}
-
-// SMTPHostCleared returns if the "smtp_host" field was cleared in this mutation.
-func (m *JobMutation) SMTPHostCleared() bool {
-	_, ok := m.clearedFields[job.FieldSMTPHost]
-	return ok
-}
-
-// ResetSMTPHost resets all changes to the "smtp_host" field.
-func (m *JobMutation) ResetSMTPHost() {
-	m.smtp_host = nil
-	delete(m.clearedFields, job.FieldSMTPHost)
-}
-
-// SetSMTPPort sets the "smtp_port" field.
-func (m *JobMutation) SetSMTPPort(i int) {
-	m.smtp_port = &i
-	m.addsmtp_port = nil
-}
-
-// SMTPPort returns the value of the "smtp_port" field in the mutation.
-func (m *JobMutation) SMTPPort() (r int, exists bool) {
-	v := m.smtp_port
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSMTPPort returns the old "smtp_port" field's value of the Job entity.
-// If the Job object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *JobMutation) OldSMTPPort(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSMTPPort is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSMTPPort requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSMTPPort: %w", err)
-	}
-	return oldValue.SMTPPort, nil
-}
-
-// AddSMTPPort adds i to the "smtp_port" field.
-func (m *JobMutation) AddSMTPPort(i int) {
-	if m.addsmtp_port != nil {
-		*m.addsmtp_port += i
-	} else {
-		m.addsmtp_port = &i
-	}
-}
-
-// AddedSMTPPort returns the value that was added to the "smtp_port" field in this mutation.
-func (m *JobMutation) AddedSMTPPort() (r int, exists bool) {
-	v := m.addsmtp_port
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearSMTPPort clears the value of the "smtp_port" field.
-func (m *JobMutation) ClearSMTPPort() {
-	m.smtp_port = nil
-	m.addsmtp_port = nil
-	m.clearedFields[job.FieldSMTPPort] = struct{}{}
-}
-
-// SMTPPortCleared returns if the "smtp_port" field was cleared in this mutation.
-func (m *JobMutation) SMTPPortCleared() bool {
-	_, ok := m.clearedFields[job.FieldSMTPPort]
-	return ok
-}
-
-// ResetSMTPPort resets all changes to the "smtp_port" field.
-func (m *JobMutation) ResetSMTPPort() {
-	m.smtp_port = nil
-	m.addsmtp_port = nil
-	delete(m.clearedFields, job.FieldSMTPPort)
+// ResetIsActive resets all changes to the "is_active" field.
+func (m *JobMutation) ResetIsActive() {
+	m.is_active = nil
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -610,7 +538,13 @@ func (m *JobMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *JobMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 8)
+	if m.email != nil {
+		fields = append(fields, job.FieldEmail)
+	}
+	if m.from_regex != nil {
+		fields = append(fields, job.FieldFromRegex)
+	}
 	if m.url != nil {
 		fields = append(fields, job.FieldURL)
 	}
@@ -620,20 +554,11 @@ func (m *JobMutation) Fields() []string {
 	if m.headers != nil {
 		fields = append(fields, job.FieldHeaders)
 	}
-	if m.data != nil {
-		fields = append(fields, job.FieldData)
+	if m.payload_template != nil {
+		fields = append(fields, job.FieldPayloadTemplate)
 	}
-	if m.email != nil {
-		fields = append(fields, job.FieldEmail)
-	}
-	if m.password != nil {
-		fields = append(fields, job.FieldPassword)
-	}
-	if m.smtp_host != nil {
-		fields = append(fields, job.FieldSMTPHost)
-	}
-	if m.smtp_port != nil {
-		fields = append(fields, job.FieldSMTPPort)
+	if m.is_active != nil {
+		fields = append(fields, job.FieldIsActive)
 	}
 	if m.created_at != nil {
 		fields = append(fields, job.FieldCreatedAt)
@@ -646,22 +571,20 @@ func (m *JobMutation) Fields() []string {
 // schema.
 func (m *JobMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case job.FieldEmail:
+		return m.Email()
+	case job.FieldFromRegex:
+		return m.FromRegex()
 	case job.FieldURL:
 		return m.URL()
 	case job.FieldMethod:
 		return m.Method()
 	case job.FieldHeaders:
 		return m.Headers()
-	case job.FieldData:
-		return m.Data()
-	case job.FieldEmail:
-		return m.Email()
-	case job.FieldPassword:
-		return m.Password()
-	case job.FieldSMTPHost:
-		return m.SMTPHost()
-	case job.FieldSMTPPort:
-		return m.SMTPPort()
+	case job.FieldPayloadTemplate:
+		return m.PayloadTemplate()
+	case job.FieldIsActive:
+		return m.IsActive()
 	case job.FieldCreatedAt:
 		return m.CreatedAt()
 	}
@@ -673,22 +596,20 @@ func (m *JobMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *JobMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case job.FieldEmail:
+		return m.OldEmail(ctx)
+	case job.FieldFromRegex:
+		return m.OldFromRegex(ctx)
 	case job.FieldURL:
 		return m.OldURL(ctx)
 	case job.FieldMethod:
 		return m.OldMethod(ctx)
 	case job.FieldHeaders:
 		return m.OldHeaders(ctx)
-	case job.FieldData:
-		return m.OldData(ctx)
-	case job.FieldEmail:
-		return m.OldEmail(ctx)
-	case job.FieldPassword:
-		return m.OldPassword(ctx)
-	case job.FieldSMTPHost:
-		return m.OldSMTPHost(ctx)
-	case job.FieldSMTPPort:
-		return m.OldSMTPPort(ctx)
+	case job.FieldPayloadTemplate:
+		return m.OldPayloadTemplate(ctx)
+	case job.FieldIsActive:
+		return m.OldIsActive(ctx)
 	case job.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	}
@@ -700,6 +621,20 @@ func (m *JobMutation) OldField(ctx context.Context, name string) (ent.Value, err
 // type.
 func (m *JobMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case job.FieldEmail:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEmail(v)
+		return nil
+	case job.FieldFromRegex:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFromRegex(v)
+		return nil
 	case job.FieldURL:
 		v, ok := value.(string)
 		if !ok {
@@ -721,40 +656,19 @@ func (m *JobMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetHeaders(v)
 		return nil
-	case job.FieldData:
+	case job.FieldPayloadTemplate:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetData(v)
+		m.SetPayloadTemplate(v)
 		return nil
-	case job.FieldEmail:
-		v, ok := value.(string)
+	case job.FieldIsActive:
+		v, ok := value.(bool)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetEmail(v)
-		return nil
-	case job.FieldPassword:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPassword(v)
-		return nil
-	case job.FieldSMTPHost:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSMTPHost(v)
-		return nil
-	case job.FieldSMTPPort:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSMTPPort(v)
+		m.SetIsActive(v)
 		return nil
 	case job.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -770,21 +684,13 @@ func (m *JobMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *JobMutation) AddedFields() []string {
-	var fields []string
-	if m.addsmtp_port != nil {
-		fields = append(fields, job.FieldSMTPPort)
-	}
-	return fields
+	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *JobMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case job.FieldSMTPPort:
-		return m.AddedSMTPPort()
-	}
 	return nil, false
 }
 
@@ -793,13 +699,6 @@ func (m *JobMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *JobMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case job.FieldSMTPPort:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddSMTPPort(v)
-		return nil
 	}
 	return fmt.Errorf("unknown Job numeric field %s", name)
 }
@@ -808,14 +707,11 @@ func (m *JobMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *JobMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(job.FieldData) {
-		fields = append(fields, job.FieldData)
+	if m.FieldCleared(job.FieldHeaders) {
+		fields = append(fields, job.FieldHeaders)
 	}
-	if m.FieldCleared(job.FieldSMTPHost) {
-		fields = append(fields, job.FieldSMTPHost)
-	}
-	if m.FieldCleared(job.FieldSMTPPort) {
-		fields = append(fields, job.FieldSMTPPort)
+	if m.FieldCleared(job.FieldPayloadTemplate) {
+		fields = append(fields, job.FieldPayloadTemplate)
 	}
 	return fields
 }
@@ -831,14 +727,11 @@ func (m *JobMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *JobMutation) ClearField(name string) error {
 	switch name {
-	case job.FieldData:
-		m.ClearData()
+	case job.FieldHeaders:
+		m.ClearHeaders()
 		return nil
-	case job.FieldSMTPHost:
-		m.ClearSMTPHost()
-		return nil
-	case job.FieldSMTPPort:
-		m.ClearSMTPPort()
+	case job.FieldPayloadTemplate:
+		m.ClearPayloadTemplate()
 		return nil
 	}
 	return fmt.Errorf("unknown Job nullable field %s", name)
@@ -848,6 +741,12 @@ func (m *JobMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *JobMutation) ResetField(name string) error {
 	switch name {
+	case job.FieldEmail:
+		m.ResetEmail()
+		return nil
+	case job.FieldFromRegex:
+		m.ResetFromRegex()
+		return nil
 	case job.FieldURL:
 		m.ResetURL()
 		return nil
@@ -857,20 +756,11 @@ func (m *JobMutation) ResetField(name string) error {
 	case job.FieldHeaders:
 		m.ResetHeaders()
 		return nil
-	case job.FieldData:
-		m.ResetData()
+	case job.FieldPayloadTemplate:
+		m.ResetPayloadTemplate()
 		return nil
-	case job.FieldEmail:
-		m.ResetEmail()
-		return nil
-	case job.FieldPassword:
-		m.ResetPassword()
-		return nil
-	case job.FieldSMTPHost:
-		m.ResetSMTPHost()
-		return nil
-	case job.FieldSMTPPort:
-		m.ResetSMTPPort()
+	case job.FieldIsActive:
+		m.ResetIsActive()
 		return nil
 	case job.FieldCreatedAt:
 		m.ResetCreatedAt()

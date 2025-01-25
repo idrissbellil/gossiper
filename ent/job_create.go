@@ -21,6 +21,26 @@ type JobCreate struct {
 	hooks    []Hook
 }
 
+// SetEmail sets the "email" field.
+func (jc *JobCreate) SetEmail(s string) *JobCreate {
+	jc.mutation.SetEmail(s)
+	return jc
+}
+
+// SetFromRegex sets the "from_regex" field.
+func (jc *JobCreate) SetFromRegex(s string) *JobCreate {
+	jc.mutation.SetFromRegex(s)
+	return jc
+}
+
+// SetNillableFromRegex sets the "from_regex" field if the given value is not nil.
+func (jc *JobCreate) SetNillableFromRegex(s *string) *JobCreate {
+	if s != nil {
+		jc.SetFromRegex(*s)
+	}
+	return jc
+}
+
 // SetURL sets the "url" field.
 func (jc *JobCreate) SetURL(s string) *JobCreate {
 	jc.mutation.SetURL(s)
@@ -47,56 +67,30 @@ func (jc *JobCreate) SetHeaders(m map[string]string) *JobCreate {
 	return jc
 }
 
-// SetData sets the "data" field.
-func (jc *JobCreate) SetData(s string) *JobCreate {
-	jc.mutation.SetData(s)
+// SetPayloadTemplate sets the "payload_template" field.
+func (jc *JobCreate) SetPayloadTemplate(s string) *JobCreate {
+	jc.mutation.SetPayloadTemplate(s)
 	return jc
 }
 
-// SetNillableData sets the "data" field if the given value is not nil.
-func (jc *JobCreate) SetNillableData(s *string) *JobCreate {
+// SetNillablePayloadTemplate sets the "payload_template" field if the given value is not nil.
+func (jc *JobCreate) SetNillablePayloadTemplate(s *string) *JobCreate {
 	if s != nil {
-		jc.SetData(*s)
+		jc.SetPayloadTemplate(*s)
 	}
 	return jc
 }
 
-// SetEmail sets the "email" field.
-func (jc *JobCreate) SetEmail(s string) *JobCreate {
-	jc.mutation.SetEmail(s)
+// SetIsActive sets the "is_active" field.
+func (jc *JobCreate) SetIsActive(b bool) *JobCreate {
+	jc.mutation.SetIsActive(b)
 	return jc
 }
 
-// SetPassword sets the "password" field.
-func (jc *JobCreate) SetPassword(s string) *JobCreate {
-	jc.mutation.SetPassword(s)
-	return jc
-}
-
-// SetSMTPHost sets the "smtp_host" field.
-func (jc *JobCreate) SetSMTPHost(s string) *JobCreate {
-	jc.mutation.SetSMTPHost(s)
-	return jc
-}
-
-// SetNillableSMTPHost sets the "smtp_host" field if the given value is not nil.
-func (jc *JobCreate) SetNillableSMTPHost(s *string) *JobCreate {
-	if s != nil {
-		jc.SetSMTPHost(*s)
-	}
-	return jc
-}
-
-// SetSMTPPort sets the "smtp_port" field.
-func (jc *JobCreate) SetSMTPPort(i int) *JobCreate {
-	jc.mutation.SetSMTPPort(i)
-	return jc
-}
-
-// SetNillableSMTPPort sets the "smtp_port" field if the given value is not nil.
-func (jc *JobCreate) SetNillableSMTPPort(i *int) *JobCreate {
-	if i != nil {
-		jc.SetSMTPPort(*i)
+// SetNillableIsActive sets the "is_active" field if the given value is not nil.
+func (jc *JobCreate) SetNillableIsActive(b *bool) *JobCreate {
+	if b != nil {
+		jc.SetIsActive(*b)
 	}
 	return jc
 }
@@ -161,9 +155,17 @@ func (jc *JobCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (jc *JobCreate) defaults() {
+	if _, ok := jc.mutation.FromRegex(); !ok {
+		v := job.DefaultFromRegex
+		jc.mutation.SetFromRegex(v)
+	}
 	if _, ok := jc.mutation.Method(); !ok {
 		v := job.DefaultMethod
 		jc.mutation.SetMethod(v)
+	}
+	if _, ok := jc.mutation.IsActive(); !ok {
+		v := job.DefaultIsActive
+		jc.mutation.SetIsActive(v)
 	}
 	if _, ok := jc.mutation.CreatedAt(); !ok {
 		v := job.DefaultCreatedAt()
@@ -173,6 +175,17 @@ func (jc *JobCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (jc *JobCreate) check() error {
+	if _, ok := jc.mutation.Email(); !ok {
+		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "Job.email"`)}
+	}
+	if v, ok := jc.mutation.Email(); ok {
+		if err := job.EmailValidator(v); err != nil {
+			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Job.email": %w`, err)}
+		}
+	}
+	if _, ok := jc.mutation.FromRegex(); !ok {
+		return &ValidationError{Name: "from_regex", err: errors.New(`ent: missing required field "Job.from_regex"`)}
+	}
 	if _, ok := jc.mutation.URL(); !ok {
 		return &ValidationError{Name: "url", err: errors.New(`ent: missing required field "Job.url"`)}
 	}
@@ -189,24 +202,8 @@ func (jc *JobCreate) check() error {
 			return &ValidationError{Name: "method", err: fmt.Errorf(`ent: validator failed for field "Job.method": %w`, err)}
 		}
 	}
-	if _, ok := jc.mutation.Headers(); !ok {
-		return &ValidationError{Name: "headers", err: errors.New(`ent: missing required field "Job.headers"`)}
-	}
-	if _, ok := jc.mutation.Email(); !ok {
-		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "Job.email"`)}
-	}
-	if v, ok := jc.mutation.Email(); ok {
-		if err := job.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Job.email": %w`, err)}
-		}
-	}
-	if _, ok := jc.mutation.Password(); !ok {
-		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "Job.password"`)}
-	}
-	if v, ok := jc.mutation.Password(); ok {
-		if err := job.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Job.password": %w`, err)}
-		}
+	if _, ok := jc.mutation.IsActive(); !ok {
+		return &ValidationError{Name: "is_active", err: errors.New(`ent: missing required field "Job.is_active"`)}
 	}
 	if _, ok := jc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Job.created_at"`)}
@@ -240,6 +237,14 @@ func (jc *JobCreate) createSpec() (*Job, *sqlgraph.CreateSpec) {
 		_node = &Job{config: jc.config}
 		_spec = sqlgraph.NewCreateSpec(job.Table, sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt))
 	)
+	if value, ok := jc.mutation.Email(); ok {
+		_spec.SetField(job.FieldEmail, field.TypeString, value)
+		_node.Email = value
+	}
+	if value, ok := jc.mutation.FromRegex(); ok {
+		_spec.SetField(job.FieldFromRegex, field.TypeString, value)
+		_node.FromRegex = value
+	}
 	if value, ok := jc.mutation.URL(); ok {
 		_spec.SetField(job.FieldURL, field.TypeString, value)
 		_node.URL = value
@@ -252,25 +257,13 @@ func (jc *JobCreate) createSpec() (*Job, *sqlgraph.CreateSpec) {
 		_spec.SetField(job.FieldHeaders, field.TypeJSON, value)
 		_node.Headers = value
 	}
-	if value, ok := jc.mutation.Data(); ok {
-		_spec.SetField(job.FieldData, field.TypeString, value)
-		_node.Data = value
+	if value, ok := jc.mutation.PayloadTemplate(); ok {
+		_spec.SetField(job.FieldPayloadTemplate, field.TypeString, value)
+		_node.PayloadTemplate = value
 	}
-	if value, ok := jc.mutation.Email(); ok {
-		_spec.SetField(job.FieldEmail, field.TypeString, value)
-		_node.Email = value
-	}
-	if value, ok := jc.mutation.Password(); ok {
-		_spec.SetField(job.FieldPassword, field.TypeString, value)
-		_node.Password = value
-	}
-	if value, ok := jc.mutation.SMTPHost(); ok {
-		_spec.SetField(job.FieldSMTPHost, field.TypeString, value)
-		_node.SMTPHost = value
-	}
-	if value, ok := jc.mutation.SMTPPort(); ok {
-		_spec.SetField(job.FieldSMTPPort, field.TypeInt, value)
-		_node.SMTPPort = value
+	if value, ok := jc.mutation.IsActive(); ok {
+		_spec.SetField(job.FieldIsActive, field.TypeBool, value)
+		_node.IsActive = value
 	}
 	if value, ok := jc.mutation.CreatedAt(); ok {
 		_spec.SetField(job.FieldCreatedAt, field.TypeTime, value)

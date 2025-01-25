@@ -11,6 +11,7 @@ services:
     ports:
       - "9311:8000"
     environment:
+      GOSSIP_HTTP_HOSTNAME: gossip.risky.info
       GOSSIP_APP_ENVIRONMENT: prod
       GOSSIP_DATABASE_DRIVER: postgres
       GOSSIP_DATABASE_TESTCONNECTION: host=db port=5432 user=admin dbname=app_test password=admin sslmode=disable

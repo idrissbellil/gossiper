@@ -2,10 +2,15 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"html/template"
 	"log"
+	"math/rand"
+	"strconv"
 
 	"gitea.risky.info/risky-info/gossiper/ent"
+	"gitea.risky.info/risky-info/gossiper/ent/job"
+	gocontext "gitea.risky.info/risky-info/gossiper/pkg/context"
 	"gitea.risky.info/risky-info/gossiper/pkg/middleware"
 	"gitea.risky.info/risky-info/gossiper/pkg/page"
 	"gitea.risky.info/risky-info/gossiper/pkg/services"
@@ -21,6 +26,7 @@ const (
 type (
 	Pages struct {
 		*services.TemplateRenderer
+		ORM *ent.Client
 	}
 
 	post struct {
@@ -38,6 +44,23 @@ type (
 		Title string
 		Body  template.HTML
 	}
+	jobRead struct {
+		URL       string `json:"url" form:"url"`
+		Method    string `json:"method" form:"method"`
+		Headers   string `json:"headers" form:"headers"`
+		Payload   string `json:"payload" form:"payload"`
+		FromRegex string `json:"from_regex" form:"from_regex"`
+	}
+	inputField struct {
+		Name  string
+		Label string
+		Extra string
+		Type  string
+	}
+	renderData struct {
+		Jobs        []*ent.Job
+		InputFields []inputField
+	}
 )
 
 func init() {
@@ -46,30 +69,69 @@ func init() {
 
 func (h *Pages) Init(c *services.Container) error {
 	h.TemplateRenderer = c.TemplateRenderer
+	h.ORM = c.ORM
 	return nil
 }
 
 func (h *Pages) Routes(g *echo.Group) {
 	g.GET("/", h.Home, middleware.RequireAuthentication()).Name = routeNameHome
 	g.POST("/jobs", h.JobAdd, middleware.RequireAuthentication()).Name = "jobadd"
-	g.PUT("/jobs/:id", h.JobUpdate, middleware.RequireAuthentication()).Name = "jobupdate"
 	g.DELETE("/jobs/:id", h.JobDelete, middleware.RequireAuthentication()).Name = "jobdelete"
 	// Require authentication on the following once the testing is figured out
 	g.GET("/about", h.About).Name = routeNameAbout
 }
 
+func generateRandomEmail() string {
+	const letters = "abcdefghijklmnopqrstuvwxyz0123456789"
+	b := make([]byte, 8)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b) + "@v3m.net"
+}
+
 func (h *Pages) JobAdd(ctx echo.Context) error {
-	// user := ctx.Get(gocontext.AuthenticatedUserKey).(*ent.User)
+	user := ctx.Get(gocontext.AuthenticatedUserKey).(*ent.User)
+	jobRead := jobRead{}
+	if err := ctx.Bind(&jobRead); err != nil {
+		log.Printf("Error loading form data: %v", err)
+		return h.Home(ctx)
+	}
+	var headersMap map[string]string
+	if jobRead.Headers != "" {
+		if err := json.Unmarshal([]byte(jobRead.Headers), &headersMap); err != nil {
+			log.Printf("Error loading headers: %v", err)
+		}
+	}
+	dbJob, err := h.ORM.Job.Create().
+		SetEmail(generateRandomEmail()).
+		SetURL(jobRead.URL).
+		SetMethod(job.Method(jobRead.Method)).
+		SetFromRegex(jobRead.FromRegex).
+		SetUser(user).
+		SetPayloadTemplate(jobRead.Payload).
+		SetHeaders(headersMap).
+		Save(context.Background())
+	if err != nil {
+		log.Printf("Error saving the job %v", err)
+	}
+
+	log.Println(dbJob)
+
 	return h.Home(ctx)
 }
 
 func (h *Pages) JobDelete(ctx echo.Context) error {
-	// Delete ..
-	return h.Home(ctx)
-}
-
-func (h *Pages) JobUpdate(ctx echo.Context) error {
-	// Update ..
+	jobId, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		log.Printf("Error loading job ID: %v", err)
+		return h.Home(ctx)
+	}
+	err = h.ORM.Job.DeleteOneID(jobId).Exec(context.Background())
+	if err != nil {
+		log.Printf("Error deleting ID: %v", err)
+		return h.Home(ctx)
+	}
 	return h.Home(ctx)
 }
 
@@ -80,23 +142,29 @@ func (h *Pages) Home(ctx echo.Context) error {
 	p.Metatags.Description = "Welcome to the homepage."
 	p.Metatags.Keywords = []string{"gossip", "email", "api"}
 	p.Pager = page.NewPager(ctx, 4)
-	p.Data = h.fetchPosts(&p.Pager, p.AuthUser)
 
+	p.Data = renderData{
+		Jobs: h.fetchPosts(&p.Pager, p.AuthUser),
+		InputFields: []inputField{
+			{Name: "url", Label: "URL", Type: "input", Extra: "required"},
+			{Name: "method", Label: "HTTP Method", Type: "input", Extra: ""},
+			{Name: "from_regex", Label: "From Regex", Type: "input", Extra: ""},
+			{Name: "headers", Label: "Headers", Type: "textarea", Extra: ""},
+			{Name: "payload", Label: "Payload", Type: "textarea", Extra: ""},
+		},
+	}
 	return h.RenderPage(ctx, p)
 }
 
-// fetchPosts is an mock example of fetching posts to illustrate how paging works
 func (h *Pages) fetchPosts(pager *page.Pager, user *ent.User) []*ent.Job {
 	pager.SetItems(20)
 
-	// Query jobs for the user
 	jobs, err := user.QueryJobs().
 		Order(ent.Desc("created_at")).
 		Limit(pager.ItemsPerPage).
 		Offset(pager.GetOffset()).
 		All(context.Background())
 	if err != nil {
-		// Handle error appropriately in your application
 		log.Printf("Error fetching jobs: %v", err)
 		return []*ent.Job{}
 	}

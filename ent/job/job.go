@@ -15,22 +15,20 @@ const (
 	Label = "job"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldEmail holds the string denoting the email field in the database.
+	FieldEmail = "email"
+	// FieldFromRegex holds the string denoting the from_regex field in the database.
+	FieldFromRegex = "from_regex"
 	// FieldURL holds the string denoting the url field in the database.
 	FieldURL = "url"
 	// FieldMethod holds the string denoting the method field in the database.
 	FieldMethod = "method"
 	// FieldHeaders holds the string denoting the headers field in the database.
 	FieldHeaders = "headers"
-	// FieldData holds the string denoting the data field in the database.
-	FieldData = "data"
-	// FieldEmail holds the string denoting the email field in the database.
-	FieldEmail = "email"
-	// FieldPassword holds the string denoting the password field in the database.
-	FieldPassword = "password"
-	// FieldSMTPHost holds the string denoting the smtp_host field in the database.
-	FieldSMTPHost = "smtp_host"
-	// FieldSMTPPort holds the string denoting the smtp_port field in the database.
-	FieldSMTPPort = "smtp_port"
+	// FieldPayloadTemplate holds the string denoting the payload_template field in the database.
+	FieldPayloadTemplate = "payload_template"
+	// FieldIsActive holds the string denoting the is_active field in the database.
+	FieldIsActive = "is_active"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// EdgeUser holds the string denoting the user edge name in mutations.
@@ -49,14 +47,13 @@ const (
 // Columns holds all SQL columns for job fields.
 var Columns = []string{
 	FieldID,
+	FieldEmail,
+	FieldFromRegex,
 	FieldURL,
 	FieldMethod,
 	FieldHeaders,
-	FieldData,
-	FieldEmail,
-	FieldPassword,
-	FieldSMTPHost,
-	FieldSMTPPort,
+	FieldPayloadTemplate,
+	FieldIsActive,
 	FieldCreatedAt,
 }
 
@@ -82,12 +79,14 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// URLValidator is a validator for the "url" field. It is called by the builders before save.
-	URLValidator func(string) error
 	// EmailValidator is a validator for the "email" field. It is called by the builders before save.
 	EmailValidator func(string) error
-	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
-	PasswordValidator func(string) error
+	// DefaultFromRegex holds the default value on creation for the "from_regex" field.
+	DefaultFromRegex string
+	// URLValidator is a validator for the "url" field. It is called by the builders before save.
+	URLValidator func(string) error
+	// DefaultIsActive holds the default value on creation for the "is_active" field.
+	DefaultIsActive bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 )
@@ -95,13 +94,16 @@ var (
 // Method defines the type for the "method" enum field.
 type Method string
 
-// MethodGet is the default value of the Method enum.
-const DefaultMethod = MethodGet
+// MethodGET is the default value of the Method enum.
+const DefaultMethod = MethodGET
 
 // Method values.
 const (
-	MethodGet  Method = "get"
-	MethodPost Method = "post"
+	MethodGET    Method = "GET"
+	MethodPOST   Method = "POST"
+	MethodPUT    Method = "PUT"
+	MethodDELETE Method = "DELETE"
+	MethodPATCH  Method = "PATCH"
 )
 
 func (m Method) String() string {
@@ -111,7 +113,7 @@ func (m Method) String() string {
 // MethodValidator is a validator for the "method" field enum values. It is called by the builders before save.
 func MethodValidator(m Method) error {
 	switch m {
-	case MethodGet, MethodPost:
+	case MethodGET, MethodPOST, MethodPUT, MethodDELETE, MethodPATCH:
 		return nil
 	default:
 		return fmt.Errorf("job: invalid enum value for method field: %q", m)
@@ -126,6 +128,16 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
+// ByEmail orders the results by the email field.
+func ByEmail(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEmail, opts...).ToFunc()
+}
+
+// ByFromRegex orders the results by the from_regex field.
+func ByFromRegex(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFromRegex, opts...).ToFunc()
+}
+
 // ByURL orders the results by the url field.
 func ByURL(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldURL, opts...).ToFunc()
@@ -136,29 +148,14 @@ func ByMethod(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMethod, opts...).ToFunc()
 }
 
-// ByData orders the results by the data field.
-func ByData(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldData, opts...).ToFunc()
+// ByPayloadTemplate orders the results by the payload_template field.
+func ByPayloadTemplate(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPayloadTemplate, opts...).ToFunc()
 }
 
-// ByEmail orders the results by the email field.
-func ByEmail(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldEmail, opts...).ToFunc()
-}
-
-// ByPassword orders the results by the password field.
-func ByPassword(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldPassword, opts...).ToFunc()
-}
-
-// BySMTPHost orders the results by the smtp_host field.
-func BySMTPHost(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldSMTPHost, opts...).ToFunc()
-}
-
-// BySMTPPort orders the results by the smtp_port field.
-func BySMTPPort(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldSMTPPort, opts...).ToFunc()
+// ByIsActive orders the results by the is_active field.
+func ByIsActive(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsActive, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

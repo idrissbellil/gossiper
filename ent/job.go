@@ -19,22 +19,20 @@ type Job struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// URL holds the value of the "url" field.
-	URL string `json:"url,omitempty"`
-	// Method holds the value of the "method" field.
-	Method job.Method `json:"method,omitempty"`
-	// Headers holds the value of the "headers" field.
-	Headers map[string]string `json:"headers,omitempty"`
-	// Data holds the value of the "data" field.
-	Data string `json:"data,omitempty"`
 	// Email holds the value of the "email" field.
 	Email string `json:"email,omitempty"`
-	// Password holds the value of the "password" field.
-	Password string `json:"password,omitempty"`
-	// SMTPHost holds the value of the "smtp_host" field.
-	SMTPHost string `json:"smtp_host,omitempty"`
-	// SMTPPort holds the value of the "smtp_port" field.
-	SMTPPort int `json:"smtp_port,omitempty"`
+	// FromRegex holds the value of the "from_regex" field.
+	FromRegex string `json:"from_regex,omitempty"`
+	// The URL to send the webhook to
+	URL string `json:"url,omitempty"`
+	// HTTP method to use
+	Method job.Method `json:"method,omitempty"`
+	// HTTP headers to send with the request
+	Headers map[string]string `json:"headers,omitempty"`
+	// Template for the payload to be sent
+	PayloadTemplate string `json:"payload_template,omitempty"`
+	// Whether this webhook is currently active
+	IsActive bool `json:"is_active,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -71,9 +69,11 @@ func (*Job) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case job.FieldHeaders:
 			values[i] = new([]byte)
-		case job.FieldID, job.FieldSMTPPort:
+		case job.FieldIsActive:
+			values[i] = new(sql.NullBool)
+		case job.FieldID:
 			values[i] = new(sql.NullInt64)
-		case job.FieldURL, job.FieldMethod, job.FieldData, job.FieldEmail, job.FieldPassword, job.FieldSMTPHost:
+		case job.FieldEmail, job.FieldFromRegex, job.FieldURL, job.FieldMethod, job.FieldPayloadTemplate:
 			values[i] = new(sql.NullString)
 		case job.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -100,6 +100,18 @@ func (j *Job) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			j.ID = int(value.Int64)
+		case job.FieldEmail:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field email", values[i])
+			} else if value.Valid {
+				j.Email = value.String
+			}
+		case job.FieldFromRegex:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field from_regex", values[i])
+			} else if value.Valid {
+				j.FromRegex = value.String
+			}
 		case job.FieldURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field url", values[i])
@@ -120,35 +132,17 @@ func (j *Job) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field headers: %w", err)
 				}
 			}
-		case job.FieldData:
+		case job.FieldPayloadTemplate:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field data", values[i])
+				return fmt.Errorf("unexpected type %T for field payload_template", values[i])
 			} else if value.Valid {
-				j.Data = value.String
+				j.PayloadTemplate = value.String
 			}
-		case job.FieldEmail:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field email", values[i])
+		case job.FieldIsActive:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_active", values[i])
 			} else if value.Valid {
-				j.Email = value.String
-			}
-		case job.FieldPassword:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field password", values[i])
-			} else if value.Valid {
-				j.Password = value.String
-			}
-		case job.FieldSMTPHost:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field smtp_host", values[i])
-			} else if value.Valid {
-				j.SMTPHost = value.String
-			}
-		case job.FieldSMTPPort:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field smtp_port", values[i])
-			} else if value.Valid {
-				j.SMTPPort = int(value.Int64)
+				j.IsActive = value.Bool
 			}
 		case job.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -204,6 +198,12 @@ func (j *Job) String() string {
 	var builder strings.Builder
 	builder.WriteString("Job(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", j.ID))
+	builder.WriteString("email=")
+	builder.WriteString(j.Email)
+	builder.WriteString(", ")
+	builder.WriteString("from_regex=")
+	builder.WriteString(j.FromRegex)
+	builder.WriteString(", ")
 	builder.WriteString("url=")
 	builder.WriteString(j.URL)
 	builder.WriteString(", ")
@@ -213,20 +213,11 @@ func (j *Job) String() string {
 	builder.WriteString("headers=")
 	builder.WriteString(fmt.Sprintf("%v", j.Headers))
 	builder.WriteString(", ")
-	builder.WriteString("data=")
-	builder.WriteString(j.Data)
+	builder.WriteString("payload_template=")
+	builder.WriteString(j.PayloadTemplate)
 	builder.WriteString(", ")
-	builder.WriteString("email=")
-	builder.WriteString(j.Email)
-	builder.WriteString(", ")
-	builder.WriteString("password=")
-	builder.WriteString(j.Password)
-	builder.WriteString(", ")
-	builder.WriteString("smtp_host=")
-	builder.WriteString(j.SMTPHost)
-	builder.WriteString(", ")
-	builder.WriteString("smtp_port=")
-	builder.WriteString(fmt.Sprintf("%v", j.SMTPPort))
+	builder.WriteString("is_active=")
+	builder.WriteString(fmt.Sprintf("%v", j.IsActive))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(j.CreatedAt.Format(time.ANSIC))

@@ -299,12 +299,12 @@ func (jq *JobQuery) WithUser(opts ...func(*UserQuery)) *JobQuery {
 // Example:
 //
 //	var v []struct {
-//		URL string `json:"url,omitempty"`
+//		Email string `json:"email,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Job.Query().
-//		GroupBy(job.FieldURL).
+//		GroupBy(job.FieldEmail).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (jq *JobQuery) GroupBy(field string, fields ...string) *JobGroupBy {
@@ -322,11 +322,11 @@ func (jq *JobQuery) GroupBy(field string, fields ...string) *JobGroupBy {
 // Example:
 //
 //	var v []struct {
-//		URL string `json:"url,omitempty"`
+//		Email string `json:"email,omitempty"`
 //	}
 //
 //	client.Job.Query().
-//		Select(job.FieldURL).
+//		Select(job.FieldEmail).
 //		Scan(ctx, &v)
 func (jq *JobQuery) Select(fields ...string) *JobSelect {
 	jq.ctx.Fields = append(jq.ctx.Fields, fields...)

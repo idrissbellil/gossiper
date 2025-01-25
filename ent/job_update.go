@@ -28,6 +28,34 @@ func (ju *JobUpdate) Where(ps ...predicate.Job) *JobUpdate {
 	return ju
 }
 
+// SetEmail sets the "email" field.
+func (ju *JobUpdate) SetEmail(s string) *JobUpdate {
+	ju.mutation.SetEmail(s)
+	return ju
+}
+
+// SetNillableEmail sets the "email" field if the given value is not nil.
+func (ju *JobUpdate) SetNillableEmail(s *string) *JobUpdate {
+	if s != nil {
+		ju.SetEmail(*s)
+	}
+	return ju
+}
+
+// SetFromRegex sets the "from_regex" field.
+func (ju *JobUpdate) SetFromRegex(s string) *JobUpdate {
+	ju.mutation.SetFromRegex(s)
+	return ju
+}
+
+// SetNillableFromRegex sets the "from_regex" field if the given value is not nil.
+func (ju *JobUpdate) SetNillableFromRegex(s *string) *JobUpdate {
+	if s != nil {
+		ju.SetFromRegex(*s)
+	}
+	return ju
+}
+
 // SetURL sets the "url" field.
 func (ju *JobUpdate) SetURL(s string) *JobUpdate {
 	ju.mutation.SetURL(s)
@@ -62,98 +90,43 @@ func (ju *JobUpdate) SetHeaders(m map[string]string) *JobUpdate {
 	return ju
 }
 
-// SetData sets the "data" field.
-func (ju *JobUpdate) SetData(s string) *JobUpdate {
-	ju.mutation.SetData(s)
+// ClearHeaders clears the value of the "headers" field.
+func (ju *JobUpdate) ClearHeaders() *JobUpdate {
+	ju.mutation.ClearHeaders()
 	return ju
 }
 
-// SetNillableData sets the "data" field if the given value is not nil.
-func (ju *JobUpdate) SetNillableData(s *string) *JobUpdate {
+// SetPayloadTemplate sets the "payload_template" field.
+func (ju *JobUpdate) SetPayloadTemplate(s string) *JobUpdate {
+	ju.mutation.SetPayloadTemplate(s)
+	return ju
+}
+
+// SetNillablePayloadTemplate sets the "payload_template" field if the given value is not nil.
+func (ju *JobUpdate) SetNillablePayloadTemplate(s *string) *JobUpdate {
 	if s != nil {
-		ju.SetData(*s)
+		ju.SetPayloadTemplate(*s)
 	}
 	return ju
 }
 
-// ClearData clears the value of the "data" field.
-func (ju *JobUpdate) ClearData() *JobUpdate {
-	ju.mutation.ClearData()
+// ClearPayloadTemplate clears the value of the "payload_template" field.
+func (ju *JobUpdate) ClearPayloadTemplate() *JobUpdate {
+	ju.mutation.ClearPayloadTemplate()
 	return ju
 }
 
-// SetEmail sets the "email" field.
-func (ju *JobUpdate) SetEmail(s string) *JobUpdate {
-	ju.mutation.SetEmail(s)
+// SetIsActive sets the "is_active" field.
+func (ju *JobUpdate) SetIsActive(b bool) *JobUpdate {
+	ju.mutation.SetIsActive(b)
 	return ju
 }
 
-// SetNillableEmail sets the "email" field if the given value is not nil.
-func (ju *JobUpdate) SetNillableEmail(s *string) *JobUpdate {
-	if s != nil {
-		ju.SetEmail(*s)
+// SetNillableIsActive sets the "is_active" field if the given value is not nil.
+func (ju *JobUpdate) SetNillableIsActive(b *bool) *JobUpdate {
+	if b != nil {
+		ju.SetIsActive(*b)
 	}
-	return ju
-}
-
-// SetPassword sets the "password" field.
-func (ju *JobUpdate) SetPassword(s string) *JobUpdate {
-	ju.mutation.SetPassword(s)
-	return ju
-}
-
-// SetNillablePassword sets the "password" field if the given value is not nil.
-func (ju *JobUpdate) SetNillablePassword(s *string) *JobUpdate {
-	if s != nil {
-		ju.SetPassword(*s)
-	}
-	return ju
-}
-
-// SetSMTPHost sets the "smtp_host" field.
-func (ju *JobUpdate) SetSMTPHost(s string) *JobUpdate {
-	ju.mutation.SetSMTPHost(s)
-	return ju
-}
-
-// SetNillableSMTPHost sets the "smtp_host" field if the given value is not nil.
-func (ju *JobUpdate) SetNillableSMTPHost(s *string) *JobUpdate {
-	if s != nil {
-		ju.SetSMTPHost(*s)
-	}
-	return ju
-}
-
-// ClearSMTPHost clears the value of the "smtp_host" field.
-func (ju *JobUpdate) ClearSMTPHost() *JobUpdate {
-	ju.mutation.ClearSMTPHost()
-	return ju
-}
-
-// SetSMTPPort sets the "smtp_port" field.
-func (ju *JobUpdate) SetSMTPPort(i int) *JobUpdate {
-	ju.mutation.ResetSMTPPort()
-	ju.mutation.SetSMTPPort(i)
-	return ju
-}
-
-// SetNillableSMTPPort sets the "smtp_port" field if the given value is not nil.
-func (ju *JobUpdate) SetNillableSMTPPort(i *int) *JobUpdate {
-	if i != nil {
-		ju.SetSMTPPort(*i)
-	}
-	return ju
-}
-
-// AddSMTPPort adds i to the "smtp_port" field.
-func (ju *JobUpdate) AddSMTPPort(i int) *JobUpdate {
-	ju.mutation.AddSMTPPort(i)
-	return ju
-}
-
-// ClearSMTPPort clears the value of the "smtp_port" field.
-func (ju *JobUpdate) ClearSMTPPort() *JobUpdate {
-	ju.mutation.ClearSMTPPort()
 	return ju
 }
 
@@ -208,6 +181,11 @@ func (ju *JobUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ju *JobUpdate) check() error {
+	if v, ok := ju.mutation.Email(); ok {
+		if err := job.EmailValidator(v); err != nil {
+			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Job.email": %w`, err)}
+		}
+	}
 	if v, ok := ju.mutation.URL(); ok {
 		if err := job.URLValidator(v); err != nil {
 			return &ValidationError{Name: "url", err: fmt.Errorf(`ent: validator failed for field "Job.url": %w`, err)}
@@ -216,16 +194,6 @@ func (ju *JobUpdate) check() error {
 	if v, ok := ju.mutation.Method(); ok {
 		if err := job.MethodValidator(v); err != nil {
 			return &ValidationError{Name: "method", err: fmt.Errorf(`ent: validator failed for field "Job.method": %w`, err)}
-		}
-	}
-	if v, ok := ju.mutation.Email(); ok {
-		if err := job.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Job.email": %w`, err)}
-		}
-	}
-	if v, ok := ju.mutation.Password(); ok {
-		if err := job.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Job.password": %w`, err)}
 		}
 	}
 	if ju.mutation.UserCleared() && len(ju.mutation.UserIDs()) > 0 {
@@ -246,6 +214,12 @@ func (ju *JobUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := ju.mutation.Email(); ok {
+		_spec.SetField(job.FieldEmail, field.TypeString, value)
+	}
+	if value, ok := ju.mutation.FromRegex(); ok {
+		_spec.SetField(job.FieldFromRegex, field.TypeString, value)
+	}
 	if value, ok := ju.mutation.URL(); ok {
 		_spec.SetField(job.FieldURL, field.TypeString, value)
 	}
@@ -255,32 +229,17 @@ func (ju *JobUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := ju.mutation.Headers(); ok {
 		_spec.SetField(job.FieldHeaders, field.TypeJSON, value)
 	}
-	if value, ok := ju.mutation.Data(); ok {
-		_spec.SetField(job.FieldData, field.TypeString, value)
+	if ju.mutation.HeadersCleared() {
+		_spec.ClearField(job.FieldHeaders, field.TypeJSON)
 	}
-	if ju.mutation.DataCleared() {
-		_spec.ClearField(job.FieldData, field.TypeString)
+	if value, ok := ju.mutation.PayloadTemplate(); ok {
+		_spec.SetField(job.FieldPayloadTemplate, field.TypeString, value)
 	}
-	if value, ok := ju.mutation.Email(); ok {
-		_spec.SetField(job.FieldEmail, field.TypeString, value)
+	if ju.mutation.PayloadTemplateCleared() {
+		_spec.ClearField(job.FieldPayloadTemplate, field.TypeString)
 	}
-	if value, ok := ju.mutation.Password(); ok {
-		_spec.SetField(job.FieldPassword, field.TypeString, value)
-	}
-	if value, ok := ju.mutation.SMTPHost(); ok {
-		_spec.SetField(job.FieldSMTPHost, field.TypeString, value)
-	}
-	if ju.mutation.SMTPHostCleared() {
-		_spec.ClearField(job.FieldSMTPHost, field.TypeString)
-	}
-	if value, ok := ju.mutation.SMTPPort(); ok {
-		_spec.SetField(job.FieldSMTPPort, field.TypeInt, value)
-	}
-	if value, ok := ju.mutation.AddedSMTPPort(); ok {
-		_spec.AddField(job.FieldSMTPPort, field.TypeInt, value)
-	}
-	if ju.mutation.SMTPPortCleared() {
-		_spec.ClearField(job.FieldSMTPPort, field.TypeInt)
+	if value, ok := ju.mutation.IsActive(); ok {
+		_spec.SetField(job.FieldIsActive, field.TypeBool, value)
 	}
 	if ju.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -331,6 +290,34 @@ type JobUpdateOne struct {
 	mutation *JobMutation
 }
 
+// SetEmail sets the "email" field.
+func (juo *JobUpdateOne) SetEmail(s string) *JobUpdateOne {
+	juo.mutation.SetEmail(s)
+	return juo
+}
+
+// SetNillableEmail sets the "email" field if the given value is not nil.
+func (juo *JobUpdateOne) SetNillableEmail(s *string) *JobUpdateOne {
+	if s != nil {
+		juo.SetEmail(*s)
+	}
+	return juo
+}
+
+// SetFromRegex sets the "from_regex" field.
+func (juo *JobUpdateOne) SetFromRegex(s string) *JobUpdateOne {
+	juo.mutation.SetFromRegex(s)
+	return juo
+}
+
+// SetNillableFromRegex sets the "from_regex" field if the given value is not nil.
+func (juo *JobUpdateOne) SetNillableFromRegex(s *string) *JobUpdateOne {
+	if s != nil {
+		juo.SetFromRegex(*s)
+	}
+	return juo
+}
+
 // SetURL sets the "url" field.
 func (juo *JobUpdateOne) SetURL(s string) *JobUpdateOne {
 	juo.mutation.SetURL(s)
@@ -365,98 +352,43 @@ func (juo *JobUpdateOne) SetHeaders(m map[string]string) *JobUpdateOne {
 	return juo
 }
 
-// SetData sets the "data" field.
-func (juo *JobUpdateOne) SetData(s string) *JobUpdateOne {
-	juo.mutation.SetData(s)
+// ClearHeaders clears the value of the "headers" field.
+func (juo *JobUpdateOne) ClearHeaders() *JobUpdateOne {
+	juo.mutation.ClearHeaders()
 	return juo
 }
 
-// SetNillableData sets the "data" field if the given value is not nil.
-func (juo *JobUpdateOne) SetNillableData(s *string) *JobUpdateOne {
+// SetPayloadTemplate sets the "payload_template" field.
+func (juo *JobUpdateOne) SetPayloadTemplate(s string) *JobUpdateOne {
+	juo.mutation.SetPayloadTemplate(s)
+	return juo
+}
+
+// SetNillablePayloadTemplate sets the "payload_template" field if the given value is not nil.
+func (juo *JobUpdateOne) SetNillablePayloadTemplate(s *string) *JobUpdateOne {
 	if s != nil {
-		juo.SetData(*s)
+		juo.SetPayloadTemplate(*s)
 	}
 	return juo
 }
 
-// ClearData clears the value of the "data" field.
-func (juo *JobUpdateOne) ClearData() *JobUpdateOne {
-	juo.mutation.ClearData()
+// ClearPayloadTemplate clears the value of the "payload_template" field.
+func (juo *JobUpdateOne) ClearPayloadTemplate() *JobUpdateOne {
+	juo.mutation.ClearPayloadTemplate()
 	return juo
 }
 
-// SetEmail sets the "email" field.
-func (juo *JobUpdateOne) SetEmail(s string) *JobUpdateOne {
-	juo.mutation.SetEmail(s)
+// SetIsActive sets the "is_active" field.
+func (juo *JobUpdateOne) SetIsActive(b bool) *JobUpdateOne {
+	juo.mutation.SetIsActive(b)
 	return juo
 }
 
-// SetNillableEmail sets the "email" field if the given value is not nil.
-func (juo *JobUpdateOne) SetNillableEmail(s *string) *JobUpdateOne {
-	if s != nil {
-		juo.SetEmail(*s)
+// SetNillableIsActive sets the "is_active" field if the given value is not nil.
+func (juo *JobUpdateOne) SetNillableIsActive(b *bool) *JobUpdateOne {
+	if b != nil {
+		juo.SetIsActive(*b)
 	}
-	return juo
-}
-
-// SetPassword sets the "password" field.
-func (juo *JobUpdateOne) SetPassword(s string) *JobUpdateOne {
-	juo.mutation.SetPassword(s)
-	return juo
-}
-
-// SetNillablePassword sets the "password" field if the given value is not nil.
-func (juo *JobUpdateOne) SetNillablePassword(s *string) *JobUpdateOne {
-	if s != nil {
-		juo.SetPassword(*s)
-	}
-	return juo
-}
-
-// SetSMTPHost sets the "smtp_host" field.
-func (juo *JobUpdateOne) SetSMTPHost(s string) *JobUpdateOne {
-	juo.mutation.SetSMTPHost(s)
-	return juo
-}
-
-// SetNillableSMTPHost sets the "smtp_host" field if the given value is not nil.
-func (juo *JobUpdateOne) SetNillableSMTPHost(s *string) *JobUpdateOne {
-	if s != nil {
-		juo.SetSMTPHost(*s)
-	}
-	return juo
-}
-
-// ClearSMTPHost clears the value of the "smtp_host" field.
-func (juo *JobUpdateOne) ClearSMTPHost() *JobUpdateOne {
-	juo.mutation.ClearSMTPHost()
-	return juo
-}
-
-// SetSMTPPort sets the "smtp_port" field.
-func (juo *JobUpdateOne) SetSMTPPort(i int) *JobUpdateOne {
-	juo.mutation.ResetSMTPPort()
-	juo.mutation.SetSMTPPort(i)
-	return juo
-}
-
-// SetNillableSMTPPort sets the "smtp_port" field if the given value is not nil.
-func (juo *JobUpdateOne) SetNillableSMTPPort(i *int) *JobUpdateOne {
-	if i != nil {
-		juo.SetSMTPPort(*i)
-	}
-	return juo
-}
-
-// AddSMTPPort adds i to the "smtp_port" field.
-func (juo *JobUpdateOne) AddSMTPPort(i int) *JobUpdateOne {
-	juo.mutation.AddSMTPPort(i)
-	return juo
-}
-
-// ClearSMTPPort clears the value of the "smtp_port" field.
-func (juo *JobUpdateOne) ClearSMTPPort() *JobUpdateOne {
-	juo.mutation.ClearSMTPPort()
 	return juo
 }
 
@@ -524,6 +456,11 @@ func (juo *JobUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (juo *JobUpdateOne) check() error {
+	if v, ok := juo.mutation.Email(); ok {
+		if err := job.EmailValidator(v); err != nil {
+			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Job.email": %w`, err)}
+		}
+	}
 	if v, ok := juo.mutation.URL(); ok {
 		if err := job.URLValidator(v); err != nil {
 			return &ValidationError{Name: "url", err: fmt.Errorf(`ent: validator failed for field "Job.url": %w`, err)}
@@ -532,16 +469,6 @@ func (juo *JobUpdateOne) check() error {
 	if v, ok := juo.mutation.Method(); ok {
 		if err := job.MethodValidator(v); err != nil {
 			return &ValidationError{Name: "method", err: fmt.Errorf(`ent: validator failed for field "Job.method": %w`, err)}
-		}
-	}
-	if v, ok := juo.mutation.Email(); ok {
-		if err := job.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Job.email": %w`, err)}
-		}
-	}
-	if v, ok := juo.mutation.Password(); ok {
-		if err := job.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Job.password": %w`, err)}
 		}
 	}
 	if juo.mutation.UserCleared() && len(juo.mutation.UserIDs()) > 0 {
@@ -579,6 +506,12 @@ func (juo *JobUpdateOne) sqlSave(ctx context.Context) (_node *Job, err error) {
 			}
 		}
 	}
+	if value, ok := juo.mutation.Email(); ok {
+		_spec.SetField(job.FieldEmail, field.TypeString, value)
+	}
+	if value, ok := juo.mutation.FromRegex(); ok {
+		_spec.SetField(job.FieldFromRegex, field.TypeString, value)
+	}
 	if value, ok := juo.mutation.URL(); ok {
 		_spec.SetField(job.FieldURL, field.TypeString, value)
 	}
@@ -588,32 +521,17 @@ func (juo *JobUpdateOne) sqlSave(ctx context.Context) (_node *Job, err error) {
 	if value, ok := juo.mutation.Headers(); ok {
 		_spec.SetField(job.FieldHeaders, field.TypeJSON, value)
 	}
-	if value, ok := juo.mutation.Data(); ok {
-		_spec.SetField(job.FieldData, field.TypeString, value)
+	if juo.mutation.HeadersCleared() {
+		_spec.ClearField(job.FieldHeaders, field.TypeJSON)
 	}
-	if juo.mutation.DataCleared() {
-		_spec.ClearField(job.FieldData, field.TypeString)
+	if value, ok := juo.mutation.PayloadTemplate(); ok {
+		_spec.SetField(job.FieldPayloadTemplate, field.TypeString, value)
 	}
-	if value, ok := juo.mutation.Email(); ok {
-		_spec.SetField(job.FieldEmail, field.TypeString, value)
+	if juo.mutation.PayloadTemplateCleared() {
+		_spec.ClearField(job.FieldPayloadTemplate, field.TypeString)
 	}
-	if value, ok := juo.mutation.Password(); ok {
-		_spec.SetField(job.FieldPassword, field.TypeString, value)
-	}
-	if value, ok := juo.mutation.SMTPHost(); ok {
-		_spec.SetField(job.FieldSMTPHost, field.TypeString, value)
-	}
-	if juo.mutation.SMTPHostCleared() {
-		_spec.ClearField(job.FieldSMTPHost, field.TypeString)
-	}
-	if value, ok := juo.mutation.SMTPPort(); ok {
-		_spec.SetField(job.FieldSMTPPort, field.TypeInt, value)
-	}
-	if value, ok := juo.mutation.AddedSMTPPort(); ok {
-		_spec.AddField(job.FieldSMTPPort, field.TypeInt, value)
-	}
-	if juo.mutation.SMTPPortCleared() {
-		_spec.ClearField(job.FieldSMTPPort, field.TypeInt)
+	if value, ok := juo.mutation.IsActive(); ok {
+		_spec.SetField(job.FieldIsActive, field.TypeBool, value)
 	}
 	if juo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -55,39 +55,164 @@ func IDLTE(id int) predicate.Job {
 	return predicate.Job(sql.FieldLTE(FieldID, id))
 }
 
-// URL applies equality check predicate on the "url" field. It's identical to URLEQ.
-func URL(v string) predicate.Job {
-	return predicate.Job(sql.FieldEQ(FieldURL, v))
-}
-
-// Data applies equality check predicate on the "data" field. It's identical to DataEQ.
-func Data(v string) predicate.Job {
-	return predicate.Job(sql.FieldEQ(FieldData, v))
-}
-
 // Email applies equality check predicate on the "email" field. It's identical to EmailEQ.
 func Email(v string) predicate.Job {
 	return predicate.Job(sql.FieldEQ(FieldEmail, v))
 }
 
-// Password applies equality check predicate on the "password" field. It's identical to PasswordEQ.
-func Password(v string) predicate.Job {
-	return predicate.Job(sql.FieldEQ(FieldPassword, v))
+// FromRegex applies equality check predicate on the "from_regex" field. It's identical to FromRegexEQ.
+func FromRegex(v string) predicate.Job {
+	return predicate.Job(sql.FieldEQ(FieldFromRegex, v))
 }
 
-// SMTPHost applies equality check predicate on the "smtp_host" field. It's identical to SMTPHostEQ.
-func SMTPHost(v string) predicate.Job {
-	return predicate.Job(sql.FieldEQ(FieldSMTPHost, v))
+// URL applies equality check predicate on the "url" field. It's identical to URLEQ.
+func URL(v string) predicate.Job {
+	return predicate.Job(sql.FieldEQ(FieldURL, v))
 }
 
-// SMTPPort applies equality check predicate on the "smtp_port" field. It's identical to SMTPPortEQ.
-func SMTPPort(v int) predicate.Job {
-	return predicate.Job(sql.FieldEQ(FieldSMTPPort, v))
+// PayloadTemplate applies equality check predicate on the "payload_template" field. It's identical to PayloadTemplateEQ.
+func PayloadTemplate(v string) predicate.Job {
+	return predicate.Job(sql.FieldEQ(FieldPayloadTemplate, v))
+}
+
+// IsActive applies equality check predicate on the "is_active" field. It's identical to IsActiveEQ.
+func IsActive(v bool) predicate.Job {
+	return predicate.Job(sql.FieldEQ(FieldIsActive, v))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Job {
 	return predicate.Job(sql.FieldEQ(FieldCreatedAt, v))
+}
+
+// EmailEQ applies the EQ predicate on the "email" field.
+func EmailEQ(v string) predicate.Job {
+	return predicate.Job(sql.FieldEQ(FieldEmail, v))
+}
+
+// EmailNEQ applies the NEQ predicate on the "email" field.
+func EmailNEQ(v string) predicate.Job {
+	return predicate.Job(sql.FieldNEQ(FieldEmail, v))
+}
+
+// EmailIn applies the In predicate on the "email" field.
+func EmailIn(vs ...string) predicate.Job {
+	return predicate.Job(sql.FieldIn(FieldEmail, vs...))
+}
+
+// EmailNotIn applies the NotIn predicate on the "email" field.
+func EmailNotIn(vs ...string) predicate.Job {
+	return predicate.Job(sql.FieldNotIn(FieldEmail, vs...))
+}
+
+// EmailGT applies the GT predicate on the "email" field.
+func EmailGT(v string) predicate.Job {
+	return predicate.Job(sql.FieldGT(FieldEmail, v))
+}
+
+// EmailGTE applies the GTE predicate on the "email" field.
+func EmailGTE(v string) predicate.Job {
+	return predicate.Job(sql.FieldGTE(FieldEmail, v))
+}
+
+// EmailLT applies the LT predicate on the "email" field.
+func EmailLT(v string) predicate.Job {
+	return predicate.Job(sql.FieldLT(FieldEmail, v))
+}
+
+// EmailLTE applies the LTE predicate on the "email" field.
+func EmailLTE(v string) predicate.Job {
+	return predicate.Job(sql.FieldLTE(FieldEmail, v))
+}
+
+// EmailContains applies the Contains predicate on the "email" field.
+func EmailContains(v string) predicate.Job {
+	return predicate.Job(sql.FieldContains(FieldEmail, v))
+}
+
+// EmailHasPrefix applies the HasPrefix predicate on the "email" field.
+func EmailHasPrefix(v string) predicate.Job {
+	return predicate.Job(sql.FieldHasPrefix(FieldEmail, v))
+}
+
+// EmailHasSuffix applies the HasSuffix predicate on the "email" field.
+func EmailHasSuffix(v string) predicate.Job {
+	return predicate.Job(sql.FieldHasSuffix(FieldEmail, v))
+}
+
+// EmailEqualFold applies the EqualFold predicate on the "email" field.
+func EmailEqualFold(v string) predicate.Job {
+	return predicate.Job(sql.FieldEqualFold(FieldEmail, v))
+}
+
+// EmailContainsFold applies the ContainsFold predicate on the "email" field.
+func EmailContainsFold(v string) predicate.Job {
+	return predicate.Job(sql.FieldContainsFold(FieldEmail, v))
+}
+
+// FromRegexEQ applies the EQ predicate on the "from_regex" field.
+func FromRegexEQ(v string) predicate.Job {
+	return predicate.Job(sql.FieldEQ(FieldFromRegex, v))
+}
+
+// FromRegexNEQ applies the NEQ predicate on the "from_regex" field.
+func FromRegexNEQ(v string) predicate.Job {
+	return predicate.Job(sql.FieldNEQ(FieldFromRegex, v))
+}
+
+// FromRegexIn applies the In predicate on the "from_regex" field.
+func FromRegexIn(vs ...string) predicate.Job {
+	return predicate.Job(sql.FieldIn(FieldFromRegex, vs...))
+}
+
+// FromRegexNotIn applies the NotIn predicate on the "from_regex" field.
+func FromRegexNotIn(vs ...string) predicate.Job {
+	return predicate.Job(sql.FieldNotIn(FieldFromRegex, vs...))
+}
+
+// FromRegexGT applies the GT predicate on the "from_regex" field.
+func FromRegexGT(v string) predicate.Job {
+	return predicate.Job(sql.FieldGT(FieldFromRegex, v))
+}
+
+// FromRegexGTE applies the GTE predicate on the "from_regex" field.
+func FromRegexGTE(v string) predicate.Job {
+	return predicate.Job(sql.FieldGTE(FieldFromRegex, v))
+}
+
+// FromRegexLT applies the LT predicate on the "from_regex" field.
+func FromRegexLT(v string) predicate.Job {
+	return predicate.Job(sql.FieldLT(FieldFromRegex, v))
+}
+
+// FromRegexLTE applies the LTE predicate on the "from_regex" field.
+func FromRegexLTE(v string) predicate.Job {
+	return predicate.Job(sql.FieldLTE(FieldFromRegex, v))
+}
+
+// FromRegexContains applies the Contains predicate on the "from_regex" field.
+func FromRegexContains(v string) predicate.Job {
+	return predicate.Job(sql.FieldContains(FieldFromRegex, v))
+}
+
+// FromRegexHasPrefix applies the HasPrefix predicate on the "from_regex" field.
+func FromRegexHasPrefix(v string) predicate.Job {
+	return predicate.Job(sql.FieldHasPrefix(FieldFromRegex, v))
+}
+
+// FromRegexHasSuffix applies the HasSuffix predicate on the "from_regex" field.
+func FromRegexHasSuffix(v string) predicate.Job {
+	return predicate.Job(sql.FieldHasSuffix(FieldFromRegex, v))
+}
+
+// FromRegexEqualFold applies the EqualFold predicate on the "from_regex" field.
+func FromRegexEqualFold(v string) predicate.Job {
+	return predicate.Job(sql.FieldEqualFold(FieldFromRegex, v))
+}
+
+// FromRegexContainsFold applies the ContainsFold predicate on the "from_regex" field.
+func FromRegexContainsFold(v string) predicate.Job {
+	return predicate.Job(sql.FieldContainsFold(FieldFromRegex, v))
 }
 
 // URLEQ applies the EQ predicate on the "url" field.
@@ -175,334 +300,99 @@ func MethodNotIn(vs ...Method) predicate.Job {
 	return predicate.Job(sql.FieldNotIn(FieldMethod, vs...))
 }
 
-// DataEQ applies the EQ predicate on the "data" field.
-func DataEQ(v string) predicate.Job {
-	return predicate.Job(sql.FieldEQ(FieldData, v))
+// HeadersIsNil applies the IsNil predicate on the "headers" field.
+func HeadersIsNil() predicate.Job {
+	return predicate.Job(sql.FieldIsNull(FieldHeaders))
 }
 
-// DataNEQ applies the NEQ predicate on the "data" field.
-func DataNEQ(v string) predicate.Job {
-	return predicate.Job(sql.FieldNEQ(FieldData, v))
+// HeadersNotNil applies the NotNil predicate on the "headers" field.
+func HeadersNotNil() predicate.Job {
+	return predicate.Job(sql.FieldNotNull(FieldHeaders))
 }
 
-// DataIn applies the In predicate on the "data" field.
-func DataIn(vs ...string) predicate.Job {
-	return predicate.Job(sql.FieldIn(FieldData, vs...))
+// PayloadTemplateEQ applies the EQ predicate on the "payload_template" field.
+func PayloadTemplateEQ(v string) predicate.Job {
+	return predicate.Job(sql.FieldEQ(FieldPayloadTemplate, v))
 }
 
-// DataNotIn applies the NotIn predicate on the "data" field.
-func DataNotIn(vs ...string) predicate.Job {
-	return predicate.Job(sql.FieldNotIn(FieldData, vs...))
+// PayloadTemplateNEQ applies the NEQ predicate on the "payload_template" field.
+func PayloadTemplateNEQ(v string) predicate.Job {
+	return predicate.Job(sql.FieldNEQ(FieldPayloadTemplate, v))
 }
 
-// DataGT applies the GT predicate on the "data" field.
-func DataGT(v string) predicate.Job {
-	return predicate.Job(sql.FieldGT(FieldData, v))
+// PayloadTemplateIn applies the In predicate on the "payload_template" field.
+func PayloadTemplateIn(vs ...string) predicate.Job {
+	return predicate.Job(sql.FieldIn(FieldPayloadTemplate, vs...))
 }
 
-// DataGTE applies the GTE predicate on the "data" field.
-func DataGTE(v string) predicate.Job {
-	return predicate.Job(sql.FieldGTE(FieldData, v))
+// PayloadTemplateNotIn applies the NotIn predicate on the "payload_template" field.
+func PayloadTemplateNotIn(vs ...string) predicate.Job {
+	return predicate.Job(sql.FieldNotIn(FieldPayloadTemplate, vs...))
 }
 
-// DataLT applies the LT predicate on the "data" field.
-func DataLT(v string) predicate.Job {
-	return predicate.Job(sql.FieldLT(FieldData, v))
+// PayloadTemplateGT applies the GT predicate on the "payload_template" field.
+func PayloadTemplateGT(v string) predicate.Job {
+	return predicate.Job(sql.FieldGT(FieldPayloadTemplate, v))
 }
 
-// DataLTE applies the LTE predicate on the "data" field.
-func DataLTE(v string) predicate.Job {
-	return predicate.Job(sql.FieldLTE(FieldData, v))
+// PayloadTemplateGTE applies the GTE predicate on the "payload_template" field.
+func PayloadTemplateGTE(v string) predicate.Job {
+	return predicate.Job(sql.FieldGTE(FieldPayloadTemplate, v))
 }
 
-// DataContains applies the Contains predicate on the "data" field.
-func DataContains(v string) predicate.Job {
-	return predicate.Job(sql.FieldContains(FieldData, v))
+// PayloadTemplateLT applies the LT predicate on the "payload_template" field.
+func PayloadTemplateLT(v string) predicate.Job {
+	return predicate.Job(sql.FieldLT(FieldPayloadTemplate, v))
 }
 
-// DataHasPrefix applies the HasPrefix predicate on the "data" field.
-func DataHasPrefix(v string) predicate.Job {
-	return predicate.Job(sql.FieldHasPrefix(FieldData, v))
+// PayloadTemplateLTE applies the LTE predicate on the "payload_template" field.
+func PayloadTemplateLTE(v string) predicate.Job {
+	return predicate.Job(sql.FieldLTE(FieldPayloadTemplate, v))
 }
 
-// DataHasSuffix applies the HasSuffix predicate on the "data" field.
-func DataHasSuffix(v string) predicate.Job {
-	return predicate.Job(sql.FieldHasSuffix(FieldData, v))
+// PayloadTemplateContains applies the Contains predicate on the "payload_template" field.
+func PayloadTemplateContains(v string) predicate.Job {
+	return predicate.Job(sql.FieldContains(FieldPayloadTemplate, v))
 }
 
-// DataIsNil applies the IsNil predicate on the "data" field.
-func DataIsNil() predicate.Job {
-	return predicate.Job(sql.FieldIsNull(FieldData))
+// PayloadTemplateHasPrefix applies the HasPrefix predicate on the "payload_template" field.
+func PayloadTemplateHasPrefix(v string) predicate.Job {
+	return predicate.Job(sql.FieldHasPrefix(FieldPayloadTemplate, v))
 }
 
-// DataNotNil applies the NotNil predicate on the "data" field.
-func DataNotNil() predicate.Job {
-	return predicate.Job(sql.FieldNotNull(FieldData))
+// PayloadTemplateHasSuffix applies the HasSuffix predicate on the "payload_template" field.
+func PayloadTemplateHasSuffix(v string) predicate.Job {
+	return predicate.Job(sql.FieldHasSuffix(FieldPayloadTemplate, v))
 }
 
-// DataEqualFold applies the EqualFold predicate on the "data" field.
-func DataEqualFold(v string) predicate.Job {
-	return predicate.Job(sql.FieldEqualFold(FieldData, v))
+// PayloadTemplateIsNil applies the IsNil predicate on the "payload_template" field.
+func PayloadTemplateIsNil() predicate.Job {
+	return predicate.Job(sql.FieldIsNull(FieldPayloadTemplate))
 }
 
-// DataContainsFold applies the ContainsFold predicate on the "data" field.
-func DataContainsFold(v string) predicate.Job {
-	return predicate.Job(sql.FieldContainsFold(FieldData, v))
+// PayloadTemplateNotNil applies the NotNil predicate on the "payload_template" field.
+func PayloadTemplateNotNil() predicate.Job {
+	return predicate.Job(sql.FieldNotNull(FieldPayloadTemplate))
 }
 
-// EmailEQ applies the EQ predicate on the "email" field.
-func EmailEQ(v string) predicate.Job {
-	return predicate.Job(sql.FieldEQ(FieldEmail, v))
+// PayloadTemplateEqualFold applies the EqualFold predicate on the "payload_template" field.
+func PayloadTemplateEqualFold(v string) predicate.Job {
+	return predicate.Job(sql.FieldEqualFold(FieldPayloadTemplate, v))
 }
 
-// EmailNEQ applies the NEQ predicate on the "email" field.
-func EmailNEQ(v string) predicate.Job {
-	return predicate.Job(sql.FieldNEQ(FieldEmail, v))
+// PayloadTemplateContainsFold applies the ContainsFold predicate on the "payload_template" field.
+func PayloadTemplateContainsFold(v string) predicate.Job {
+	return predicate.Job(sql.FieldContainsFold(FieldPayloadTemplate, v))
 }
 
-// EmailIn applies the In predicate on the "email" field.
-func EmailIn(vs ...string) predicate.Job {
-	return predicate.Job(sql.FieldIn(FieldEmail, vs...))
+// IsActiveEQ applies the EQ predicate on the "is_active" field.
+func IsActiveEQ(v bool) predicate.Job {
+	return predicate.Job(sql.FieldEQ(FieldIsActive, v))
 }
 
-// EmailNotIn applies the NotIn predicate on the "email" field.
-func EmailNotIn(vs ...string) predicate.Job {
-	return predicate.Job(sql.FieldNotIn(FieldEmail, vs...))
-}
-
-// EmailGT applies the GT predicate on the "email" field.
-func EmailGT(v string) predicate.Job {
-	return predicate.Job(sql.FieldGT(FieldEmail, v))
-}
-
-// EmailGTE applies the GTE predicate on the "email" field.
-func EmailGTE(v string) predicate.Job {
-	return predicate.Job(sql.FieldGTE(FieldEmail, v))
-}
-
-// EmailLT applies the LT predicate on the "email" field.
-func EmailLT(v string) predicate.Job {
-	return predicate.Job(sql.FieldLT(FieldEmail, v))
-}
-
-// EmailLTE applies the LTE predicate on the "email" field.
-func EmailLTE(v string) predicate.Job {
-	return predicate.Job(sql.FieldLTE(FieldEmail, v))
-}
-
-// EmailContains applies the Contains predicate on the "email" field.
-func EmailContains(v string) predicate.Job {
-	return predicate.Job(sql.FieldContains(FieldEmail, v))
-}
-
-// EmailHasPrefix applies the HasPrefix predicate on the "email" field.
-func EmailHasPrefix(v string) predicate.Job {
-	return predicate.Job(sql.FieldHasPrefix(FieldEmail, v))
-}
-
-// EmailHasSuffix applies the HasSuffix predicate on the "email" field.
-func EmailHasSuffix(v string) predicate.Job {
-	return predicate.Job(sql.FieldHasSuffix(FieldEmail, v))
-}
-
-// EmailEqualFold applies the EqualFold predicate on the "email" field.
-func EmailEqualFold(v string) predicate.Job {
-	return predicate.Job(sql.FieldEqualFold(FieldEmail, v))
-}
-
-// EmailContainsFold applies the ContainsFold predicate on the "email" field.
-func EmailContainsFold(v string) predicate.Job {
-	return predicate.Job(sql.FieldContainsFold(FieldEmail, v))
-}
-
-// PasswordEQ applies the EQ predicate on the "password" field.
-func PasswordEQ(v string) predicate.Job {
-	return predicate.Job(sql.FieldEQ(FieldPassword, v))
-}
-
-// PasswordNEQ applies the NEQ predicate on the "password" field.
-func PasswordNEQ(v string) predicate.Job {
-	return predicate.Job(sql.FieldNEQ(FieldPassword, v))
-}
-
-// PasswordIn applies the In predicate on the "password" field.
-func PasswordIn(vs ...string) predicate.Job {
-	return predicate.Job(sql.FieldIn(FieldPassword, vs...))
-}
-
-// PasswordNotIn applies the NotIn predicate on the "password" field.
-func PasswordNotIn(vs ...string) predicate.Job {
-	return predicate.Job(sql.FieldNotIn(FieldPassword, vs...))
-}
-
-// PasswordGT applies the GT predicate on the "password" field.
-func PasswordGT(v string) predicate.Job {
-	return predicate.Job(sql.FieldGT(FieldPassword, v))
-}
-
-// PasswordGTE applies the GTE predicate on the "password" field.
-func PasswordGTE(v string) predicate.Job {
-	return predicate.Job(sql.FieldGTE(FieldPassword, v))
-}
-
-// PasswordLT applies the LT predicate on the "password" field.
-func PasswordLT(v string) predicate.Job {
-	return predicate.Job(sql.FieldLT(FieldPassword, v))
-}
-
-// PasswordLTE applies the LTE predicate on the "password" field.
-func PasswordLTE(v string) predicate.Job {
-	return predicate.Job(sql.FieldLTE(FieldPassword, v))
-}
-
-// PasswordContains applies the Contains predicate on the "password" field.
-func PasswordContains(v string) predicate.Job {
-	return predicate.Job(sql.FieldContains(FieldPassword, v))
-}
-
-// PasswordHasPrefix applies the HasPrefix predicate on the "password" field.
-func PasswordHasPrefix(v string) predicate.Job {
-	return predicate.Job(sql.FieldHasPrefix(FieldPassword, v))
-}
-
-// PasswordHasSuffix applies the HasSuffix predicate on the "password" field.
-func PasswordHasSuffix(v string) predicate.Job {
-	return predicate.Job(sql.FieldHasSuffix(FieldPassword, v))
-}
-
-// PasswordEqualFold applies the EqualFold predicate on the "password" field.
-func PasswordEqualFold(v string) predicate.Job {
-	return predicate.Job(sql.FieldEqualFold(FieldPassword, v))
-}
-
-// PasswordContainsFold applies the ContainsFold predicate on the "password" field.
-func PasswordContainsFold(v string) predicate.Job {
-	return predicate.Job(sql.FieldContainsFold(FieldPassword, v))
-}
-
-// SMTPHostEQ applies the EQ predicate on the "smtp_host" field.
-func SMTPHostEQ(v string) predicate.Job {
-	return predicate.Job(sql.FieldEQ(FieldSMTPHost, v))
-}
-
-// SMTPHostNEQ applies the NEQ predicate on the "smtp_host" field.
-func SMTPHostNEQ(v string) predicate.Job {
-	return predicate.Job(sql.FieldNEQ(FieldSMTPHost, v))
-}
-
-// SMTPHostIn applies the In predicate on the "smtp_host" field.
-func SMTPHostIn(vs ...string) predicate.Job {
-	return predicate.Job(sql.FieldIn(FieldSMTPHost, vs...))
-}
-
-// SMTPHostNotIn applies the NotIn predicate on the "smtp_host" field.
-func SMTPHostNotIn(vs ...string) predicate.Job {
-	return predicate.Job(sql.FieldNotIn(FieldSMTPHost, vs...))
-}
-
-// SMTPHostGT applies the GT predicate on the "smtp_host" field.
-func SMTPHostGT(v string) predicate.Job {
-	return predicate.Job(sql.FieldGT(FieldSMTPHost, v))
-}
-
-// SMTPHostGTE applies the GTE predicate on the "smtp_host" field.
-func SMTPHostGTE(v string) predicate.Job {
-	return predicate.Job(sql.FieldGTE(FieldSMTPHost, v))
-}
-
-// SMTPHostLT applies the LT predicate on the "smtp_host" field.
-func SMTPHostLT(v string) predicate.Job {
-	return predicate.Job(sql.FieldLT(FieldSMTPHost, v))
-}
-
-// SMTPHostLTE applies the LTE predicate on the "smtp_host" field.
-func SMTPHostLTE(v string) predicate.Job {
-	return predicate.Job(sql.FieldLTE(FieldSMTPHost, v))
-}
-
-// SMTPHostContains applies the Contains predicate on the "smtp_host" field.
-func SMTPHostContains(v string) predicate.Job {
-	return predicate.Job(sql.FieldContains(FieldSMTPHost, v))
-}
-
-// SMTPHostHasPrefix applies the HasPrefix predicate on the "smtp_host" field.
-func SMTPHostHasPrefix(v string) predicate.Job {
-	return predicate.Job(sql.FieldHasPrefix(FieldSMTPHost, v))
-}
-
-// SMTPHostHasSuffix applies the HasSuffix predicate on the "smtp_host" field.
-func SMTPHostHasSuffix(v string) predicate.Job {
-	return predicate.Job(sql.FieldHasSuffix(FieldSMTPHost, v))
-}
-
-// SMTPHostIsNil applies the IsNil predicate on the "smtp_host" field.
-func SMTPHostIsNil() predicate.Job {
-	return predicate.Job(sql.FieldIsNull(FieldSMTPHost))
-}
-
-// SMTPHostNotNil applies the NotNil predicate on the "smtp_host" field.
-func SMTPHostNotNil() predicate.Job {
-	return predicate.Job(sql.FieldNotNull(FieldSMTPHost))
-}
-
-// SMTPHostEqualFold applies the EqualFold predicate on the "smtp_host" field.
-func SMTPHostEqualFold(v string) predicate.Job {
-	return predicate.Job(sql.FieldEqualFold(FieldSMTPHost, v))
-}
-
-// SMTPHostContainsFold applies the ContainsFold predicate on the "smtp_host" field.
-func SMTPHostContainsFold(v string) predicate.Job {
-	return predicate.Job(sql.FieldContainsFold(FieldSMTPHost, v))
-}
-
-// SMTPPortEQ applies the EQ predicate on the "smtp_port" field.
-func SMTPPortEQ(v int) predicate.Job {
-	return predicate.Job(sql.FieldEQ(FieldSMTPPort, v))
-}
-
-// SMTPPortNEQ applies the NEQ predicate on the "smtp_port" field.
-func SMTPPortNEQ(v int) predicate.Job {
-	return predicate.Job(sql.FieldNEQ(FieldSMTPPort, v))
-}
-
-// SMTPPortIn applies the In predicate on the "smtp_port" field.
-func SMTPPortIn(vs ...int) predicate.Job {
-	return predicate.Job(sql.FieldIn(FieldSMTPPort, vs...))
-}
-
-// SMTPPortNotIn applies the NotIn predicate on the "smtp_port" field.
-func SMTPPortNotIn(vs ...int) predicate.Job {
-	return predicate.Job(sql.FieldNotIn(FieldSMTPPort, vs...))
-}
-
-// SMTPPortGT applies the GT predicate on the "smtp_port" field.
-func SMTPPortGT(v int) predicate.Job {
-	return predicate.Job(sql.FieldGT(FieldSMTPPort, v))
-}
-
-// SMTPPortGTE applies the GTE predicate on the "smtp_port" field.
-func SMTPPortGTE(v int) predicate.Job {
-	return predicate.Job(sql.FieldGTE(FieldSMTPPort, v))
-}
-
-// SMTPPortLT applies the LT predicate on the "smtp_port" field.
-func SMTPPortLT(v int) predicate.Job {
-	return predicate.Job(sql.FieldLT(FieldSMTPPort, v))
-}
-
-// SMTPPortLTE applies the LTE predicate on the "smtp_port" field.
-func SMTPPortLTE(v int) predicate.Job {
-	return predicate.Job(sql.FieldLTE(FieldSMTPPort, v))
-}
-
-// SMTPPortIsNil applies the IsNil predicate on the "smtp_port" field.
-func SMTPPortIsNil() predicate.Job {
-	return predicate.Job(sql.FieldIsNull(FieldSMTPPort))
-}
-
-// SMTPPortNotNil applies the NotNil predicate on the "smtp_port" field.
-func SMTPPortNotNil() predicate.Job {
-	return predicate.Job(sql.FieldNotNull(FieldSMTPPort))
+// IsActiveNEQ applies the NEQ predicate on the "is_active" field.
+func IsActiveNEQ(v bool) predicate.Job {
+	return predicate.Job(sql.FieldNEQ(FieldIsActive, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

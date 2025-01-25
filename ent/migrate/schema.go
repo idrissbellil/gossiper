@@ -11,14 +11,13 @@ var (
 	// JobsColumns holds the columns for the "jobs" table.
 	JobsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "url", Type: field.TypeString},
-		{Name: "method", Type: field.TypeEnum, Enums: []string{"get", "post"}, Default: "get"},
-		{Name: "headers", Type: field.TypeJSON},
-		{Name: "data", Type: field.TypeString, Nullable: true},
 		{Name: "email", Type: field.TypeString},
-		{Name: "password", Type: field.TypeString},
-		{Name: "smtp_host", Type: field.TypeString, Nullable: true},
-		{Name: "smtp_port", Type: field.TypeInt, Nullable: true},
+		{Name: "from_regex", Type: field.TypeString, Default: ".*"},
+		{Name: "url", Type: field.TypeString},
+		{Name: "method", Type: field.TypeEnum, Enums: []string{"GET", "POST", "PUT", "DELETE", "PATCH"}, Default: "GET"},
+		{Name: "headers", Type: field.TypeJSON, Nullable: true},
+		{Name: "payload_template", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "is_active", Type: field.TypeBool, Default: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "job_user", Type: field.TypeInt},
 	}
@@ -30,9 +29,16 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "jobs_users_user",
-				Columns:    []*schema.Column{JobsColumns[10]},
+				Columns:    []*schema.Column{JobsColumns[9]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "job_email",
+				Unique:  true,
+				Columns: []*schema.Column{JobsColumns[1]},
 			},
 		},
 	}

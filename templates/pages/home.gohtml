@@ -43,7 +43,7 @@
             </tr>
         </thead>
         <tbody>
-        {{- range .Data}}
+        {{- range .Data.Jobs}}
             <tr>
                 <td>{{ .Email }}</td>
                 <td>{{ .URL }}</td>
@@ -53,7 +53,7 @@
                     </td>
                     <td>
                         <div class="insert" x-data="{modal:false}">
-                            <button @click="modal = true" class="button is-link is-small">edit</button>
+                            <button @click="modal = true" class="button is-link is-small">view</button>
                         <div class="modal" :class="modal ? 'is-active' : ''" x-show="modal == true">
                             <div class="modal-background"></div>
                             <div class="modal-content" @click.away="modal = false;">
@@ -61,39 +61,26 @@
                                 <form hx-put="/jobs/{{ .ID }}" hx-target="#posts">
                                     <table class="table is-fullwidth">
                                     <tr>
-                                        <td><label class="label" for="email">Email</label></td>
-                                        <td><input class="input" type="text" id="email" name="email" value="{{ .Email }}" required></td>
+                                        <td><label class="label" for="url">URL</label></td>
+                                        <td><input class="input" type="text" id="url" name="url" value="{{ .URL }}"></td>
                                     </tr>
                                     <tr>
-                                        <td><label class="label" for="password">Password</label></td>
-                                        <td><input class="input" type="password" id="password" name="password" value="{{ .Password }}" required></td>
+                                        <td><label class="label" for="method">Method</label></td>
+                                        <td><input class="input" type="text" id="method" name="method" value="{{ .Method }}"></td>
                                     </tr>
                                     <tr>
-                                        <td><label class="label" for="host">SMTP Host</label></td>
-                                        <td><input class="input" type="text" id="host" name="host" value="{{ .SMTPHost }}"></td>
+                                        <td><label class="label" for="from_regex">From Regex</label></td>
+                                        <td><input class="input" type="text" id="from_regex" name="from_regex" value="{{ .FromRegex }}"></td>
                                     </tr>
                                     <tr>
-                                        <td><label class="label" for="port">SMTP Port</label></td>
-                                        <td><input class="input" type="text" id="port" name="port" value="{{ .SMTPPort }}"></td>
+                                        <td><label class="label" for="payload">Payload</label></td>
+                                        <td><textarea class="input" id="payload" name="payload">{{ .PayloadTemplate }}</textarea></td>
                                     </tr>
                                     <tr>
-                                        <td><label class="label" for="url">URL to call</label></td>
-                                        <td><input class="input" type="text" id="url" name="url" required value="{{ .URL }}"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><label class="label" for="method">HTTP Method</label></td>
-                                        <td><input class="input" type="text" id="port" name="method" default="get" value="{{ .Method }}" required></td>
-                                    </tr>
-                                    <tr>
-                                        <td><label class="label" for="headers">JSON Headers</label></td>
-                                        <td><textarea class="textarea" id="headers" name="headers" value="{{ .Headers }}"></textarea></td>
-                                    </tr>
-                                    <tr>
-                                        <td><label class="label" for="data">Post Data</label></td>
-                                        <td><textarea class="textarea" id="data" name="data" value="{{ .Data }}"></textarea></td>
+                                        <td><label class="label" for="headers">Headers</label></td>
+                                        <td><textarea class="input" id="headers" name="headers">{{ .Headers }}</textarea></td>
                                     </tr>
                                     </table>
-                                    <button class="button is-primary">Submit</button>
                                 </form>
                                 </div>
                             </div>
@@ -107,7 +94,7 @@
         </tbody>
         </table>
 
-            {{ template "insert"}}
+            {{ template "insert" .}}
         <div class="field is-grouped is-grouped-centered">
             {{- if not $.Pager.IsBeginning}}
                 <p class="control">
@@ -134,38 +121,15 @@
             <div class="box">
             <form hx-post="/jobs" hx-target="#posts">
                 <table class="table is-fullwidth">
-                <tr>
-                    <td><label class="label" for="email">Email</label></td>
-                    <td><input class="input" type="text" id="email" name="email" required></td>
-                </tr>
-                <tr>
-                    <td><label class="label" for="password">Password</label></td>
-                    <td><input class="input" type="password" id="password" name="password" required></td>
-                </tr>
-                <tr>
-                    <td><label class="label" for="host">SMTP Host</label></td>
-                    <td><input class="input" type="text" id="host" name="host"></td>
-                </tr>
-                <tr>
-                    <td><label class="label" for="port">SMTP Port</label></td>
-                    <td><input class="input" type="text" id="port" name="port"></td>
-                </tr>
-                <tr>
-                    <td><label class="label" for="url">URL to call</label></td>
-                    <td><input class="input" type="text" id="url" name="url" required></td>
-                </tr>
-                <tr>
-                    <td><label class="label" for="method">HTTP Method</label></td>
-                    <td><input class="input" type="text" id="port" name="method" default="get" required></td>
-                </tr>
-                <tr>
-                    <td><label class="label" for="headers">JSON Headers</label></td>
-                    <td><textarea class="textarea" id="headers" name="headers"></textarea></td>
-                </tr>
-                <tr>
-                    <td><label class="label" for="data">Post Data</label></td>
-                    <td><textarea class="textarea" id="data" name="data"></textarea></td>
-                </tr>
+                    {{- range .Data.InputFields }}
+                    <tr>
+                        <td><label class="label" for="{{ .Name }}">{{ .Label }}</label></td>
+                        <td>
+                {{ if eq .Type "input" }}<input class="input" type="text" id="{{ .Name }}" name="{{ .Name }}" {{ .Extra }}> {{ end }}
+                {{ if eq .Type "textarea" }}<textarea class="textarea" id="{{ .Name }}" name="{{ .Name }}" {{ .Extra }}></textarea> {{ end }}
+                        </td>
+                    </tr>
+                    {{ end }}
                 </table>
                 <button class="button is-primary">Submit</button>
             </form>

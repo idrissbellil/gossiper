@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"gitea.risky.info/risky-info/gossiper/config"
 	"gitea.risky.info/risky-info/gossiper/ent"
 	"gitea.risky.info/risky-info/gossiper/ent/user"
 	"gitea.risky.info/risky-info/gossiper/pkg/context"
@@ -34,9 +35,10 @@ const (
 
 type (
 	Auth struct {
-		auth *services.AuthClient
-		mail *services.MailClient
-		orm  *ent.Client
+		auth   *services.AuthClient
+		mail   *services.MailClient
+		orm    *ent.Client
+		config *config.Config
 		*services.TemplateRenderer
 	}
 
@@ -75,6 +77,7 @@ func (h *Auth) Init(c *services.Container) error {
 	h.orm = c.ORM
 	h.auth = c.Auth
 	h.mail = c.Mail
+	h.config = c.Config
 	return nil
 }
 
@@ -185,6 +188,12 @@ func (h *Auth) LoginSubmit(ctx echo.Context) error {
 		msg.Danger(ctx, "Invalid credentials. Please try again.")
 		return h.LoginPage(ctx)
 	}
+	notVerified := func() error {
+		input.SetFieldError("Email", "")
+		input.SetFieldError("Password", "")
+		msg.Danger(ctx, "Please verify the email first")
+		return h.LoginPage(ctx)
+	}
 
 	err := form.Submit(ctx, &input)
 
@@ -208,6 +217,11 @@ func (h *Auth) LoginSubmit(ctx echo.Context) error {
 	case nil:
 	default:
 		return fail(err, "error querying user during login")
+	}
+
+	if !u.Verified {
+		h.sendVerificationEmail(ctx, u)
+		return notVerified()
 	}
 
 	// Check if the password is correct
@@ -292,22 +306,8 @@ func (h *Auth) RegisterSubmit(ctx echo.Context) error {
 		return fail(err, "unable to create user")
 	}
 
-	// Log the user in
-	err = h.auth.Login(ctx, u.ID)
-	if err != nil {
-		log.Ctx(ctx).Error("unable to log user in",
-			"error", err,
-			"user_id", u.ID,
-		)
-		msg.Info(ctx, "Your account has been created.")
-		return redirect.New(ctx).
-			Route(routeNameLogin).
-			Go()
-	}
+	msg.Success(ctx, "Your account has been created. Please verify your email.")
 
-	msg.Success(ctx, "Your account has been created. You are now logged in.")
-
-	// Send the verification email
 	h.sendVerificationEmail(ctx, u)
 
 	return redirect.New(ctx).
@@ -326,8 +326,7 @@ func (h *Auth) sendVerificationEmail(ctx echo.Context, usr *ent.User) {
 		return
 	}
 
-	// Send the email
-	url := ctx.Echo().Reverse(routeNameVerifyEmail, token)
+	url := h.config.HTTP.Hostname + ctx.Echo().Reverse(routeNameVerifyEmail, token)
 	err = h.mail.
 		Compose().
 		To(usr.Email).

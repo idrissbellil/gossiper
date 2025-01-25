@@ -17,20 +17,24 @@ import (
 func init() {
 	jobFields := schema.Job{}.Fields()
 	_ = jobFields
-	// jobDescURL is the schema descriptor for url field.
-	jobDescURL := jobFields[0].Descriptor()
-	// job.URLValidator is a validator for the "url" field. It is called by the builders before save.
-	job.URLValidator = jobDescURL.Validators[0].(func(string) error)
 	// jobDescEmail is the schema descriptor for email field.
-	jobDescEmail := jobFields[4].Descriptor()
+	jobDescEmail := jobFields[0].Descriptor()
 	// job.EmailValidator is a validator for the "email" field. It is called by the builders before save.
 	job.EmailValidator = jobDescEmail.Validators[0].(func(string) error)
-	// jobDescPassword is the schema descriptor for password field.
-	jobDescPassword := jobFields[5].Descriptor()
-	// job.PasswordValidator is a validator for the "password" field. It is called by the builders before save.
-	job.PasswordValidator = jobDescPassword.Validators[0].(func(string) error)
+	// jobDescFromRegex is the schema descriptor for from_regex field.
+	jobDescFromRegex := jobFields[1].Descriptor()
+	// job.DefaultFromRegex holds the default value on creation for the from_regex field.
+	job.DefaultFromRegex = jobDescFromRegex.Default.(string)
+	// jobDescURL is the schema descriptor for url field.
+	jobDescURL := jobFields[2].Descriptor()
+	// job.URLValidator is a validator for the "url" field. It is called by the builders before save.
+	job.URLValidator = jobDescURL.Validators[0].(func(string) error)
+	// jobDescIsActive is the schema descriptor for is_active field.
+	jobDescIsActive := jobFields[6].Descriptor()
+	// job.DefaultIsActive holds the default value on creation for the is_active field.
+	job.DefaultIsActive = jobDescIsActive.Default.(bool)
 	// jobDescCreatedAt is the schema descriptor for created_at field.
-	jobDescCreatedAt := jobFields[8].Descriptor()
+	jobDescCreatedAt := jobFields[7].Descriptor()
 	// job.DefaultCreatedAt holds the default value on creation for the created_at field.
 	job.DefaultCreatedAt = jobDescCreatedAt.Default.(func() time.Time)
 	passwordtokenFields := schema.PasswordToken{}.Fields()
