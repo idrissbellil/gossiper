@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"strconv"
 
+	"gitea.risky.info/risky-info/gossiper/config"
 	"gitea.risky.info/risky-info/gossiper/ent"
 	"gitea.risky.info/risky-info/gossiper/ent/job"
 	gocontext "gitea.risky.info/risky-info/gossiper/pkg/context"
@@ -26,7 +27,8 @@ const (
 type (
 	Pages struct {
 		*services.TemplateRenderer
-		ORM *ent.Client
+		ORM    *ent.Client
+		Config *config.Config
 	}
 
 	post struct {
@@ -70,6 +72,7 @@ func init() {
 func (h *Pages) Init(c *services.Container) error {
 	h.TemplateRenderer = c.TemplateRenderer
 	h.ORM = c.ORM
+	h.Config = c.Config
 	return nil
 }
 
@@ -81,13 +84,14 @@ func (h *Pages) Routes(g *echo.Group) {
 	g.GET("/about", h.About).Name = routeNameAbout
 }
 
-func generateRandomEmail() string {
+func generateRandomEmail(hostname string) string {
+	// FIXME check for collisions
 	const letters = "abcdefghijklmnopqrstuvwxyz0123456789"
 	b := make([]byte, 8)
 	for i := range b {
 		b[i] = letters[rand.Intn(len(letters))]
 	}
-	return string(b) + "@v3m.net"
+	return string(b) + "@" + hostname
 }
 
 func (h *Pages) JobAdd(ctx echo.Context) error {
@@ -104,7 +108,7 @@ func (h *Pages) JobAdd(ctx echo.Context) error {
 		}
 	}
 	dbJob, err := h.ORM.Job.Create().
-		SetEmail(generateRandomEmail()).
+		SetEmail(generateRandomEmail(h.Config.Mailhog.Hostname)).
 		SetURL(jobRead.URL).
 		SetMethod(job.Method(jobRead.Method)).
 		SetFromRegex(jobRead.FromRegex).

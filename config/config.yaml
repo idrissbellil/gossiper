@@ -42,6 +42,7 @@ tasks:
 
 mailhog:
   ws: ws://127.0.0.1:8025/api/v2/websocket
+  hostname: localhost
 
 mail:
   hostname: "localhost"

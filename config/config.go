@@ -115,7 +115,8 @@ type (
 
 	// TasksConfig stores the tasks configuration
 	MailhogConfig struct {
-		Ws string
+		Ws       string
+		Hostname string
 	}
 
 	// MailConfig stores the mail configuration
