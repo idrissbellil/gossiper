@@ -33,7 +33,7 @@ steps:
     - git checkout $DRONE_COMMIT
 
   - name: test
-    image: golang:1.22
+    image: golang:1.23
     commands:
       - sleep 10
       - go test -count=1 -p 1 ./...
@@ -80,9 +80,8 @@ steps:
     - git checkout $DRONE_COMMIT
 
   - name: test
-    image: golang:1.22
+    image: golang:1.23
     commands:
-      - sleep 10
       - go test -count=1 -p 1 ./...
     environment:
       GOSSIP_DATABASE_DRIVER: postgres
