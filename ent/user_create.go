@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"gitea.risky.info/risky-info/gossiper/ent/job"
 	"gitea.risky.info/risky-info/gossiper/ent/passwordtoken"
 	"gitea.risky.info/risky-info/gossiper/ent/user"
 )
@@ -81,19 +82,34 @@ func (uc *UserCreate) SetNillableCreatedAt(t *time.Time) *UserCreate {
 	return uc
 }
 
-// AddOwnerIDs adds the "owner" edge to the PasswordToken entity by IDs.
-func (uc *UserCreate) AddOwnerIDs(ids ...int) *UserCreate {
-	uc.mutation.AddOwnerIDs(ids...)
+// AddAuthtokenIDs adds the "authtokens" edge to the PasswordToken entity by IDs.
+func (uc *UserCreate) AddAuthtokenIDs(ids ...int) *UserCreate {
+	uc.mutation.AddAuthtokenIDs(ids...)
 	return uc
 }
 
-// AddOwner adds the "owner" edges to the PasswordToken entity.
-func (uc *UserCreate) AddOwner(p ...*PasswordToken) *UserCreate {
+// AddAuthtokens adds the "authtokens" edges to the PasswordToken entity.
+func (uc *UserCreate) AddAuthtokens(p ...*PasswordToken) *UserCreate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return uc.AddOwnerIDs(ids...)
+	return uc.AddAuthtokenIDs(ids...)
+}
+
+// AddJobIDs adds the "jobs" edge to the Job entity by IDs.
+func (uc *UserCreate) AddJobIDs(ids ...int) *UserCreate {
+	uc.mutation.AddJobIDs(ids...)
+	return uc
+}
+
+// AddJobs adds the "jobs" edges to the Job entity.
+func (uc *UserCreate) AddJobs(j ...*Job) *UserCreate {
+	ids := make([]int, len(j))
+	for i := range j {
+		ids[i] = j[i].ID
+	}
+	return uc.AddJobIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -236,15 +252,31 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if nodes := uc.mutation.OwnerIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.AuthtokensIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.OwnerTable,
-			Columns: []string{user.OwnerColumn},
+			Table:   user.AuthtokensTable,
+			Columns: []string{user.AuthtokensColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(passwordtoken.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.JobsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.JobsTable,
+			Columns: []string{user.JobsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(job.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

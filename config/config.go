@@ -58,6 +58,7 @@ type (
 		Cache         CacheConfig
 		Database      DatabaseConfig
 		QueueDatabase DatabaseConfig
+		Mailhog       MailhogConfig
 		Tasks         TasksConfig
 		Mail          MailConfig
 	}
@@ -110,6 +111,12 @@ type (
 		PollInterval time.Duration
 		MaxRetries   int
 		Goroutines   int
+	}
+
+	// TasksConfig stores the tasks configuration
+	MailhogConfig struct {
+		Ws       string
+		Hostname string
 	}
 
 	// MailConfig stores the mail configuration

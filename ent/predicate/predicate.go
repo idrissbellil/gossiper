@@ -6,6 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Job is the predicate function for job builders.
+type Job func(*sql.Selector)
+
 // PasswordToken is the predicate function for passwordtoken builders.
 type PasswordToken func(*sql.Selector)
 

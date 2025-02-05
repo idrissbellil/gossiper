@@ -7,12 +7,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/labstack/echo/v4"
 	"gitea.risky.info/risky-info/gossiper/config"
 	"gitea.risky.info/risky-info/gossiper/pkg/htmx"
 	"gitea.risky.info/risky-info/gossiper/pkg/page"
 	"gitea.risky.info/risky-info/gossiper/pkg/tests"
 	"gitea.risky.info/risky-info/gossiper/templates"
+	"github.com/labstack/echo/v4"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -91,6 +91,13 @@ func TestTemplateRenderer_RenderPage(t *testing.T) {
 		p.Headers["A"] = "b"
 		p.Headers["C"] = "d"
 		p.StatusCode = http.StatusCreated
+		p.Data = struct {
+			Jobs        interface{}
+			InputFields interface{}
+		}{
+			nil,
+			nil,
+		}
 		return ctx, rec, p
 	}
 

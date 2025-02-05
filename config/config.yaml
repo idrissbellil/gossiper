@@ -1,5 +1,5 @@
 http:
-  hostname: ""
+  hostname: "localhost"
   port: 8000
   readTimeout: "5s"
   writeTimeout: "10s"
@@ -39,6 +39,10 @@ tasks:
   pollInterval: "1s"
   maxRetries: 10
   goroutines: 1
+
+mailhog:
+  ws: ws://127.0.0.1:8025/api/v2/websocket
+  hostname: localhost
 
 mail:
   hostname: "localhost"

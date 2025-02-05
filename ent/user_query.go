@@ -8,9 +8,11 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"gitea.risky.info/risky-info/gossiper/ent/job"
 	"gitea.risky.info/risky-info/gossiper/ent/passwordtoken"
 	"gitea.risky.info/risky-info/gossiper/ent/predicate"
 	"gitea.risky.info/risky-info/gossiper/ent/user"
@@ -19,11 +21,12 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	ctx        *QueryContext
-	order      []user.OrderOption
-	inters     []Interceptor
-	predicates []predicate.User
-	withOwner  *PasswordTokenQuery
+	ctx            *QueryContext
+	order          []user.OrderOption
+	inters         []Interceptor
+	predicates     []predicate.User
+	withAuthtokens *PasswordTokenQuery
+	withJobs       *JobQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -60,8 +63,8 @@ func (uq *UserQuery) Order(o ...user.OrderOption) *UserQuery {
 	return uq
 }
 
-// QueryOwner chains the current query on the "owner" edge.
-func (uq *UserQuery) QueryOwner() *PasswordTokenQuery {
+// QueryAuthtokens chains the current query on the "authtokens" edge.
+func (uq *UserQuery) QueryAuthtokens() *PasswordTokenQuery {
 	query := (&PasswordTokenClient{config: uq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := uq.prepareQuery(ctx); err != nil {
@@ -74,7 +77,29 @@ func (uq *UserQuery) QueryOwner() *PasswordTokenQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(passwordtoken.Table, passwordtoken.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, user.OwnerTable, user.OwnerColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.AuthtokensTable, user.AuthtokensColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryJobs chains the current query on the "jobs" edge.
+func (uq *UserQuery) QueryJobs() *JobQuery {
+	query := (&JobClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(job.Table, job.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.JobsTable, user.JobsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -85,7 +110,7 @@ func (uq *UserQuery) QueryOwner() *PasswordTokenQuery {
 // First returns the first User entity from the query.
 // Returns a *NotFoundError when no User was found.
 func (uq *UserQuery) First(ctx context.Context) (*User, error) {
-	nodes, err := uq.Limit(1).All(setContextOp(ctx, uq.ctx, "First"))
+	nodes, err := uq.Limit(1).All(setContextOp(ctx, uq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +133,7 @@ func (uq *UserQuery) FirstX(ctx context.Context) *User {
 // Returns a *NotFoundError when no User ID was found.
 func (uq *UserQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = uq.Limit(1).IDs(setContextOp(ctx, uq.ctx, "FirstID")); err != nil {
+	if ids, err = uq.Limit(1).IDs(setContextOp(ctx, uq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -131,7 +156,7 @@ func (uq *UserQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one User entity is found.
 // Returns a *NotFoundError when no User entities are found.
 func (uq *UserQuery) Only(ctx context.Context) (*User, error) {
-	nodes, err := uq.Limit(2).All(setContextOp(ctx, uq.ctx, "Only"))
+	nodes, err := uq.Limit(2).All(setContextOp(ctx, uq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +184,7 @@ func (uq *UserQuery) OnlyX(ctx context.Context) *User {
 // Returns a *NotFoundError when no entities are found.
 func (uq *UserQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = uq.Limit(2).IDs(setContextOp(ctx, uq.ctx, "OnlyID")); err != nil {
+	if ids, err = uq.Limit(2).IDs(setContextOp(ctx, uq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -184,7 +209,7 @@ func (uq *UserQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of Users.
 func (uq *UserQuery) All(ctx context.Context) ([]*User, error) {
-	ctx = setContextOp(ctx, uq.ctx, "All")
+	ctx = setContextOp(ctx, uq.ctx, ent.OpQueryAll)
 	if err := uq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -206,7 +231,7 @@ func (uq *UserQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if uq.ctx.Unique == nil && uq.path != nil {
 		uq.Unique(true)
 	}
-	ctx = setContextOp(ctx, uq.ctx, "IDs")
+	ctx = setContextOp(ctx, uq.ctx, ent.OpQueryIDs)
 	if err = uq.Select(user.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -224,7 +249,7 @@ func (uq *UserQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (uq *UserQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, uq.ctx, "Count")
+	ctx = setContextOp(ctx, uq.ctx, ent.OpQueryCount)
 	if err := uq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -242,7 +267,7 @@ func (uq *UserQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (uq *UserQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, uq.ctx, "Exist")
+	ctx = setContextOp(ctx, uq.ctx, ent.OpQueryExist)
 	switch _, err := uq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -269,26 +294,38 @@ func (uq *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:     uq.config,
-		ctx:        uq.ctx.Clone(),
-		order:      append([]user.OrderOption{}, uq.order...),
-		inters:     append([]Interceptor{}, uq.inters...),
-		predicates: append([]predicate.User{}, uq.predicates...),
-		withOwner:  uq.withOwner.Clone(),
+		config:         uq.config,
+		ctx:            uq.ctx.Clone(),
+		order:          append([]user.OrderOption{}, uq.order...),
+		inters:         append([]Interceptor{}, uq.inters...),
+		predicates:     append([]predicate.User{}, uq.predicates...),
+		withAuthtokens: uq.withAuthtokens.Clone(),
+		withJobs:       uq.withJobs.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
 	}
 }
 
-// WithOwner tells the query-builder to eager-load the nodes that are connected to
-// the "owner" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithOwner(opts ...func(*PasswordTokenQuery)) *UserQuery {
+// WithAuthtokens tells the query-builder to eager-load the nodes that are connected to
+// the "authtokens" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithAuthtokens(opts ...func(*PasswordTokenQuery)) *UserQuery {
 	query := (&PasswordTokenClient{config: uq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uq.withOwner = query
+	uq.withAuthtokens = query
+	return uq
+}
+
+// WithJobs tells the query-builder to eager-load the nodes that are connected to
+// the "jobs" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithJobs(opts ...func(*JobQuery)) *UserQuery {
+	query := (&JobClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withJobs = query
 	return uq
 }
 
@@ -370,8 +407,9 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
-		loadedTypes = [1]bool{
-			uq.withOwner != nil,
+		loadedTypes = [2]bool{
+			uq.withAuthtokens != nil,
+			uq.withJobs != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -392,17 +430,24 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := uq.withOwner; query != nil {
-		if err := uq.loadOwner(ctx, query, nodes,
-			func(n *User) { n.Edges.Owner = []*PasswordToken{} },
-			func(n *User, e *PasswordToken) { n.Edges.Owner = append(n.Edges.Owner, e) }); err != nil {
+	if query := uq.withAuthtokens; query != nil {
+		if err := uq.loadAuthtokens(ctx, query, nodes,
+			func(n *User) { n.Edges.Authtokens = []*PasswordToken{} },
+			func(n *User, e *PasswordToken) { n.Edges.Authtokens = append(n.Edges.Authtokens, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withJobs; query != nil {
+		if err := uq.loadJobs(ctx, query, nodes,
+			func(n *User) { n.Edges.Jobs = []*Job{} },
+			func(n *User, e *Job) { n.Edges.Jobs = append(n.Edges.Jobs, e) }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (uq *UserQuery) loadOwner(ctx context.Context, query *PasswordTokenQuery, nodes []*User, init func(*User), assign func(*User, *PasswordToken)) error {
+func (uq *UserQuery) loadAuthtokens(ctx context.Context, query *PasswordTokenQuery, nodes []*User, init func(*User), assign func(*User, *PasswordToken)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*User)
 	for i := range nodes {
@@ -414,7 +459,7 @@ func (uq *UserQuery) loadOwner(ctx context.Context, query *PasswordTokenQuery, n
 	}
 	query.withFKs = true
 	query.Where(predicate.PasswordToken(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(user.OwnerColumn), fks...))
+		s.Where(sql.InValues(s.C(user.AuthtokensColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -428,6 +473,37 @@ func (uq *UserQuery) loadOwner(ctx context.Context, query *PasswordTokenQuery, n
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "password_token_user" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (uq *UserQuery) loadJobs(ctx context.Context, query *JobQuery, nodes []*User, init func(*User), assign func(*User, *Job)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Job(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.JobsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.job_user
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "job_user" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "job_user" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -529,7 +605,7 @@ func (ugb *UserGroupBy) Aggregate(fns ...AggregateFunc) *UserGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (ugb *UserGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ugb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, ugb.build.ctx, ent.OpQueryGroupBy)
 	if err := ugb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -577,7 +653,7 @@ func (us *UserSelect) Aggregate(fns ...AggregateFunc) *UserSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (us *UserSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, us.ctx, "Select")
+	ctx = setContextOp(ctx, us.ctx, ent.OpQuerySelect)
 	if err := us.prepareQuery(ctx); err != nil {
 		return err
 	}

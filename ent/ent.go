@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"gitea.risky.info/risky-info/gossiper/ent/job"
 	"gitea.risky.info/risky-info/gossiper/ent/passwordtoken"
 	"gitea.risky.info/risky-info/gossiper/ent/user"
 )
@@ -70,10 +71,11 @@ var (
 	columnCheck sql.ColumnCheck
 )
 
-// columnChecker checks if the column exists in the given table.
+// checkColumn checks if the column exists in the given table.
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
+			job.Table:           job.ValidColumn,
 			passwordtoken.Table: passwordtoken.ValidColumn,
 			user.Table:          user.ValidColumn,
 		})

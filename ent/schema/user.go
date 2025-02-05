@@ -41,7 +41,9 @@ func (User) Fields() []ent.Field {
 // Edges of the User.
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("owner", PasswordToken.Type).
+		edge.From("authtokens", PasswordToken.Type).
+			Ref("user"),
+		edge.From("jobs", Job.Type).
 			Ref("user"),
 	}
 }

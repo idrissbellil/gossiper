@@ -23,60 +23,132 @@
     </section>
 
     <section class="section">
-        <h1 class="title">Recent posts</h1>
+        <h1 class="title">Active Jobs</h1>
         <h2 class="subtitle">
-            Below is an example of both paging and AJAX fetching using HTMX
+            Below is the list of active jobs.
         </h2>
     </section>
 {{end}}
 
 {{define "posts"}}
     <div id="posts">
-        {{- range .Data}}
-            <article class="media">
-                <figure class="media-left">
-                    <p class="image is-64x64">
-                        <img src="{{file "gopher.png"}}" alt="Gopher"/>
-                    </p>
-                </figure>
-                <div class="media-content">
-                    <div class="content">
-                        <p>
-                            <strong>{{.Title}}</strong>
-                            <br>
-                            {{.Body}}
-                        </p>
+        <table class="table is-fullwidth is-striped is-narrow is-hoverable">
+        <thead>
+            <tr class="has-text-centered">
+                <th>Email</th>
+                <th>URL</th>
+                <th style="width: 50px;">Method</th>
+                <th style="width: 50px;"></th>
+                <th style="width: 50px;"></th>
+            </tr>
+        </thead>
+        <tbody>
+        {{- range .Data.Jobs}}
+            <tr>
+                <td>{{ .Email }}</td>
+                <td>{{ .URL }}</td>
+                <td>{{ .Method }}</td>
+                <td>
+                    <button class="button is-danger is-small" hx-delete="/jobs/{{ .ID }}" hx-target="#posts">delete</button>
+                    </td>
+                    <td>
+                        <div class="insert" x-data="{modal:false}">
+                            <button @click="modal = true" class="button is-link is-small">view</button>
+                        <div class="modal" :class="modal ? 'is-active' : ''" x-show="modal == true">
+                            <div class="modal-background"></div>
+                            <div class="modal-content" @click.away="modal = false;">
+                                <div class="box">
+                                <form hx-put="/jobs/{{ .ID }}" hx-target="#posts">
+                                    <table class="table is-fullwidth">
+                                    <tr>
+                                        <td><label class="label" for="url">URL</label></td>
+                                        <td><input class="input" type="text" id="url" name="url" value="{{ .URL }}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label class="label" for="method">Method</label></td>
+                                        <td><input class="input" type="text" id="method" name="method" value="{{ .Method }}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label class="label" for="from_regex">From Regex</label></td>
+                                        <td><input class="input" type="text" id="from_regex" name="from_regex" value="{{ .FromRegex }}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label class="label" for="payload">Payload</label></td>
+                                        <td><textarea class="input" id="payload" name="payload">{{ .PayloadTemplate }}</textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label class="label" for="headers">Headers</label></td>
+                                        <td><textarea class="input" id="headers" name="headers">{{ .Headers }}</textarea></td>
+                                    </tr>
+                                    </table>
+                                </form>
+                                </div>
+                            </div>
+                            <button class="modal-close is-large" aria-label="close"></button>
+                        </div>
                     </div>
-                </div>
-            </article>
+                    </td>
+                </td>
+            </tr>
         {{- end}}
+        </tbody>
+        </table>
 
+            {{ template "insert" .}}
         <div class="field is-grouped is-grouped-centered">
             {{- if not $.Pager.IsBeginning}}
                 <p class="control">
-                    <button class="button is-primary" hx-swap="outerHTML" hx-get="/?page={{sub $.Pager.Page 1}}" hx-target="#posts">Previous page</button>
+                    <button class="button is-primary" hx-swap="outerHTML" hx-get="/?page={{sub $.Pager.Page 1}}" hx-target="#posts">&lt;</button>
                 </p>
             {{- end}}
             {{- if not $.Pager.IsEnd}}
                 <p class="control">
-                    <button class="button is-primary" hx-swap="outerHTML" hx-get="/?page={{add $.Pager.Page 1}}" hx-target="#posts">Next page</button>
+                    <button class="button is-primary" hx-swap="outerHTML" hx-get="/?page={{add $.Pager.Page 1}}" hx-target="#posts">&gt;</button>
                 </p>
             {{- end}}
         </div>
     </div>
 {{end}}
 
+{{define "insert"}}
+<div class="insert mr-2 mt-1" x-data="{modal:false}">
+    <p class="control">
+        <button @click="modal = true" class="button is-primary">Add New</button>
+    </p>
+    <div class="modal" :class="modal ? 'is-active' : ''" x-show="modal == true">
+        <div class="modal-background"></div>
+        <div class="modal-content" @click.away="modal = false;">
+            <div class="box">
+            <form hx-post="/jobs" hx-target="#posts">
+                <table class="table is-fullwidth">
+                    {{- range .Data.InputFields }}
+                    <tr>
+                        <td><label class="label" for="{{ .Name }}">{{ .Label }}</label></td>
+                        <td>
+                {{ if eq .Type "input" }}<input class="input" type="text" id="{{ .Name }}" name="{{ .Name }}" {{ .Extra }}> {{ end }}
+                {{ if eq .Type "textarea" }}<textarea class="textarea" id="{{ .Name }}" name="{{ .Name }}" {{ .Extra }}></textarea> {{ end }}
+                        </td>
+                    </tr>
+                    {{ end }}
+                </table>
+                <button class="button is-primary">Submit</button>
+            </form>
+            </div>
+        </div>
+        <button class="modal-close is-large" aria-label="close"></button>
+    </div>
+</div>
+{{end}}
+
 {{define "file-msg"}}
     <div class="block"></div>
     <article class="message is-small is-warning" x-data="{show: true}" x-show="show">
         <div class="message-header">
-            <p>Serving files</p>
+            <p>Jobs Review</p>
             <button class="delete is-small" aria-label="delete" @click="show = false"></button>
         </div>
         <div class="message-body">
-            In the example posts above, check how the file URL contains a cache-buster query parameter which changes only when the app is restarted.
-            Static files also contain cache-control headers which are configured via middleware.
-            You can also use AlpineJS to dismiss this message.
+            Review the saved jobs and make sure to keep them updated.
         </div>
     </article>
 {{end}}

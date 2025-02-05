@@ -25,6 +25,13 @@ func TestServeCachedPage(t *testing.T) {
 	p.StatusCode = http.StatusCreated
 	p.Headers["a"] = "b"
 	p.Headers["c"] = "d"
+	p.Data = struct {
+		Jobs        interface{}
+		InputFields interface{}
+	}{
+		nil,
+		nil,
+	}
 	err := c.TemplateRenderer.RenderPage(ctx, p)
 	output := rec.Body.Bytes()
 	require.NoError(t, err)

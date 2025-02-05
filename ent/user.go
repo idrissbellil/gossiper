@@ -37,20 +37,31 @@ type User struct {
 
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
-	// Owner holds the value of the owner edge.
-	Owner []*PasswordToken `json:"owner,omitempty"`
+	// Authtokens holds the value of the authtokens edge.
+	Authtokens []*PasswordToken `json:"authtokens,omitempty"`
+	// Jobs holds the value of the jobs edge.
+	Jobs []*Job `json:"jobs,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
-// OwnerOrErr returns the Owner value or an error if the edge
+// AuthtokensOrErr returns the Authtokens value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) OwnerOrErr() ([]*PasswordToken, error) {
+func (e UserEdges) AuthtokensOrErr() ([]*PasswordToken, error) {
 	if e.loadedTypes[0] {
-		return e.Owner, nil
+		return e.Authtokens, nil
 	}
-	return nil, &NotLoadedError{edge: "owner"}
+	return nil, &NotLoadedError{edge: "authtokens"}
+}
+
+// JobsOrErr returns the Jobs value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) JobsOrErr() ([]*Job, error) {
+	if e.loadedTypes[1] {
+		return e.Jobs, nil
+	}
+	return nil, &NotLoadedError{edge: "jobs"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -138,9 +149,14 @@ func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
 }
 
-// QueryOwner queries the "owner" edge of the User entity.
-func (u *User) QueryOwner() *PasswordTokenQuery {
-	return NewUserClient(u.config).QueryOwner(u)
+// QueryAuthtokens queries the "authtokens" edge of the User entity.
+func (u *User) QueryAuthtokens() *PasswordTokenQuery {
+	return NewUserClient(u.config).QueryAuthtokens(u)
+}
+
+// QueryJobs queries the "jobs" edge of the User entity.
+func (u *User) QueryJobs() *JobQuery {
+	return NewUserClient(u.config).QueryJobs(u)
 }
 
 // Update returns a builder for updating this User.
