@@ -37,8 +37,6 @@ services:
       - "25:1025"  # SMTP port
   worker:
     image: gitea.risky.info/risky-info/gossip-worker:latest
-    ports:
-      - "9311:8000"
     environment:
       GOSSIP_APP_ENVIRONMENT: prod
       GOSSIP_DATABASE_DRIVER: postgres
