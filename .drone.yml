@@ -114,36 +114,31 @@ steps:
       password:
         from_secret: DOCKER_REGISTRY_PASSWORD
 
-#  - name: copy-compose
-#    image: appleboy/drone-scp
-#    settings:
-#      host: 173.249.23.177
-#      username: idriss
-#      key:
-#        from_secret: DOCKER_DEPLOY_SSH_KEY
-#      port: 7777
-#      source:
-#        - docker-compose.yml
-#      target: /tmp/
-#      strip_components: 0
-#
-#  - name: deploy
-#    image: appleboy/drone-ssh
-#    environment:
-#      GOSSIP_MAIL_PASSWORD:
-#        from_secret: MAIL_PASSWORD
-#    settings:
-#      host: 173.249.23.177
-#      username: idriss
-#      key:
-#        from_secret: DOCKER_DEPLOY_SSH_KEY
-#      port: 7777
-#      envs: [GOSSIP_MAIL_PASSWORD]
-#      script:
-#        - export GOSSIP_MAIL_PASSWORD=$GOSSIP_MAIL_PASSWORD
-#        - docker stack rm gossip-stack
-#        - docker container prune -f
-#        - docker image prune -f
-#        - docker compose -f /tmp/docker-compose.yml pull
-#        - docker stack deploy -c /tmp/docker-compose.yml gossip-stack
-#        - docker image prune -f
+  - name: copy-compose
+    image: appleboy/drone-scp
+    settings:
+      host: 37.221.67.221
+      username: idriss
+      key:
+        from_secret: DOCKER_DEPLOY_SSH_KEY
+      port: 7777
+      source:
+        - docker-compose.yml
+      target: /home/idriss/services/gossiper
+      strip_components: 0
+
+  - name: deploy
+    image: appleboy/drone-ssh
+    settings:
+      host: 37.221.67.221
+      username: idriss
+      key:
+        from_secret: DOCKER_DEPLOY_SSH_KEY
+      port: 7777
+      script:
+        - docker compose -f /home/idriss/services/gossiper/docker-compose.yml down || true
+        - docker container prune -f
+        - docker image prune -f
+        - docker compose -f /home/idriss/services/gossiper/docker-compose.yml pull
+        - cd /home/idriss/services/gossiper/ && docker compose -f /home/idriss/services/gossiper/docker-compose.yml up -d
+        - docker image prune -f
