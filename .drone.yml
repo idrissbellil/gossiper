@@ -129,13 +129,18 @@ steps:
 
   - name: deploy
     image: appleboy/drone-ssh
+    environment:
+      GOSSIP_MAIL_PASSWORD:
+        from_secret: MAIL_PASSWORD
     settings:
       host: 37.221.67.221
       username: idriss
+      envs: [GOSSIP_MAIL_PASSWORD]
       key:
         from_secret: DOCKER_DEPLOY_SSH_KEY
       port: 7777
       script:
+        - export GOSSIP_MAIL_PASSWORD=$GOSSIP_MAIL_PASSWORD
         - docker compose -f /home/idriss/services/gossiper/docker-compose.yml down || true
         - docker container prune -f
         - docker image prune -f
