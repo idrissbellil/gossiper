@@ -48,3 +48,10 @@ services:
     depends_on:
       - db
       - mailhog
+
+networks:
+  traefik-public:
+    external: false
+
+volumes:
+  letsencrypt:
