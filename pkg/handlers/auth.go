@@ -308,7 +308,7 @@ func (h *Auth) RegisterSubmit(ctx echo.Context) error {
 
 	msg.Success(ctx, "Your account has been created. Please verify your email.")
 
-	h.sendVerificationEmail(ctx, u)
+	go h.sendVerificationEmail(ctx, u)
 
 	return redirect.New(ctx).
 		Route(routeNameHome).
@@ -326,7 +326,7 @@ func (h *Auth) sendVerificationEmail(ctx echo.Context, usr *ent.User) {
 		return
 	}
 
-	url := h.config.HTTP.Hostname + ctx.Echo().Reverse(routeNameVerifyEmail, token)
+	url := "https://" + h.config.HTTP.Hostname + ctx.Echo().Reverse(routeNameVerifyEmail, token)
 	err = h.mail.
 		Compose().
 		To(usr.Email).
