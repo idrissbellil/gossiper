@@ -10,6 +10,7 @@ services:
 
   web:
     image: gitea.risky.info/risky-info/gossip-web:latest
+    restart: unless-stopped
     environment:
       GOSSIP_HTTP_HOSTNAME: gossip.v3m.net
       GOSSIP_APP_ENVIRONMENT: prod
@@ -42,6 +43,7 @@ services:
       - backend
   worker:
     image: gitea.risky.info/risky-info/gossip-worker:latest
+    restart: unless-stopped
     environment:
       GOSSIP_APP_ENVIRONMENT: prod
       GOSSIP_DATABASE_DRIVER: postgres
@@ -60,6 +62,3 @@ networks:
     external: true
   backend:
     external: false
-
-volumes:
-  letsencrypt:
