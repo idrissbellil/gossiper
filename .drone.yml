@@ -142,8 +142,5 @@ steps:
       script:
         - export GOSSIP_MAIL_PASSWORD=$GOSSIP_MAIL_PASSWORD
         - docker compose -f /home/idriss/services/gossiper/docker-compose.yml down || true
-        - docker container prune -f
-        - docker image prune -f
         - docker compose -f /home/idriss/services/gossiper/docker-compose.yml pull
         - cd /home/idriss/services/gossiper/ && docker compose -f /home/idriss/services/gossiper/docker-compose.yml up -d
-        - docker image prune -f
