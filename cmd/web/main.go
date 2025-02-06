@@ -33,7 +33,7 @@ func main() {
 	// Start the server
 	go func() {
 		srv := http.Server{
-			Addr:         fmt.Sprintf("%s:%d", c.Config.HTTP.Hostname, c.Config.HTTP.Port),
+			Addr:         fmt.Sprintf("%s:%d", "0.0.0.0", c.Config.HTTP.Port),
 			Handler:      c.Web,
 			ReadTimeout:  c.Config.HTTP.ReadTimeout,
 			WriteTimeout: c.Config.HTTP.WriteTimeout,

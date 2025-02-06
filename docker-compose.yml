@@ -5,6 +5,8 @@ services:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
       - POSTGRES_DB=app_test
+    networks:
+      - backend
 
   web:
     image: gitea.risky.info/risky-info/gossip-web:latest
@@ -31,10 +33,13 @@ services:
       - "traefik.http.services.gossip.loadbalancer.server.port=8000"
     networks:
       - traefik-public
+      - backend
   mailhog:
     image: mailhog/mailhog:latest
     ports:
       - "25:1025"  # SMTP port
+    networks:
+      - backend
   worker:
     image: gitea.risky.info/risky-info/gossip-worker:latest
     environment:
@@ -43,12 +48,17 @@ services:
       GOSSIP_DATABASE_TESTCONNECTION: host=db port=5432 user=admin dbname=app_test password=admin sslmode=disable
       GOSSIP_DATABASE_CONNECTION: host=db port=5432 user=admin dbname=app_test password=admin sslmode=disable
       GOSSIP_MAILHOG_WS: ws://mailhog:8025/api/v2/websocket
+    networks:
+      - backend
     depends_on:
       - db
       - mailhog
 
 networks:
   traefik-public:
+    name: traefik-public
+    external: true
+  backend:
     external: false
 
 volumes:
