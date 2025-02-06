@@ -30,10 +30,10 @@ type RawMessage struct {
 }
 
 type Message struct {
-	From    string   `json:"From"`
-	To      []string `json:"To"`
-	Subject string   `json:"Subject"`
-	Body    string   `json:"Body"`
+	From    string `json:"From"`
+	To      string `json:"To"`
+	Subject string `json:"Subject"`
+	Body    string `json:"Body"`
 }
 
 func firstOrEmpty(arr []string) string {
@@ -67,20 +67,23 @@ func main() {
 			if err := client.ReadJSON(&rawMsg); err != nil {
 				log.Println("receiving error: ", err)
 			}
-			msg := Message{
-				To:      strings.Split(rawMsg.Content.Headers.To[0], ","),
-				From:    rawMsg.Content.Headers.From[0],
-				Subject: rawMsg.Content.Headers.Subject[0],
-				Body:    rawMsg.Content.Body,
+			for _, to := range strings.Split(rawMsg.Content.Headers.To[0], ",") {
+				msg := Message{
+					To:      strings.TrimSpace(to),
+					From:    rawMsg.Content.Headers.From[0],
+					Subject: rawMsg.Content.Headers.Subject[0],
+					Body:    rawMsg.Content.Body,
+				}
+				go processMsg(msg, c.ORM)
 			}
-			go processMsg(msg, c.ORM)
 		}
 	}()
 }
 
 func processMsg(msg Message, client *ent.Client) error {
+	log.Println(msg)
 	jobs, err := client.Job.Query().
-		Where(job.EmailIn(msg.To...)).
+		Where(job.EmailEQ(msg.To)).
 		Where(job.IsActive(true)).
 		All(context.Background())
 	if err != nil {
