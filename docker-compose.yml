@@ -37,6 +37,10 @@ services:
     networks:
       - traefik-public
       - backend
+    logging:
+      driver: loki
+      options:
+        loki-url: http://127.0.0.1:3100/loki/api/v1/push
   mailhog:
     image: mailhog/mailhog:latest
     ports:
@@ -57,6 +61,10 @@ services:
     depends_on:
       - db
       - mailhog
+    logging:
+      driver: loki
+      options:
+        loki-url: http://127.0.0.1:3100/loki/api/v1/push
 
 networks:
   traefik-public:

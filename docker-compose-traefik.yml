@@ -13,10 +13,10 @@ services:
       # Dashboard config
       - "--api.dashboard=true"
       # Log config
-      - "--log.level=DEBUG"
+      - --log.level=INFO
       - "--accesslog=true"
-      - "--accesslog.filepath=/logs/access.log"
-      - "--log.filepath=/logs/traefik.log"
+      - "--log.format=json"
+      - "--accesslog.format=json"
       # Metrics config
       - "--metrics.prometheus=true"
       - "--metrics.prometheus.addEntryPointsLabels=true"
@@ -43,6 +43,10 @@ services:
       # Basic auth middleware (recommended)
       - "traefik.http.middlewares.auth.basicauth.users=idriss:$$apr1$$cIdOPlj3$$yDdeEu0GJR19jT6RW8pY8/"  # Generate this with htpasswd
       - "traefik.http.routers.dashboard.middlewares=auth@docker"
+    logging:
+      driver: loki
+      options:
+        loki-url: http://127.0.0.1:3100/loki/api/v1/push
 
   prometheus:
     image: prom/prometheus:latest
@@ -51,6 +55,15 @@ services:
       - prometheus-data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - traefik-public
+
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "127.0.0.1:3100:3100"
+    volumes:
+      - loki-data:/loki
     networks:
       - traefik-public
 
@@ -76,5 +89,6 @@ networks:
 volumes:
   letsencrypt:
   traefik-logs:
+  loki-data:
   prometheus-data:
   grafana-data:
