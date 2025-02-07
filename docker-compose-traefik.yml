@@ -1,8 +1,7 @@
 services:
   traefik:
-    image: traefik:v2.10
+    image: traefik:v3.0
     command:
-      # Existing commands
       - "--providers.docker=true"
       - "--providers.docker.network=traefik-public"
       - "--providers.docker.exposedbydefault=false"
@@ -22,11 +21,6 @@ services:
       - "--metrics.prometheus=true"
       - "--metrics.prometheus.addEntryPointsLabels=true"
       - "--metrics.prometheus.addServicesLabels=true"
-      # Tracing config
-      - "--tracing.otlp=true"
-      - "--tracing.otlp.grpc=true"
-      - "--tracing.otlp.endpoint=jaeger:4317"
-      - "--tracing.serviceName=traefik"
     ports:
       - "80:80"
       - "443:443"
@@ -73,20 +67,6 @@ services:
       - "traefik.http.routers.grafana.tls.certresolver=myresolver"
       - "traefik.http.routers.grafana.middlewares=auth@docker"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
-
-  jaeger:
-    image: jaegertracing/all-in-one:latest
-    environment:
-      - COLLECTOR_OTLP_ENABLED=true
-    networks:
-      - traefik-public
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.jaeger.rule=Host(`jaeger.v3m.net`)"
-      - "traefik.http.routers.jaeger.entrypoints=websecure"
-      - "traefik.http.routers.jaeger.tls.certresolver=myresolver"
-      - "traefik.http.routers.jaeger.middlewares=auth@docker"
-      - "traefik.http.services.jaeger.loadbalancer.server.port=16686"
 
 networks:
   traefik-public:
