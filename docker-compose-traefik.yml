@@ -2,22 +2,91 @@ services:
   traefik:
     image: traefik:v2.10
     command:
+      # Existing commands
       - "--providers.docker=true"
       - "--providers.docker.network=traefik-public"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=idriss@risky.info"  # Change this
+      - "--certificatesresolvers.myresolver.acme.email=idriss@risky.info"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      # Dashboard config
+      - "--api.dashboard=true"
+      # Log config
+      - "--log.level=DEBUG"
+      - "--accesslog=true"
+      - "--accesslog.filepath=/logs/access.log"
+      - "--log.filepath=/logs/traefik.log"
+      # Metrics config
+      - "--metrics.prometheus=true"
+      - "--metrics.prometheus.addEntryPointsLabels=true"
+      - "--metrics.prometheus.addServicesLabels=true"
+      # Tracing config
+      - "--tracing.otlp=true"
+      - "--tracing.otlp.grpc=true"
+      - "--tracing.otlp.endpoint=jaeger:4317"
+      - "--tracing.serviceName=traefik"
     ports:
       - "80:80"
       - "443:443"
+      # Dashboard port (you can restrict this to localhost)
+      - "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "letsencrypt:/letsencrypt"
+      - "traefik-logs:/logs"  # New volume for logs
     networks:
       - traefik-public
+    # Add labels to secure the dashboard
+    labels:
+      - "traefik.enable=true"
+      # Dashboard router
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.v3m.net`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
+      # Basic auth middleware (recommended)
+      - "traefik.http.middlewares.auth.basicauth.users=idriss:$$apr1$$cIdOPlj3$$yDdeEu0GJR19jT6RW8pY8/"  # Generate this with htpasswd
+      - "traefik.http.routers.dashboard.middlewares=auth@docker"
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - traefik-public
+
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - traefik-public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.v3m.net`)"
+      - "traefik.http.routers.grafana.entrypoints=websecure"
+      - "traefik.http.routers.grafana.tls.certresolver=myresolver"
+      - "traefik.http.routers.grafana.middlewares=auth@docker"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - traefik-public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jaeger.rule=Host(`jaeger.v3m.net`)"
+      - "traefik.http.routers.jaeger.entrypoints=websecure"
+      - "traefik.http.routers.jaeger.tls.certresolver=myresolver"
+      - "traefik.http.routers.jaeger.middlewares=auth@docker"
+      - "traefik.http.services.jaeger.loadbalancer.server.port=16686"
 
 networks:
   traefik-public:
@@ -26,3 +95,6 @@ networks:
 
 volumes:
   letsencrypt:
+  traefik-logs:
+  prometheus-data:
+  grafana-data:
