@@ -36,7 +36,7 @@ services:
     labels:
       - "traefik.enable=true"
       # Dashboard router
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.v3m.net`)"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.g.v3m.net`)"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
       - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
@@ -75,7 +75,7 @@ services:
       - traefik-public
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.grafana.rule=Host(`grafana.v3m.net`)"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.g.v3m.net`)"
       - "traefik.http.routers.grafana.entrypoints=websecure"
       - "traefik.http.routers.grafana.tls.certresolver=myresolver"
       - "traefik.http.routers.grafana.middlewares=auth@docker"

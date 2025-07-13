@@ -14,7 +14,7 @@ services:
     image: gitea.risky.info/risky-info/gossip-web:latest
     restart: unless-stopped
     environment:
-      GOSSIP_HTTP_HOSTNAME: gossip.v3m.net
+      GOSSIP_HTTP_HOSTNAME: g.v3m.net
       GOSSIP_APP_ENVIRONMENT: prod
       GOSSIP_DATABASE_DRIVER: postgres
       GOSSIP_DATABASE_TESTCONNECTION: host=db port=5432 user=admin dbname=app_test password=admin sslmode=disable
@@ -25,12 +25,12 @@ services:
       GOSSIP_MAIL_PASSWORD: ${GOSSIP_MAIL_PASSWORD}
       GOSSIP_MAIL_FROMADDRESS: noreply@risky.info
       GOSSIP_MAIL_SKIPTLSVERIFY: "true"
-      GOSSIP_MAILHOG_HOSTNAME: v3m.net
+      GOSSIP_MAILHOG_HOSTNAME: g.v3m.net
     depends_on:
       - db
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.gossip.rule=Host(`gossip.v3m.net`)"
+      - "traefik.http.routers.gossip.rule=Host(`g.v3m.net`)"
       - "traefik.http.routers.gossip.entrypoints=websecure"
       - "traefik.http.routers.gossip.tls.certresolver=myresolver"
       - "traefik.http.services.gossip.loadbalancer.server.port=8000"
@@ -44,7 +44,7 @@ services:
   mailhog:
     image: mailhog/mailhog:latest
     ports:
-      - "25:1025"  # SMTP port
+      - "25:1025" # SMTP port
     networks:
       - backend
   worker:
