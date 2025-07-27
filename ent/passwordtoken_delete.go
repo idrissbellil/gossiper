@@ -8,8 +8,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"gitea.risky.info/risky-info/gossiper/ent/passwordtoken"
-	"gitea.risky.info/risky-info/gossiper/ent/predicate"
+	"gitea.v3m.net/idriss/gossiper/ent/passwordtoken"
+	"gitea.v3m.net/idriss/gossiper/ent/predicate"
 )
 
 // PasswordTokenDelete is the builder for deleting a PasswordToken entity.

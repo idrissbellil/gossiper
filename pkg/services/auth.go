@@ -8,12 +8,12 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"gitea.risky.info/risky-info/gossiper/config"
-	"gitea.risky.info/risky-info/gossiper/ent"
-	"gitea.risky.info/risky-info/gossiper/ent/passwordtoken"
-	"gitea.risky.info/risky-info/gossiper/ent/user"
-	"gitea.risky.info/risky-info/gossiper/pkg/context"
-	"gitea.risky.info/risky-info/gossiper/pkg/session"
+	"gitea.v3m.net/idriss/gossiper/config"
+	"gitea.v3m.net/idriss/gossiper/ent"
+	"gitea.v3m.net/idriss/gossiper/ent/passwordtoken"
+	"gitea.v3m.net/idriss/gossiper/ent/user"
+	"gitea.v3m.net/idriss/gossiper/pkg/context"
+	"gitea.v3m.net/idriss/gossiper/pkg/session"
 
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"

@@ -29,8 +29,8 @@ steps:
       GIT_ORIGIN_WITH_AUTH:
         from_secret: GIT_ORIGIN
     commands:
-    - git clone $GIT_ORIGIN_WITH_AUTH .
-    - git checkout $DRONE_COMMIT
+      - git clone $GIT_ORIGIN_WITH_AUTH/idriss/gossiper.git .
+      - git checkout $DRONE_COMMIT
 
   - name: test
     image: golang:1.23
@@ -41,7 +41,6 @@ steps:
       GOSSIP_DATABASE_DRIVER: postgres
       GOSSIP_DATABASE_TESTCONNECTION: host=postgres port=5432 user=admin dbname=app_test password=admin sslmode=disable
       GOSSIP_DATABASE_CONNECTION: host=postgres port=5432 user=admin dbname=app_test password=admin sslmode=disable
-
 
 ---
 # Run the following on `promote`
@@ -62,9 +61,9 @@ services:
 
 trigger:
   event:
-  - promote
+    - promote
   target:
-  - production
+    - production
 
 clone:
   disable: true
@@ -76,8 +75,8 @@ steps:
       GIT_ORIGIN_WITH_AUTH:
         from_secret: GIT_ORIGIN
     commands:
-    - git clone $GIT_ORIGIN_WITH_AUTH .
-    - git checkout $DRONE_COMMIT
+      - git clone $GIT_ORIGIN_WITH_AUTH/idriss/gossiper.git .
+      - git checkout $DRONE_COMMIT
 
   - name: test
     image: golang:1.23
@@ -91,9 +90,9 @@ steps:
   - name: build-web
     image: plugins/docker
     settings:
-      repo: gitea.risky.info/risky-info/gossip-web
+      repo: gitea.v3m.net/idriss/gossip-web
       tags: latest
-      registry: gitea.risky.info
+      registry: gitea.v3m.net
       dockerfile: ./web.dockerfile
       context: .
       username:
@@ -104,9 +103,9 @@ steps:
   - name: build-worker
     image: plugins/docker
     settings:
-      repo: gitea.risky.info/risky-info/gossip-worker
+      repo: gitea.v3m.net/idriss/gossip-worker
       tags: latest
-      registry: gitea.risky.info
+      registry: gitea.v3m.net
       dockerfile: ./worker.dockerfile
       context: .
       username:

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"math/rand"
 
-	"gitea.risky.info/risky-info/gossiper/pkg/middleware"
-	"gitea.risky.info/risky-info/gossiper/pkg/page"
-	"gitea.risky.info/risky-info/gossiper/pkg/services"
-	"gitea.risky.info/risky-info/gossiper/templates"
+	"gitea.v3m.net/idriss/gossiper/pkg/middleware"
+	"gitea.v3m.net/idriss/gossiper/pkg/page"
+	"gitea.v3m.net/idriss/gossiper/pkg/services"
+	"gitea.v3m.net/idriss/gossiper/templates"
 	"github.com/labstack/echo/v4"
 )
 

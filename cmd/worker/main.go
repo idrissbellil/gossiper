@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"gitea.risky.info/risky-info/gossiper/ent"
-	"gitea.risky.info/risky-info/gossiper/ent/job"
-	"gitea.risky.info/risky-info/gossiper/pkg/services"
+	"gitea.v3m.net/idriss/gossiper/ent"
+	"gitea.v3m.net/idriss/gossiper/ent/job"
+	"gitea.v3m.net/idriss/gossiper/pkg/services"
 	"github.com/gorilla/websocket"
 )
 

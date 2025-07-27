@@ -7,7 +7,7 @@ import (
 	"net/url"
 
 	"github.com/labstack/echo/v4"
-	"gitea.risky.info/risky-info/gossiper/pkg/htmx"
+	"gitea.v3m.net/idriss/gossiper/pkg/htmx"
 )
 
 // Redirect is a helper to perform HTTP redirects.

@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"gitea.risky.info/risky-info/gossiper/ent"
-	"gitea.risky.info/risky-info/gossiper/ent/user"
-	"gitea.risky.info/risky-info/gossiper/pkg/context"
+	"gitea.v3m.net/idriss/gossiper/ent"
+	"gitea.v3m.net/idriss/gossiper/ent/user"
+	"gitea.v3m.net/idriss/gossiper/pkg/context"
 
 	"github.com/labstack/echo/v4"
 )

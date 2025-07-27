@@ -4,7 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/labstack/echo/v4"
-	"gitea.risky.info/risky-info/gossiper/pkg/context"
+	"gitea.v3m.net/idriss/gossiper/pkg/context"
 )
 
 // Set sets a logger in the context

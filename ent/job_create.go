@@ -10,8 +10,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"gitea.risky.info/risky-info/gossiper/ent/job"
-	"gitea.risky.info/risky-info/gossiper/ent/user"
+	"gitea.v3m.net/idriss/gossiper/ent/job"
+	"gitea.v3m.net/idriss/gossiper/ent/user"
 )
 
 // JobCreate is the builder for creating a Job entity.

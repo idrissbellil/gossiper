@@ -4,11 +4,11 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"gitea.risky.info/risky-info/gossiper/pkg/context"
-	"gitea.risky.info/risky-info/gossiper/pkg/log"
-	"gitea.risky.info/risky-info/gossiper/pkg/page"
-	"gitea.risky.info/risky-info/gossiper/pkg/services"
-	"gitea.risky.info/risky-info/gossiper/templates"
+	"gitea.v3m.net/idriss/gossiper/pkg/context"
+	"gitea.v3m.net/idriss/gossiper/pkg/log"
+	"gitea.v3m.net/idriss/gossiper/pkg/page"
+	"gitea.v3m.net/idriss/gossiper/pkg/services"
+	"gitea.v3m.net/idriss/gossiper/templates"
 )
 
 type Error struct {

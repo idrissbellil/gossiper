@@ -5,12 +5,12 @@ package enttest
 import (
 	"context"
 
-	"gitea.risky.info/risky-info/gossiper/ent"
+	"gitea.v3m.net/idriss/gossiper/ent"
 	// required by schema hooks.
-	_ "gitea.risky.info/risky-info/gossiper/ent/runtime"
+	_ "gitea.v3m.net/idriss/gossiper/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
-	"gitea.risky.info/risky-info/gossiper/ent/migrate"
+	"gitea.v3m.net/idriss/gossiper/ent/migrate"
 )
 
 type (

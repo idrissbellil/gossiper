@@ -1,7 +1,7 @@
 package tasks
 
 import (
-	"gitea.risky.info/risky-info/gossiper/pkg/services"
+	"gitea.v3m.net/idriss/gossiper/pkg/services"
 )
 
 // Register registers all task queues with the task client

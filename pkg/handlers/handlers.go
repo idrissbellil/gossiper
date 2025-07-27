@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"gitea.risky.info/risky-info/gossiper/pkg/services"
+	"gitea.v3m.net/idriss/gossiper/pkg/services"
 )
 
 var handlers []Handler

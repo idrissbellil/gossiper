@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/labstack/echo/v4"
-	"gitea.risky.info/risky-info/gossiper/pkg/htmx"
-	"gitea.risky.info/risky-info/gossiper/pkg/tests"
+	"gitea.v3m.net/idriss/gossiper/pkg/htmx"
+	"gitea.v3m.net/idriss/gossiper/pkg/tests"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

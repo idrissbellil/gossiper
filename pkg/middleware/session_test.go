@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/gorilla/sessions"
-	"gitea.risky.info/risky-info/gossiper/pkg/session"
-	"gitea.risky.info/risky-info/gossiper/pkg/tests"
+	"gitea.v3m.net/idriss/gossiper/pkg/session"
+	"gitea.v3m.net/idriss/gossiper/pkg/tests"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

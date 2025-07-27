@@ -5,7 +5,7 @@ import (
 
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo/v4"
-	"gitea.risky.info/risky-info/gossiper/pkg/context"
+	"gitea.v3m.net/idriss/gossiper/pkg/context"
 )
 
 // ErrStoreNotFound indicates that the session store was not present in the context

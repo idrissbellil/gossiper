@@ -1,4 +1,4 @@
-module gitea.risky.info/risky-info/gossiper
+module gitea.v3m.net/idriss/gossiper
 
 go 1.23.0
 

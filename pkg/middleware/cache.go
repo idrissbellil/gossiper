@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"gitea.risky.info/risky-info/gossiper/pkg/context"
-	"gitea.risky.info/risky-info/gossiper/pkg/log"
-	"gitea.risky.info/risky-info/gossiper/pkg/services"
+	"gitea.v3m.net/idriss/gossiper/pkg/context"
+	"gitea.v3m.net/idriss/gossiper/pkg/log"
+	"gitea.v3m.net/idriss/gossiper/pkg/services"
 
 	"github.com/labstack/echo/v4"
 )

@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"time"
 
-	"gitea.risky.info/risky-info/gossiper/ent"
-	"gitea.risky.info/risky-info/gossiper/pkg/context"
-	"gitea.risky.info/risky-info/gossiper/pkg/htmx"
-	"gitea.risky.info/risky-info/gossiper/pkg/msg"
-	"gitea.risky.info/risky-info/gossiper/templates"
+	"gitea.v3m.net/idriss/gossiper/ent"
+	"gitea.v3m.net/idriss/gossiper/pkg/context"
+	"gitea.v3m.net/idriss/gossiper/pkg/htmx"
+	"gitea.v3m.net/idriss/gossiper/pkg/msg"
+	"gitea.v3m.net/idriss/gossiper/templates"
 
 	echomw "github.com/labstack/echo/v4/middleware"
 

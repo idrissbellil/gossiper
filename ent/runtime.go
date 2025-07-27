@@ -2,4 +2,4 @@
 
 package ent
 
-// The schema-stitching logic is generated in gitea.risky.info/risky-info/gossiper/ent/runtime/runtime.go
+// The schema-stitching logic is generated in gitea.v3m.net/idriss/gossiper/ent/runtime/runtime.go

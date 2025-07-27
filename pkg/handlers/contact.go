@@ -3,11 +3,11 @@ package handlers
 import (
 	"fmt"
 
-	"gitea.risky.info/risky-info/gossiper/pkg/form"
-	"gitea.risky.info/risky-info/gossiper/pkg/middleware"
-	"gitea.risky.info/risky-info/gossiper/pkg/page"
-	"gitea.risky.info/risky-info/gossiper/pkg/services"
-	"gitea.risky.info/risky-info/gossiper/templates"
+	"gitea.v3m.net/idriss/gossiper/pkg/form"
+	"gitea.v3m.net/idriss/gossiper/pkg/middleware"
+	"gitea.v3m.net/idriss/gossiper/pkg/page"
+	"gitea.v3m.net/idriss/gossiper/pkg/services"
+	"gitea.v3m.net/idriss/gossiper/templates"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )

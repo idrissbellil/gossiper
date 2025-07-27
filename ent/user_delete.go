@@ -8,8 +8,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"gitea.risky.info/risky-info/gossiper/ent/predicate"
-	"gitea.risky.info/risky-info/gossiper/ent/user"
+	"gitea.v3m.net/idriss/gossiper/ent/predicate"
+	"gitea.v3m.net/idriss/gossiper/ent/user"
 )
 
 // UserDelete is the builder for deleting a User entity.

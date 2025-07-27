@@ -8,8 +8,8 @@ import (
 	"os"
 	"testing"
 
-	"gitea.risky.info/risky-info/gossiper/config"
-	"gitea.risky.info/risky-info/gossiper/pkg/services"
+	"gitea.v3m.net/idriss/gossiper/config"
+	"gitea.v3m.net/idriss/gossiper/pkg/services"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/stretchr/testify/assert"

@@ -9,7 +9,7 @@ import (
 	"github.com/Masterminds/sprig"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/random"
-	"gitea.risky.info/risky-info/gossiper/config"
+	"gitea.v3m.net/idriss/gossiper/config"
 )
 
 var (

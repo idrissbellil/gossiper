@@ -3,8 +3,8 @@ package tasks
 import (
 	"context"
 
-	"gitea.risky.info/risky-info/gossiper/pkg/log"
-	"gitea.risky.info/risky-info/gossiper/pkg/services"
+	"gitea.v3m.net/idriss/gossiper/pkg/log"
+	"gitea.v3m.net/idriss/gossiper/pkg/services"
 )
 
 // ExampleTask is an example implementation of services.Task

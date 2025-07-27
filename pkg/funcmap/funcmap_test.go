@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/labstack/echo/v4"
-	"gitea.risky.info/risky-info/gossiper/config"
+	"gitea.v3m.net/idriss/gossiper/config"
 
 	"github.com/stretchr/testify/assert"
 )

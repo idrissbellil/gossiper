@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"testing"
 
-	"gitea.risky.info/risky-info/gossiper/ent"
-	"gitea.risky.info/risky-info/gossiper/pkg/context"
-	"gitea.risky.info/risky-info/gossiper/pkg/tests"
+	"gitea.v3m.net/idriss/gossiper/ent"
+	"gitea.v3m.net/idriss/gossiper/pkg/context"
+	"gitea.v3m.net/idriss/gossiper/pkg/tests"
 
 	"github.com/stretchr/testify/require"
 

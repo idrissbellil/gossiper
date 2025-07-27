@@ -11,8 +11,8 @@ import (
 
 	"github.com/maragudk/goqite"
 	"github.com/maragudk/goqite/jobs"
-	"gitea.risky.info/risky-info/gossiper/config"
-	"gitea.risky.info/risky-info/gossiper/pkg/log"
+	"gitea.v3m.net/idriss/gossiper/config"
+	"gitea.v3m.net/idriss/gossiper/pkg/log"
 )
 
 type (

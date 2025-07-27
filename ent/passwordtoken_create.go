@@ -10,8 +10,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"gitea.risky.info/risky-info/gossiper/ent/passwordtoken"
-	"gitea.risky.info/risky-info/gossiper/ent/user"
+	"gitea.v3m.net/idriss/gossiper/ent/passwordtoken"
+	"gitea.v3m.net/idriss/gossiper/ent/user"
 )
 
 // PasswordTokenCreate is the builder for creating a PasswordToken entity.

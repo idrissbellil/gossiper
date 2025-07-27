@@ -11,7 +11,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   web:
-    image: gitea.risky.info/risky-info/gossip-web:latest
+    image: gitea.v3m.net/idriss/gossip-web:latest
     restart: unless-stopped
     environment:
       GOSSIP_HTTP_HOSTNAME: g.v3m.net
@@ -48,7 +48,7 @@ services:
     networks:
       - backend
   worker:
-    image: gitea.risky.info/risky-info/gossip-worker:latest
+    image: gitea.v3m.net/idriss/gossip-worker:latest
     restart: unless-stopped
     environment:
       GOSSIP_APP_ENVIRONMENT: prod

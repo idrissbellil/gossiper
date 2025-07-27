@@ -9,8 +9,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"gitea.risky.info/risky-info/gossiper/ent/passwordtoken"
-	"gitea.risky.info/risky-info/gossiper/ent/user"
+	"gitea.v3m.net/idriss/gossiper/ent/passwordtoken"
+	"gitea.v3m.net/idriss/gossiper/ent/user"
 )
 
 // PasswordToken is the model entity for the PasswordToken schema.

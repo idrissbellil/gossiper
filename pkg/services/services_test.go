@@ -4,9 +4,9 @@ import (
 	"os"
 	"testing"
 
-	"gitea.risky.info/risky-info/gossiper/config"
-	"gitea.risky.info/risky-info/gossiper/ent"
-	"gitea.risky.info/risky-info/gossiper/pkg/tests"
+	"gitea.v3m.net/idriss/gossiper/config"
+	"gitea.v3m.net/idriss/gossiper/ent"
+	"gitea.v3m.net/idriss/gossiper/pkg/tests"
 
 	"github.com/labstack/echo/v4"
 )

@@ -5,9 +5,9 @@ import (
 
 	"github.com/gorilla/sessions"
 	echomw "github.com/labstack/echo/v4/middleware"
-	"gitea.risky.info/risky-info/gossiper/config"
-	"gitea.risky.info/risky-info/gossiper/pkg/middleware"
-	"gitea.risky.info/risky-info/gossiper/pkg/services"
+	"gitea.v3m.net/idriss/gossiper/config"
+	"gitea.v3m.net/idriss/gossiper/pkg/middleware"
+	"gitea.v3m.net/idriss/gossiper/pkg/services"
 )
 
 // BuildRouter builds the router

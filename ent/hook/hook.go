@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"gitea.risky.info/risky-info/gossiper/ent"
+	"gitea.v3m.net/idriss/gossiper/ent"
 )
 
 // The JobFunc type is an adapter to allow the use of ordinary

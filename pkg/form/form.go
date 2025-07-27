@@ -2,7 +2,7 @@ package form
 
 import (
 	"github.com/labstack/echo/v4"
-	"gitea.risky.info/risky-info/gossiper/pkg/context"
+	"gitea.v3m.net/idriss/gossiper/pkg/context"
 )
 
 // Form represents a form that can be submitted and validated

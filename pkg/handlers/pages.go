@@ -8,14 +8,14 @@ import (
 	"math/rand"
 	"strconv"
 
-	"gitea.risky.info/risky-info/gossiper/config"
-	"gitea.risky.info/risky-info/gossiper/ent"
-	"gitea.risky.info/risky-info/gossiper/ent/job"
-	gocontext "gitea.risky.info/risky-info/gossiper/pkg/context"
-	"gitea.risky.info/risky-info/gossiper/pkg/middleware"
-	"gitea.risky.info/risky-info/gossiper/pkg/page"
-	"gitea.risky.info/risky-info/gossiper/pkg/services"
-	"gitea.risky.info/risky-info/gossiper/templates"
+	"gitea.v3m.net/idriss/gossiper/config"
+	"gitea.v3m.net/idriss/gossiper/ent"
+	"gitea.v3m.net/idriss/gossiper/ent/job"
+	gocontext "gitea.v3m.net/idriss/gossiper/pkg/context"
+	"gitea.v3m.net/idriss/gossiper/pkg/middleware"
+	"gitea.v3m.net/idriss/gossiper/pkg/page"
+	"gitea.v3m.net/idriss/gossiper/pkg/services"
+	"gitea.v3m.net/idriss/gossiper/templates"
 	"github.com/labstack/echo/v4"
 )
 

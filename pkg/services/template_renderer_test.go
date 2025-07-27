@@ -7,11 +7,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"gitea.risky.info/risky-info/gossiper/config"
-	"gitea.risky.info/risky-info/gossiper/pkg/htmx"
-	"gitea.risky.info/risky-info/gossiper/pkg/page"
-	"gitea.risky.info/risky-info/gossiper/pkg/tests"
-	"gitea.risky.info/risky-info/gossiper/templates"
+	"gitea.v3m.net/idriss/gossiper/config"
+	"gitea.v3m.net/idriss/gossiper/pkg/htmx"
+	"gitea.v3m.net/idriss/gossiper/pkg/page"
+	"gitea.v3m.net/idriss/gossiper/pkg/tests"
+	"gitea.v3m.net/idriss/gossiper/templates"
 	"github.com/labstack/echo/v4"
 
 	"github.com/stretchr/testify/assert"

@@ -12,9 +12,9 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"gitea.risky.info/risky-info/gossiper/ent/job"
-	"gitea.risky.info/risky-info/gossiper/ent/passwordtoken"
-	"gitea.risky.info/risky-info/gossiper/ent/user"
+	"gitea.v3m.net/idriss/gossiper/ent/job"
+	"gitea.v3m.net/idriss/gossiper/ent/passwordtoken"
+	"gitea.v3m.net/idriss/gossiper/ent/user"
 )
 
 // ent aliases to avoid import conflicts in user's code.

@@ -7,8 +7,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 	echomw "github.com/labstack/echo/v4/middleware"
-	"gitea.risky.info/risky-info/gossiper/pkg/log"
-	"gitea.risky.info/risky-info/gossiper/pkg/tests"
+	"gitea.v3m.net/idriss/gossiper/pkg/log"
+	"gitea.v3m.net/idriss/gossiper/pkg/tests"
 	"github.com/stretchr/testify/require"
 
 	"github.com/stretchr/testify/assert"

@@ -7,7 +7,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"gitea.risky.info/risky-info/gossiper/ent/predicate"
+	"gitea.v3m.net/idriss/gossiper/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.

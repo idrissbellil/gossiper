@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"gitea.risky.info/risky-info/gossiper/config"
-	"gitea.risky.info/risky-info/gossiper/pkg/log"
+	"gitea.v3m.net/idriss/gossiper/config"
+	"gitea.v3m.net/idriss/gossiper/pkg/log"
 	gomail "github.com/go-mail/mail"
 
 	"github.com/labstack/echo/v4"

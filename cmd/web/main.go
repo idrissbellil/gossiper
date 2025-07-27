@@ -11,9 +11,9 @@ import (
 	"os/signal"
 	"time"
 
-	"gitea.risky.info/risky-info/gossiper/pkg/handlers"
-	"gitea.risky.info/risky-info/gossiper/pkg/services"
-	"gitea.risky.info/risky-info/gossiper/pkg/tasks"
+	"gitea.v3m.net/idriss/gossiper/pkg/handlers"
+	"gitea.v3m.net/idriss/gossiper/pkg/services"
+	"gitea.v3m.net/idriss/gossiper/pkg/tasks"
 )
 
 func main() {

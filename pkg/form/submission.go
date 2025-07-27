@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
-	"gitea.risky.info/risky-info/gossiper/pkg/context"
+	"gitea.v3m.net/idriss/gossiper/pkg/context"
 
 	"github.com/labstack/echo/v4"
 )

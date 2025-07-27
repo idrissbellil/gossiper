@@ -3,8 +3,8 @@ package msg
 import (
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo/v4"
-	"gitea.risky.info/risky-info/gossiper/pkg/log"
-	"gitea.risky.info/risky-info/gossiper/pkg/session"
+	"gitea.v3m.net/idriss/gossiper/pkg/log"
+	"gitea.v3m.net/idriss/gossiper/pkg/session"
 )
 
 // Type is a message type

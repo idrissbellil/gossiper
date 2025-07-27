@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"gitea.risky.info/risky-info/gossiper/ent/passwordtoken"
-	"gitea.risky.info/risky-info/gossiper/ent/user"
+	"gitea.v3m.net/idriss/gossiper/ent/passwordtoken"
+	"gitea.v3m.net/idriss/gossiper/ent/user"
 
 	"github.com/stretchr/testify/require"
 

@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"gitea.risky.info/risky-info/gossiper/pkg/page"
-	"gitea.risky.info/risky-info/gossiper/pkg/tests"
-	"gitea.risky.info/risky-info/gossiper/templates"
+	"gitea.v3m.net/idriss/gossiper/pkg/page"
+	"gitea.v3m.net/idriss/gossiper/pkg/tests"
+	"gitea.v3m.net/idriss/gossiper/templates"
 
 	"github.com/stretchr/testify/require"
 

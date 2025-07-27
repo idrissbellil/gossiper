@@ -9,16 +9,16 @@ import (
 	"strings"
 
 	entsql "entgo.io/ent/dialect/sql"
-	"gitea.risky.info/risky-info/gossiper/pkg/funcmap"
+	"gitea.v3m.net/idriss/gossiper/pkg/funcmap"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
 
-	"gitea.risky.info/risky-info/gossiper/config"
-	"gitea.risky.info/risky-info/gossiper/ent"
+	"gitea.v3m.net/idriss/gossiper/config"
+	"gitea.v3m.net/idriss/gossiper/ent"
 	"github.com/labstack/echo/v4"
 
 	// Require by ent
-	_ "gitea.risky.info/risky-info/gossiper/ent/runtime"
+	_ "gitea.v3m.net/idriss/gossiper/ent/runtime"
 )
 
 // Container contains all services used by the application and provides an easy way to handle dependency

@@ -4,7 +4,7 @@ import (
 	"github.com/gorilla/context"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo/v4"
-	"gitea.risky.info/risky-info/gossiper/pkg/session"
+	"gitea.v3m.net/idriss/gossiper/pkg/session"
 )
 
 // Session sets the session storage in the request context

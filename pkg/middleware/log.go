@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"gitea.risky.info/risky-info/gossiper/pkg/log"
+	"gitea.v3m.net/idriss/gossiper/pkg/log"
 )
 
 // SetLogger initializes a logger for the current request and stores it in the context.

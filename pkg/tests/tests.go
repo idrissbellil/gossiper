@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"gitea.risky.info/risky-info/gossiper/ent"
-	"gitea.risky.info/risky-info/gossiper/pkg/session"
+	"gitea.v3m.net/idriss/gossiper/ent"
+	"gitea.v3m.net/idriss/gossiper/pkg/session"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
