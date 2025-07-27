@@ -31,7 +31,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.gossip.rule=Host(`g.v3m.net`)"
-      - "traefik.http.routers.gossip.entrypoints=websecure"
+      - "traefik.http.routers.gossip.entrypoints=web-secure"
       - "traefik.http.routers.gossip.tls.certresolver=myresolver"
       - "traefik.http.services.gossip.loadbalancer.server.port=8000"
     networks:
@@ -68,7 +68,7 @@ services:
 
 networks:
   traefik-public:
-    name: traefik-public
+    name: traefik
     external: true
   backend:
     external: false
