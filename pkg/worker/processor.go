@@ -8,7 +8,7 @@ import (
 	"html/template"
 	"regexp"
 
-	"gitea.v3m.net/idriss/gossiper/ent"
+	"gitea.v3m.net/idriss/gossiper/pkg/models"
 )
 
 type MessageProcessor struct {
@@ -73,7 +73,7 @@ func (p *MessageProcessor) ProcessMessage(ctx context.Context, msg Message) ([]P
 		result := ProcessResult{
 			JobID:   job.ID,
 			URL:     job.URL,
-			Method:  job.Method.String(),
+			Method:  job.Method,
 			Headers: job.Headers,
 		}
 
@@ -104,7 +104,7 @@ func (p *MessageProcessor) matchesFromRegex(pattern, from string) bool {
 	return matched
 }
 
-func (p *MessageProcessor) generatePayload(job *ent.Job, msg Message) (string, error) {
+func (p *MessageProcessor) generatePayload(job *models.Job, msg Message) (string, error) {
 	if job.PayloadTemplate != "" {
 		return p.executeTemplate(job.PayloadTemplate, msg)
 	}

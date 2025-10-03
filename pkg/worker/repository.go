@@ -3,23 +3,28 @@ package worker
 import (
 	"context"
 
-	"gitea.v3m.net/idriss/gossiper/ent"
-	"gitea.v3m.net/idriss/gossiper/ent/job"
+	"gitea.v3m.net/idriss/gossiper/pkg/models"
 )
 
 type EntJobRepository struct {
-	client *ent.Client
+	client *models.DB
 }
 
-func NewEntJobRepository(client *ent.Client) *EntJobRepository {
+func NewEntJobRepository(client *models.DB) *EntJobRepository {
 	return &EntJobRepository{
 		client: client,
 	}
 }
 
-func (r *EntJobRepository) GetActiveJobs(ctx context.Context, email string) ([]*ent.Job, error) {
-	return r.client.Job.Query().
-		Where(job.EmailEQ(email)).
-		Where(job.IsActive(true)).
-		All(ctx)
+func (r *EntJobRepository) GetActiveJobs(ctx context.Context, email string) ([]*models.Job, error) {
+	var jobs []*models.Job
+	result := r.client.WithContext(ctx).
+		Where("email = ? AND is_active = ?", email, true).
+		Find(&jobs)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return jobs, nil
 }

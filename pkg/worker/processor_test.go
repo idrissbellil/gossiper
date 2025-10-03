@@ -5,16 +5,15 @@ import (
 	"errors"
 	"testing"
 
-	"gitea.v3m.net/idriss/gossiper/ent"
-	"gitea.v3m.net/idriss/gossiper/ent/job"
+	"gitea.v3m.net/idriss/gossiper/pkg/models"
 )
 
 type mockJobRepository struct {
-	jobs map[string][]*ent.Job
+	jobs map[string][]*models.Job
 	err  error
 }
 
-func (m *mockJobRepository) GetActiveJobs(ctx context.Context, email string) ([]*ent.Job, error) {
+func (m *mockJobRepository) GetActiveJobs(ctx context.Context, email string) ([]*models.Job, error) {
 	if m.err != nil {
 		return nil, m.err
 	}
@@ -172,12 +171,12 @@ func TestMessageProcessor_ParseRawMessage(t *testing.T) {
 }
 
 func TestMessageProcessor_ProcessMessage(t *testing.T) {
-	method := job.MethodPOST
+	method := "POST"
 
 	tests := []struct {
 		name             string
 		message          Message
-		jobs             []*ent.Job
+		jobs             []*models.Job
 		repoErr          error
 		expectedResults  int
 		expectedJobID    int
@@ -192,7 +191,7 @@ func TestMessageProcessor_ProcessMessage(t *testing.T) {
 				Subject: "Test",
 				Body:    "Hello",
 			},
-			jobs: []*ent.Job{
+			jobs: []*models.Job{
 				{
 					ID:              1,
 					Email:           "test@example.com",
@@ -215,7 +214,7 @@ func TestMessageProcessor_ProcessMessage(t *testing.T) {
 				Subject: "Test",
 				Body:    "Hello",
 			},
-			jobs: []*ent.Job{
+			jobs: []*models.Job{
 				{
 					ID:              2,
 					Email:           "test@example.com",
@@ -236,7 +235,7 @@ func TestMessageProcessor_ProcessMessage(t *testing.T) {
 				To:   "test@example.com",
 				From: "other@example.com",
 			},
-			jobs: []*ent.Job{
+			jobs: []*models.Job{
 				{
 					ID:        3,
 					Email:     "test@example.com",
@@ -259,7 +258,7 @@ func TestMessageProcessor_ProcessMessage(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockRepo := &mockJobRepository{
-				jobs: map[string][]*ent.Job{
+				jobs: map[string][]*models.Job{
 					tt.message.To: tt.jobs,
 				},
 				err: tt.repoErr,
@@ -319,8 +318,8 @@ func TestMessageProcessor_generatePayload(t *testing.T) {
 	}
 
 	t.Run("template payload", func(t *testing.T) {
-		method := job.MethodPOST
-		job := &ent.Job{
+		method := "POST"
+		job := &models.Job{
 			ID:              1,
 			PayloadTemplate: "From: {{.From}}, Subject: {{.Subject}}",
 			Method:          method,
@@ -338,8 +337,8 @@ func TestMessageProcessor_generatePayload(t *testing.T) {
 	})
 
 	t.Run("JSON payload", func(t *testing.T) {
-		method := job.MethodPOST
-		job := &ent.Job{
+		method := "POST"
+		job := &models.Job{
 			ID:              2,
 			PayloadTemplate: "",
 			Method:          method,
@@ -357,8 +356,8 @@ func TestMessageProcessor_generatePayload(t *testing.T) {
 	})
 
 	t.Run("invalid template", func(t *testing.T) {
-		method := job.MethodPOST
-		job := &ent.Job{
+		method := "POST"
+		job := &models.Job{
 			ID:              3,
 			PayloadTemplate: "{{.Invalid",
 			Method:          method,

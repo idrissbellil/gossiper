@@ -5,14 +5,14 @@ import (
 	"testing"
 
 	"gitea.v3m.net/idriss/gossiper/config"
-	"gitea.v3m.net/idriss/gossiper/ent"
+	"gitea.v3m.net/idriss/gossiper/pkg/models"
 	"gitea.v3m.net/idriss/gossiper/pkg/services"
 	"gitea.v3m.net/idriss/gossiper/pkg/tests"
 )
 
 var (
 	c   *services.Container
-	usr *ent.User
+	usr *models.User
 )
 
 func TestMain(m *testing.M) {

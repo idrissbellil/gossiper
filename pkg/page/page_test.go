@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/labstack/echo/v4"
-	"gitea.v3m.net/idriss/gossiper/ent"
 	"gitea.v3m.net/idriss/gossiper/pkg/context"
+	"gitea.v3m.net/idriss/gossiper/pkg/models"
 	"gitea.v3m.net/idriss/gossiper/pkg/msg"
 	"gitea.v3m.net/idriss/gossiper/pkg/tests"
 
@@ -31,7 +31,7 @@ func TestNew(t *testing.T) {
 	assert.False(t, p.Cache.Enabled)
 
 	ctx, _ = tests.NewContext(e, "/abc?def=123")
-	usr := &ent.User{
+	usr := &models.User{
 		ID: 1,
 	}
 	ctx.Set(context.AuthenticatedUserKey, usr)

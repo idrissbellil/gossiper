@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"gitea.v3m.net/idriss/gossiper/ent"
+	"gitea.v3m.net/idriss/gossiper/pkg/models"
 	"gitea.v3m.net/idriss/gossiper/pkg/session"
 
 	"github.com/stretchr/testify/assert"
@@ -63,12 +63,13 @@ func AssertHTTPErrorCode(t *testing.T, err error, code int) {
 }
 
 // CreateUser creates a random user entity
-func CreateUser(orm *ent.Client) (*ent.User, error) {
+func CreateUser(orm *models.DB) (*models.User, error) {
 	seed := fmt.Sprintf("%d-%d", time.Now().UnixMilli(), rand.Intn(1000000))
-	return orm.User.
-		Create().
-		SetEmail(fmt.Sprintf("testuser-%s@localhost.localhost", seed)).
-		SetPassword("password").
-		SetName(fmt.Sprintf("Test User %s", seed)).
-		Save(context.Background())
+	user := &models.User{
+		Email:    fmt.Sprintf("testuser-%s@localhost.localhost", seed),
+		Password: "password",
+		Name:     fmt.Sprintf("Test User %s", seed),
+	}
+	result := orm.WithContext(context.Background()).Create(user)
+	return user, result.Error
 }

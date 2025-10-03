@@ -9,10 +9,9 @@ import (
 	"strconv"
 
 	"gitea.v3m.net/idriss/gossiper/config"
-	"gitea.v3m.net/idriss/gossiper/ent"
-	"gitea.v3m.net/idriss/gossiper/ent/job"
 	gocontext "gitea.v3m.net/idriss/gossiper/pkg/context"
 	"gitea.v3m.net/idriss/gossiper/pkg/middleware"
+	"gitea.v3m.net/idriss/gossiper/pkg/models"
 	"gitea.v3m.net/idriss/gossiper/pkg/page"
 	"gitea.v3m.net/idriss/gossiper/pkg/services"
 	"gitea.v3m.net/idriss/gossiper/templates"
@@ -27,7 +26,7 @@ const (
 type (
 	Pages struct {
 		*services.TemplateRenderer
-		ORM    *ent.Client
+		ORM    *models.DB
 		Config *config.Config
 	}
 
@@ -60,7 +59,7 @@ type (
 		Type  string
 	}
 	renderData struct {
-		Jobs        []*ent.Job
+		Jobs        []*models.Job
 		InputFields []inputField
 	}
 )
@@ -95,7 +94,7 @@ func generateRandomEmail(hostname string) string {
 }
 
 func (h *Pages) JobAdd(ctx echo.Context) error {
-	user := ctx.Get(gocontext.AuthenticatedUserKey).(*ent.User)
+	user := ctx.Get(gocontext.AuthenticatedUserKey).(*models.User)
 	jobRead := jobRead{}
 	if err := ctx.Bind(&jobRead); err != nil {
 		log.Printf("Error loading form data: %v", err)
@@ -107,17 +106,18 @@ func (h *Pages) JobAdd(ctx echo.Context) error {
 			log.Printf("Error loading headers: %v", err)
 		}
 	}
-	dbJob, err := h.ORM.Job.Create().
-		SetEmail(generateRandomEmail(h.Config.Mailcrab.Hostname)).
-		SetURL(jobRead.URL).
-		SetMethod(job.Method(jobRead.Method)).
-		SetFromRegex(jobRead.FromRegex).
-		SetUser(user).
-		SetPayloadTemplate(jobRead.Payload).
-		SetHeaders(headersMap).
-		Save(context.Background())
-	if err != nil {
-		log.Printf("Error saving the job %v", err)
+	dbJob := &models.Job{
+		Email:           generateRandomEmail(h.Config.Mailcrab.Hostname),
+		URL:             jobRead.URL,
+		Method:          jobRead.Method,
+		FromRegex:       jobRead.FromRegex,
+		UserID:          user.ID,
+		PayloadTemplate: jobRead.Payload,
+		Headers:         headersMap,
+	}
+	result := h.ORM.WithContext(context.Background()).Create(dbJob)
+	if result.Error != nil {
+		log.Printf("Error saving the job %v", result.Error)
 	}
 
 	log.Println(dbJob)
@@ -131,9 +131,9 @@ func (h *Pages) JobDelete(ctx echo.Context) error {
 		log.Printf("Error loading job ID: %v", err)
 		return h.Home(ctx)
 	}
-	err = h.ORM.Job.DeleteOneID(jobId).Exec(context.Background())
-	if err != nil {
-		log.Printf("Error deleting ID: %v", err)
+	result := h.ORM.WithContext(context.Background()).Delete(&models.Job{}, jobId)
+	if result.Error != nil {
+		log.Printf("Error deleting ID: %v", result.Error)
 		return h.Home(ctx)
 	}
 	return h.Home(ctx)
@@ -160,17 +160,19 @@ func (h *Pages) Home(ctx echo.Context) error {
 	return h.RenderPage(ctx, p)
 }
 
-func (h *Pages) fetchPosts(pager *page.Pager, user *ent.User) []*ent.Job {
+func (h *Pages) fetchPosts(pager *page.Pager, user *models.User) []*models.Job {
 	pager.SetItems(20)
 
-	jobs, err := user.QueryJobs().
-		Order(ent.Desc("created_at")).
+	var jobs []*models.Job
+	result := h.ORM.WithContext(context.Background()).
+		Where("user_id = ?", user.ID).
+		Order("created_at DESC").
 		Limit(pager.ItemsPerPage).
 		Offset(pager.GetOffset()).
-		All(context.Background())
-	if err != nil {
-		log.Printf("Error fetching jobs: %v", err)
-		return []*ent.Job{}
+		Find(&jobs)
+	if result.Error != nil {
+		log.Printf("Error fetching jobs: %v", result.Error)
+		return []*models.Job{}
 	}
 
 	return jobs

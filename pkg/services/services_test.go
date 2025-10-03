@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"gitea.v3m.net/idriss/gossiper/config"
-	"gitea.v3m.net/idriss/gossiper/ent"
+	"gitea.v3m.net/idriss/gossiper/pkg/models"
 	"gitea.v3m.net/idriss/gossiper/pkg/tests"
 
 	"github.com/labstack/echo/v4"
@@ -14,7 +14,7 @@ import (
 var (
 	c   *Container
 	ctx echo.Context
-	usr *ent.User
+	usr *models.User
 )
 
 func TestMain(m *testing.M) {

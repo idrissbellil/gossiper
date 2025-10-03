@@ -1,17 +1,19 @@
 package middleware
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 
-	"gitea.v3m.net/idriss/gossiper/ent"
 	"gitea.v3m.net/idriss/gossiper/pkg/context"
 	"gitea.v3m.net/idriss/gossiper/pkg/log"
+	"gitea.v3m.net/idriss/gossiper/pkg/models"
 	"gitea.v3m.net/idriss/gossiper/pkg/msg"
 	"gitea.v3m.net/idriss/gossiper/pkg/services"
 
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 // LoadAuthenticatedUser loads the authenticated user, if one, and stores in context
@@ -19,17 +21,17 @@ func LoadAuthenticatedUser(authClient *services.AuthClient) echo.MiddlewareFunc 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			u, err := authClient.GetAuthenticatedUser(c)
-			switch err.(type) {
-			case *ent.NotFoundError:
-				log.Ctx(c).Warn("auth user not found")
-			case services.NotAuthenticatedError:
-			case nil:
+			if err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					log.Ctx(c).Warn("auth user not found")
+				} else if _, ok := err.(services.NotAuthenticatedError); !ok {
+					return echo.NewHTTPError(
+						http.StatusInternalServerError,
+						fmt.Sprintf("error querying for authenticated user: %v", err),
+					)
+				}
+			} else {
 				c.Set(context.AuthenticatedUserKey, u)
-			default:
-				return echo.NewHTTPError(
-					http.StatusInternalServerError,
-					fmt.Sprintf("error querying for authenticated user: %v", err),
-				)
 			}
 
 			return next(c)
@@ -48,7 +50,7 @@ func LoadValidPasswordToken(authClient *services.AuthClient) echo.MiddlewareFunc
 			if c.Get(context.UserKey) == nil {
 				return echo.NewHTTPError(http.StatusInternalServerError)
 			}
-			usr := c.Get(context.UserKey).(*ent.User)
+			usr := c.Get(context.UserKey).(*models.User)
 
 			// Extract the token ID
 			tokenID, err := strconv.Atoi(c.Param("password_token"))

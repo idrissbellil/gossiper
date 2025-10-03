@@ -1,13 +1,11 @@
 package services
 
 import (
-	"context"
 	"errors"
 	"testing"
 	"time"
 
-	"gitea.v3m.net/idriss/gossiper/ent/passwordtoken"
-	"gitea.v3m.net/idriss/gossiper/ent/user"
+	"gitea.v3m.net/idriss/gossiper/pkg/models"
 
 	"github.com/stretchr/testify/require"
 
@@ -70,13 +68,11 @@ func TestAuthClient_GetValidPasswordToken(t *testing.T) {
 	assert.Equal(t, pt.ID, pt2.ID)
 
 	// Expire the token by pushing the date far enough back
-	count, err := c.ORM.PasswordToken.
-		Update().
-		SetCreatedAt(time.Now().Add(-(c.Config.App.PasswordToken.Expiration + time.Hour))).
-		Where(passwordtoken.ID(pt.ID)).
-		Save(context.Background())
-	require.NoError(t, err)
-	require.Equal(t, 1, count)
+	result := c.ORM.Model(&models.PasswordToken{}).
+		Where("id = ?", pt.ID).
+		Update("created_at", time.Now().Add(-(c.Config.App.PasswordToken.Expiration + time.Hour)))
+	require.NoError(t, result.Error)
+	require.Equal(t, int64(1), result.RowsAffected)
 
 	// Expired tokens should not be valid
 	_, err = c.Auth.GetValidPasswordToken(ctx, usr.ID, pt.ID, token)
@@ -95,13 +91,13 @@ func TestAuthClient_DeletePasswordTokens(t *testing.T) {
 	require.NoError(t, err)
 
 	// Check that no tokens remain
-	count, err := c.ORM.PasswordToken.
-		Query().
-		Where(passwordtoken.HasUserWith(user.ID(usr.ID))).
-		Count(context.Background())
+	var count int64
+	err = c.ORM.Model(&models.PasswordToken{}).
+		Where("user_id = ?", usr.ID).
+		Count(&count).Error
 
 	require.NoError(t, err)
-	assert.Equal(t, 0, count)
+	assert.Equal(t, int64(0), count)
 }
 
 func TestAuthClient_RandomToken(t *testing.T) {

@@ -1,24 +1,21 @@
 package services
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"log/slog"
 	"os"
 	"strings"
 
-	entsql "entgo.io/ent/dialect/sql"
+	"gitea.v3m.net/idriss/gossiper/config"
 	"gitea.v3m.net/idriss/gossiper/pkg/funcmap"
+	"gitea.v3m.net/idriss/gossiper/pkg/models"
+	"github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
-
-	"gitea.v3m.net/idriss/gossiper/config"
-	"gitea.v3m.net/idriss/gossiper/ent"
-	"github.com/labstack/echo/v4"
-
-	// Require by ent
-	_ "gitea.v3m.net/idriss/gossiper/ent/runtime"
+	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 // Container contains all services used by the application and provides an easy way to handle dependency
@@ -41,7 +38,7 @@ type Container struct {
 	QueueDatabase *sql.DB
 
 	// ORM stores a client to the ORM
-	ORM *ent.Client
+	ORM *models.DB
 
 	// Mail stores an email sending client
 	Mail *MailClient
@@ -76,7 +73,12 @@ func NewContainer() *Container {
 // Shutdown shuts the Container down and disconnects all connections.
 // If the task runner was started, cancel the context to shut it down prior to calling this.
 func (c *Container) Shutdown() error {
-	if err := c.ORM.Close(); err != nil {
+	// Get underlying *sql.DB from GORM to close it
+	sqlDB, err := c.ORM.DB.DB()
+	if err != nil {
+		return err
+	}
+	if err := sqlDB.Close(); err != nil {
 		return err
 	}
 	if err := c.Database.Close(); err != nil {
@@ -165,11 +167,26 @@ func (c *Container) initQueueDatabase() {
 
 // initORM initializes the ORM
 func (c *Container) initORM() {
-	drv := entsql.OpenDB(c.Config.Database.Driver, c.Database)
-	c.ORM = ent.NewClient(ent.Driver(drv))
+	var dialector gorm.Dialector
+
+	switch c.Config.Database.Driver {
+	case "postgres":
+		dialector = postgres.Open(c.Config.Database.Connection)
+	case "sqlite3":
+		dialector = sqlite.Open(c.Config.Database.Connection)
+	default:
+		panic(fmt.Sprintf("unsupported database driver: %s", c.Config.Database.Driver))
+	}
+
+	db, err := gorm.Open(dialector, &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
+
+	c.ORM = models.NewDB(db)
 
 	// Run the auto migration tool.
-	if err := c.ORM.Schema.Create(context.Background()); err != nil {
+	if err := c.ORM.AutoMigrate(); err != nil {
 		panic(err)
 	}
 }

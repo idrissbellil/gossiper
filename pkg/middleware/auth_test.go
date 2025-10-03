@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"testing"
 
-	"gitea.v3m.net/idriss/gossiper/ent"
 	"gitea.v3m.net/idriss/gossiper/pkg/context"
+	"gitea.v3m.net/idriss/gossiper/pkg/models"
 	"gitea.v3m.net/idriss/gossiper/pkg/tests"
 
 	"github.com/stretchr/testify/require"
@@ -30,7 +30,7 @@ func TestLoadAuthenticatedUser(t *testing.T) {
 	// Verify the midldeware returns the authenticated user
 	_ = tests.ExecuteMiddleware(ctx, mw)
 	require.NotNil(t, ctx.Get(context.AuthenticatedUserKey))
-	ctxUsr, ok := ctx.Get(context.AuthenticatedUserKey).(*ent.User)
+	ctxUsr, ok := ctx.Get(context.AuthenticatedUserKey).(*models.User)
 	require.True(t, ok)
 	assert.Equal(t, usr.ID, ctxUsr.ID)
 }
@@ -105,7 +105,7 @@ func TestLoadValidPasswordToken(t *testing.T) {
 	_ = tests.ExecuteMiddleware(ctx, LoadUser(c.ORM))
 	err = tests.ExecuteMiddleware(ctx, LoadValidPasswordToken(c.Auth))
 	assert.Nil(t, err)
-	ctxPt, ok := ctx.Get(context.PasswordTokenKey).(*ent.PasswordToken)
+	ctxPt, ok := ctx.Get(context.PasswordTokenKey).(*models.PasswordToken)
 	require.True(t, ok)
 	assert.Equal(t, pt.ID, ctxPt.ID)
 }

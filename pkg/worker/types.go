@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"gitea.v3m.net/idriss/gossiper/ent"
+	"gitea.v3m.net/idriss/gossiper/pkg/models"
 	"github.com/gorilla/websocket"
 )
 
@@ -85,7 +85,7 @@ type WSClient interface {
 }
 
 type JobRepository interface {
-	GetActiveJobs(ctx context.Context, email string) ([]*ent.Job, error)
+	GetActiveJobs(ctx context.Context, email string) ([]*models.Job, error)
 }
 
 type MessageFetcherInterface interface {

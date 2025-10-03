@@ -10,8 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"gitea.v3m.net/idriss/gossiper/ent"
-	"gitea.v3m.net/idriss/gossiper/ent/job"
+	"gitea.v3m.net/idriss/gossiper/pkg/models"
 )
 
 type mockWorkerDeps struct {
@@ -24,7 +23,7 @@ type mockWorkerDeps struct {
 
 func newMockWorkerDeps() mockWorkerDeps {
 	return mockWorkerDeps{
-		jobRepo:    &mockJobRepository{jobs: make(map[string][]*ent.Job)},
+		jobRepo:    &mockJobRepository{jobs: make(map[string][]*models.Job)},
 		logger:     &mockLogger{},
 		config:     Config{BufferSize: 10, ShutdownTimeout: 1 * time.Second},
 		wsDialer:   &mockWebSocketDialer{},
@@ -43,7 +42,7 @@ func (m mockWorkerDeps) toDependencies() WorkerDependencies {
 }
 
 func TestWorker_Integration(t *testing.T) {
-	method := job.MethodPOST
+	method := "POST"
 
 	testMessage := RawMessage{
 		ID:      "test-msg-123",
@@ -52,7 +51,7 @@ func TestWorker_Integration(t *testing.T) {
 		To:      []EmailAddress{{Name: "Webhook", Email: "webhook@example.com"}},
 	}
 
-	mockJob := &ent.Job{
+	mockJob := &models.Job{
 		ID:        1,
 		Email:     "webhook@example.com",
 		FromRegex: "sender@.*",
@@ -64,7 +63,7 @@ func TestWorker_Integration(t *testing.T) {
 	deps := newMockWorkerDeps()
 	deps.config.APIURL = "http://mailcrab.example.com/api"
 
-	deps.jobRepo.jobs["webhook@example.com"] = []*ent.Job{mockJob}
+	deps.jobRepo.jobs["webhook@example.com"] = []*models.Job{mockJob}
 
 	deps.wsDialer.conn = &mockWSConn{
 		messages: []interface{}{testMessage},
@@ -170,7 +169,7 @@ func TestWorker_WebSocketConnectionFailure(t *testing.T) {
 }
 
 func TestWorker_MessageProcessingWithMultipleJobs(t *testing.T) {
-	method := job.MethodPOST
+	method := "POST"
 
 	testMessage := RawMessage{
 		ID:      "test-msg-456",
@@ -179,7 +178,7 @@ func TestWorker_MessageProcessingWithMultipleJobs(t *testing.T) {
 		To:      []EmailAddress{{Name: "Alert", Email: "alert@example.com"}},
 	}
 
-	job1 := &ent.Job{
+	job1 := &models.Job{
 		ID:        1,
 		Email:     "alert@example.com",
 		FromRegex: "system@.*",
@@ -188,7 +187,7 @@ func TestWorker_MessageProcessingWithMultipleJobs(t *testing.T) {
 		Headers:   map[string]string{},
 	}
 
-	job2 := &ent.Job{
+	job2 := &models.Job{
 		ID:        2,
 		Email:     "alert@example.com",
 		FromRegex: "system@.*",
@@ -199,7 +198,7 @@ func TestWorker_MessageProcessingWithMultipleJobs(t *testing.T) {
 
 	deps := newMockWorkerDeps()
 	deps.config.APIURL = "http://mailcrab.example.com/api"
-	deps.jobRepo.jobs["alert@example.com"] = []*ent.Job{job1, job2}
+	deps.jobRepo.jobs["alert@example.com"] = []*models.Job{job1, job2}
 	deps.wsDialer.conn = &mockWSConn{
 		messages: []interface{}{testMessage},
 	}

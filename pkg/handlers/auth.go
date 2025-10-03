@@ -1,16 +1,16 @@
 package handlers
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
 	"gitea.v3m.net/idriss/gossiper/config"
-	"gitea.v3m.net/idriss/gossiper/ent"
-	"gitea.v3m.net/idriss/gossiper/ent/user"
 	"gitea.v3m.net/idriss/gossiper/pkg/context"
 	"gitea.v3m.net/idriss/gossiper/pkg/form"
 	"gitea.v3m.net/idriss/gossiper/pkg/log"
 	"gitea.v3m.net/idriss/gossiper/pkg/middleware"
+	"gitea.v3m.net/idriss/gossiper/pkg/models"
 	"gitea.v3m.net/idriss/gossiper/pkg/msg"
 	"gitea.v3m.net/idriss/gossiper/pkg/page"
 	"gitea.v3m.net/idriss/gossiper/pkg/redirect"
@@ -18,6 +18,7 @@ import (
 	"gitea.v3m.net/idriss/gossiper/templates"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 const (
@@ -37,7 +38,7 @@ type (
 	Auth struct {
 		auth   *services.AuthClient
 		mail   *services.MailClient
-		orm    *ent.Client
+		orm    *models.DB
 		config *config.Config
 		*services.TemplateRenderer
 	}
@@ -131,17 +132,16 @@ func (h *Auth) ForgotPasswordSubmit(ctx echo.Context) error {
 	}
 
 	// Attempt to load the user
-	u, err := h.orm.User.
-		Query().
-		Where(user.Email(strings.ToLower(input.Email))).
-		Only(ctx.Request().Context())
+	var u models.User
+	result := h.orm.WithContext(ctx.Request().Context()).
+		Where("email = ?", strings.ToLower(input.Email)).
+		First(&u)
 
-	switch err.(type) {
-	case *ent.NotFoundError:
-		return succeed()
-	case nil:
-	default:
-		return fail(err, "error querying user during forgot password")
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return succeed()
+		}
+		return fail(result.Error, "error querying user during forgot password")
 	}
 
 	// Generate the token
@@ -206,21 +206,20 @@ func (h *Auth) LoginSubmit(ctx echo.Context) error {
 	}
 
 	// Attempt to load the user
-	u, err := h.orm.User.
-		Query().
-		Where(user.Email(strings.ToLower(input.Email))).
-		Only(ctx.Request().Context())
+	var u models.User
+	result := h.orm.WithContext(ctx.Request().Context()).
+		Where("email = ?", strings.ToLower(input.Email)).
+		First(&u)
 
-	switch err.(type) {
-	case *ent.NotFoundError:
-		return authFailed()
-	case nil:
-	default:
-		return fail(err, "error querying user during login")
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return authFailed()
+		}
+		return fail(result.Error, "error querying user during login")
 	}
 
 	if !u.Verified {
-		h.sendVerificationEmail(ctx, u)
+		h.sendVerificationEmail(ctx, &u)
 		return notVerified()
 	}
 
@@ -284,27 +283,29 @@ func (h *Auth) RegisterSubmit(ctx echo.Context) error {
 	}
 
 	// Attempt creating the user
-	u, err := h.orm.User.
-		Create().
-		SetName(input.Name).
-		SetEmail(input.Email).
-		SetPassword(pwHash).
-		Save(ctx.Request().Context())
-
-	switch err.(type) {
-	case nil:
-		log.Ctx(ctx).Info("user created",
-			"user_name", u.Name,
-			"user_id", u.ID,
-		)
-	case *ent.ConstraintError:
-		msg.Warning(ctx, "A user with this email address already exists. Please log in.")
-		return redirect.New(ctx).
-			Route(routeNameLogin).
-			Go()
-	default:
-		return fail(err, "unable to create user")
+	u := &models.User{
+		Name:     input.Name,
+		Email:    input.Email,
+		Password: pwHash,
 	}
+	result := h.orm.WithContext(ctx.Request().Context()).Create(u)
+
+	if result.Error != nil {
+		// Check for unique constraint violation (email already exists)
+		if strings.Contains(result.Error.Error(), "UNIQUE constraint failed") ||
+			strings.Contains(result.Error.Error(), "duplicate key value") {
+			msg.Warning(ctx, "A user with this email address already exists. Please log in.")
+			return redirect.New(ctx).
+				Route(routeNameLogin).
+				Go()
+		}
+		return fail(result.Error, "unable to create user")
+	}
+
+	log.Ctx(ctx).Info("user created",
+		"user_name", u.Name,
+		"user_id", u.ID,
+	)
 
 	msg.Success(ctx, "Your account has been created. Please verify your email.")
 
@@ -315,7 +316,7 @@ func (h *Auth) RegisterSubmit(ctx echo.Context) error {
 		Go()
 }
 
-func (h *Auth) sendVerificationEmail(ctx echo.Context, usr *ent.User) {
+func (h *Auth) sendVerificationEmail(ctx echo.Context, usr *models.User) {
 	// Generate a token
 	token, err := h.auth.GenerateEmailVerificationToken(usr.Email)
 	if err != nil {
@@ -374,15 +375,14 @@ func (h *Auth) ResetPasswordSubmit(ctx echo.Context) error {
 	}
 
 	// Get the requesting user
-	usr := ctx.Get(context.UserKey).(*ent.User)
+	usr := ctx.Get(context.UserKey).(*models.User)
 
 	// Update the user
-	_, err = usr.
-		Update().
-		SetPassword(hash).
-		Save(ctx.Request().Context())
-	if err != nil {
-		return fail(err, "unable to update password")
+	result := h.orm.WithContext(ctx.Request().Context()).
+		Model(usr).
+		Update("password", hash)
+	if result.Error != nil {
+		return fail(result.Error, "unable to update password")
 	}
 
 	// Delete all password tokens for this user
@@ -398,7 +398,7 @@ func (h *Auth) ResetPasswordSubmit(ctx echo.Context) error {
 }
 
 func (h *Auth) VerifyEmail(ctx echo.Context) error {
-	var usr *ent.User
+	var usr *models.User
 
 	// Validate the token
 	token := ctx.Param("token")
@@ -412,7 +412,7 @@ func (h *Auth) VerifyEmail(ctx echo.Context) error {
 
 	// Check if it matches the authenticated user
 	if u := ctx.Get(context.AuthenticatedUserKey); u != nil {
-		authUser := u.(*ent.User)
+		authUser := u.(*models.User)
 
 		if authUser.Email == email {
 			usr = authUser
@@ -421,23 +421,23 @@ func (h *Auth) VerifyEmail(ctx echo.Context) error {
 
 	// Query to find a matching user, if needed
 	if usr == nil {
-		usr, err = h.orm.User.
-			Query().
-			Where(user.Email(email)).
-			Only(ctx.Request().Context())
-		if err != nil {
-			return fail(err, "query failed loading email verification token user")
+		var user models.User
+		result := h.orm.WithContext(ctx.Request().Context()).
+			Where("email = ?", email).
+			First(&user)
+		if result.Error != nil {
+			return fail(result.Error, "query failed loading email verification token user")
 		}
+		usr = &user
 	}
 
 	// Verify the user, if needed
 	if !usr.Verified {
-		usr, err = usr.
-			Update().
-			SetVerified(true).
-			Save(ctx.Request().Context())
-		if err != nil {
-			return fail(err, "failed to set user as verified")
+		result := h.orm.WithContext(ctx.Request().Context()).
+			Model(usr).
+			Update("verified", true)
+		if result.Error != nil {
+			return fail(result.Error, "failed to set user as verified")
 		}
 	}
 
