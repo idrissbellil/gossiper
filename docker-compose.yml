@@ -37,10 +37,6 @@ services:
     networks:
       - traefik-public
       - backend
-    logging:
-      driver: loki
-      options:
-        loki-url: http://127.0.0.1:3100/loki/api/v1/push
   mailcrab:
     image: marlonb/mailcrab:latest
     ports:
@@ -62,10 +58,76 @@ services:
     depends_on:
       - db
       - mailcrab
-    logging:
-      driver: loki
-      options:
-        loki-url: http://127.0.0.1:3100/loki/api/v1/push
+
+  netdata:
+    image: netdata/netdata:latest
+    restart: unless-stopped
+    hostname: gossiper-netdata
+    cap_add:
+      - SYS_PTRACE
+      - SYS_ADMIN
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - netdataconfig:/etc/netdata
+      - netdatalib:/var/lib/netdata
+      - netdatacache:/var/cache/netdata
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.netdata.rule=Host(`netdata.g.v3m.net`)"
+      - "traefik.http.routers.netdata.entrypoints=web-secure"
+      - "traefik.http.routers.netdata.tls.certresolver=myresolver"
+      - "traefik.http.services.netdata.loadbalancer.server.port=19999"
+      - "traefik.http.routers.netdata.middlewares=netdata-auth"
+      - "traefik.http.middlewares.netdata-auth.basicauth.users=${NETDATA_BASIC_AUTH}"
+    networks:
+      - traefik-public
+      - backend
+
+  dozzle:
+    image: amir20/dozzle:latest
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - DOZZLE_USERNAME=${DOZZLE_USERNAME}
+      - DOZZLE_PASSWORD=${DOZZLE_PASSWORD}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dozzle.rule=Host(`logs.g.v3m.net`)"
+      - "traefik.http.routers.dozzle.entrypoints=web-secure"
+      - "traefik.http.routers.dozzle.tls.certresolver=myresolver"
+      - "traefik.http.services.dozzle.loadbalancer.server.port=8080"
+    networks:
+      - traefik-public
+      - backend
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+      - PGADMIN_CONFIG_SERVER_MODE=True
+      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=True
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pgadmin.rule=Host(`db.g.v3m.net`)"
+      - "traefik.http.routers.pgadmin.entrypoints=web-secure"
+      - "traefik.http.routers.pgadmin.tls.certresolver=myresolver"
+      - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
+    networks:
+      - traefik-public
+      - backend
+    depends_on:
+      - db
 
 networks:
   traefik-public:
@@ -76,3 +138,7 @@ networks:
 
 volumes:
   postgres_data:
+  pgadmin_data:
+  netdataconfig:
+  netdatalib:
+  netdatacache:
