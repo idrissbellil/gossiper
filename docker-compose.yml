@@ -103,6 +103,7 @@ services:
       - "traefik.http.routers.dozzle.entrypoints=web-secure"
       - "traefik.http.routers.dozzle.tls.certresolver=default"
       - "traefik.http.services.dozzle.loadbalancer.server.port=8080"
+      - "traefik.http.routers.dozzle.middlewares=netdata-auth"
     networks:
       - traefik-public
       - backend
