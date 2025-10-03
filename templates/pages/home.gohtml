@@ -46,7 +46,7 @@
         {{- range .Data.Jobs}}
             <tr>
                 <td>{{ .Email }}</td>
-                <td>{{ .URL }}</td>
+                <td style="max-width: 300px;"><div class="is-clipped" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ .URL }}</div></td>
                 <td>{{ .Method }}</td>
                 <td>
                     <button class="button is-danger is-small" hx-delete="/jobs/{{ .ID }}" hx-target="#posts">delete</button>
