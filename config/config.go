@@ -58,7 +58,7 @@ type (
 		Cache         CacheConfig
 		Database      DatabaseConfig
 		QueueDatabase DatabaseConfig
-		Mailhog       MailhogConfig
+		Mailcrab      MailcrabConfig
 		Tasks         TasksConfig
 		Mail          MailConfig
 	}
@@ -114,8 +114,9 @@ type (
 	}
 
 	// TasksConfig stores the tasks configuration
-	MailhogConfig struct {
+	MailcrabConfig struct {
 		Ws       string
+		Api      string
 		Hostname string
 	}
 

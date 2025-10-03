@@ -15,8 +15,8 @@ app:
   encryptionKey: "A,hrAZU}_;cN-}K]e5NcgRtjE}E^[]v~o"
   timeout: "20s"
   passwordToken:
-      expiration: "60m"
-      length: 64
+    expiration: "60m"
+    length: 64
   emailVerificationTokenExpiration: "12h"
 
 cache:
@@ -40,8 +40,9 @@ tasks:
   maxRetries: 10
   goroutines: 1
 
-mailhog:
-  ws: ws://127.0.0.1:8025/api/v2/websocket
+mailcrab:
+  ws: ws://127.0.0.1:8025/ws
+  api: http://127.0.0.1:8025/api
   hostname: localhost
 
 mail:

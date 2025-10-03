@@ -32,7 +32,8 @@ func main() {
 	}()
 
 	config := worker.Config{
-		WebSocketURL:    c.Config.Mailhog.Ws,
+		WebSocketURL:    c.Config.Mailcrab.Ws,
+		APIURL:          c.Config.Mailcrab.Api,
 		HTTPTimeout:     30 * time.Second,
 		MaxRetries:      3,
 		BufferSize:      100,

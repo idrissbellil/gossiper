@@ -108,7 +108,7 @@ func (h *Pages) JobAdd(ctx echo.Context) error {
 		}
 	}
 	dbJob, err := h.ORM.Job.Create().
-		SetEmail(generateRandomEmail(h.Config.Mailhog.Hostname)).
+		SetEmail(generateRandomEmail(h.Config.Mailcrab.Hostname)).
 		SetURL(jobRead.URL).
 		SetMethod(job.Method(jobRead.Method)).
 		SetFromRegex(jobRead.FromRegex).

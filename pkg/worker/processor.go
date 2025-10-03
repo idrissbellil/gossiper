@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"html/template"
 	"regexp"
-	"strings"
 
 	"gitea.v3m.net/idriss/gossiper/ent"
 )
@@ -15,12 +14,14 @@ import (
 type MessageProcessor struct {
 	jobRepo JobRepository
 	logger  Logger
+	fetcher MessageFetcherInterface
 }
 
-func NewMessageProcessor(jobRepo JobRepository, logger Logger) *MessageProcessor {
+func NewMessageProcessor(jobRepo JobRepository, logger Logger, fetcher MessageFetcherInterface) *MessageProcessor {
 	return &MessageProcessor{
 		jobRepo: jobRepo,
 		logger:  logger,
+		fetcher: fetcher,
 	}
 }
 
@@ -36,16 +37,23 @@ type ProcessResult struct {
 func (p *MessageProcessor) ParseRawMessage(rawMsg RawMessage) []Message {
 	var messages []Message
 
-	if len(rawMsg.Content.Headers.To) == 0 {
+	// Fetch full message details from API
+	fullMsg, err := p.fetcher.FetchMessage(rawMsg.ID)
+	if err != nil {
+		p.logger.Printf("failed to fetch message %s: %v", rawMsg.ID, err)
 		return messages
 	}
 
-	for _, to := range strings.Split(rawMsg.Content.Headers.To[0], ",") {
+	// Get the message body (text or converted HTML)
+	body := p.fetcher.GetMessageBody(fullMsg)
+
+	// Create a message for each recipient
+	for _, to := range rawMsg.To {
 		msg := Message{
-			To:      strings.TrimSpace(to),
-			From:    firstOrEmpty(rawMsg.Content.Headers.From),
-			Subject: firstOrEmpty(rawMsg.Content.Headers.Subject),
-			Body:    rawMsg.Content.Body,
+			To:      to.Email,
+			From:    rawMsg.From.Email,
+			Subject: rawMsg.Subject,
+			Body:    body,
 		}
 		messages = append(messages, msg)
 	}

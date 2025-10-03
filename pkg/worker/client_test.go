@@ -106,25 +106,10 @@ func TestWebSocketClient_Connect(t *testing.T) {
 
 func TestWebSocketClient_ReadMessages(t *testing.T) {
 	testMessage := RawMessage{
-		Content: struct {
-			Headers struct {
-				To      []string `json:"To"`
-				From    []string `json:"From"`
-				Subject []string `json:"Subject"`
-			} `json:"Headers"`
-			Body string `json:"Body"`
-		}{
-			Headers: struct {
-				To      []string `json:"To"`
-				From    []string `json:"From"`
-				Subject []string `json:"Subject"`
-			}{
-				To:      []string{"test@example.com"},
-				From:    []string{"sender@example.com"},
-				Subject: []string{"Test Subject"},
-			},
-			Body: "Test body",
-		},
+		ID:      "test-message-id",
+		Subject: "Test Subject",
+		From:    EmailAddress{Name: "Sender", Email: "sender@example.com"},
+		To:      []EmailAddress{{Name: "Recipient", Email: "test@example.com"}},
 	}
 
 	tests := []struct {
@@ -222,7 +207,7 @@ func TestWebSocketClient_ReadMessages(t *testing.T) {
 
 			if tt.expectMessages > 0 && len(receivedMessages) > 0 {
 				msg := receivedMessages[0]
-				if len(msg.Content.Headers.To) == 0 || msg.Content.Headers.To[0] != "test@example.com" {
+				if len(msg.To) == 0 || msg.To[0].Email != "test@example.com" {
 					t.Error("message content not preserved correctly")
 				}
 			}
@@ -283,23 +268,10 @@ func TestWebSocketClient_ReadMessages_ChannelBlocking(t *testing.T) {
 	config := Config{}
 
 	testMessage := RawMessage{
-		Content: struct {
-			Headers struct {
-				To      []string `json:"To"`
-				From    []string `json:"From"`
-				Subject []string `json:"Subject"`
-			} `json:"Headers"`
-			Body string `json:"Body"`
-		}{
-			Headers: struct {
-				To      []string `json:"To"`
-				From    []string `json:"From"`
-				Subject []string `json:"Subject"`
-			}{
-				To: []string{"test@example.com"},
-			},
-			Body: "Test",
-		},
+		ID:      "test-id",
+		Subject: "Test",
+		From:    EmailAddress{Name: "Sender", Email: "sender@example.com"},
+		To:      []EmailAddress{{Name: "Recipient", Email: "test@example.com"}},
 	}
 
 	mockConn := &mockWSConn{

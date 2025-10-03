@@ -33,35 +33,52 @@ func (m *mockLogger) Println(args ...interface{}) {
 	m.messages = append(m.messages, "println")
 }
 
-func TestMessageProcessor_ParseRawMessage(t *testing.T) {
-	processor := NewMessageProcessor(nil, &mockLogger{})
+type mockMessageFetcher struct {
+	messages map[string]*MailcrabMessage
+	err      error
+}
 
+func (m *mockMessageFetcher) FetchMessage(messageID string) (*MailcrabMessage, error) {
+	if m.err != nil {
+		return nil, m.err
+	}
+	if msg, ok := m.messages[messageID]; ok {
+		return msg, nil
+	}
+	return nil, errors.New("message not found")
+}
+
+func (m *mockMessageFetcher) GetMessageBody(msg *MailcrabMessage) string {
+	if msg.Text != "" {
+		return msg.Text
+	}
+	return msg.HTML
+}
+
+func TestMessageProcessor_ParseRawMessage(t *testing.T) {
 	tests := []struct {
-		name     string
-		rawMsg   RawMessage
-		expected []Message
+		name         string
+		rawMsg       RawMessage
+		fetcherMsgs  map[string]*MailcrabMessage
+		fetcherErr   error
+		expected     []Message
 	}{
 		{
-			name: "single recipient",
+			name: "single recipient with text body",
 			rawMsg: RawMessage{
-				Content: struct {
-					Headers struct {
-						To      []string `json:"To"`
-						From    []string `json:"From"`
-						Subject []string `json:"Subject"`
-					} `json:"Headers"`
-					Body string `json:"Body"`
-				}{
-					Headers: struct {
-						To      []string `json:"To"`
-						From    []string `json:"From"`
-						Subject []string `json:"Subject"`
-					}{
-						To:      []string{"user@example.com"},
-						From:    []string{"sender@example.com"},
-						Subject: []string{"Test Subject"},
-					},
-					Body: "Test body",
+				ID:      "msg-123",
+				Subject: "Test Subject",
+				From:    EmailAddress{Name: "Sender", Email: "sender@example.com"},
+				To:      []EmailAddress{{Name: "User", Email: "user@example.com"}},
+			},
+			fetcherMsgs: map[string]*MailcrabMessage{
+				"msg-123": {
+					ID:      "msg-123",
+					Text:    "Test body",
+					HTML:    "",
+					Subject: "Test Subject",
+					From:    EmailAddress{Name: "Sender", Email: "sender@example.com"},
+					To:      []EmailAddress{{Name: "User", Email: "user@example.com"}},
 				},
 			},
 			expected: []Message{
@@ -76,24 +93,21 @@ func TestMessageProcessor_ParseRawMessage(t *testing.T) {
 		{
 			name: "multiple recipients",
 			rawMsg: RawMessage{
-				Content: struct {
-					Headers struct {
-						To      []string `json:"To"`
-						From    []string `json:"From"`
-						Subject []string `json:"Subject"`
-					} `json:"Headers"`
-					Body string `json:"Body"`
-				}{
-					Headers: struct {
-						To      []string `json:"To"`
-						From    []string `json:"From"`
-						Subject []string `json:"Subject"`
-					}{
-						To:      []string{"user1@example.com, user2@example.com"},
-						From:    []string{"sender@example.com"},
-						Subject: []string{"Test Subject"},
-					},
-					Body: "Test body",
+				ID:      "msg-456",
+				Subject: "Test Subject",
+				From:    EmailAddress{Name: "Sender", Email: "sender@example.com"},
+				To: []EmailAddress{
+					{Name: "User1", Email: "user1@example.com"},
+					{Name: "User2", Email: "user2@example.com"},
+				},
+			},
+			fetcherMsgs: map[string]*MailcrabMessage{
+				"msg-456": {
+					ID:      "msg-456",
+					Text:    "Test body",
+					HTML:    "",
+					Subject: "Test Subject",
+					From:    EmailAddress{Name: "Sender", Email: "sender@example.com"},
 				},
 			},
 			expected: []Message{
@@ -112,34 +126,32 @@ func TestMessageProcessor_ParseRawMessage(t *testing.T) {
 			},
 		},
 		{
-			name: "empty To field",
+			name: "fetch error",
 			rawMsg: RawMessage{
-				Content: struct {
-					Headers struct {
-						To      []string `json:"To"`
-						From    []string `json:"From"`
-						Subject []string `json:"Subject"`
-					} `json:"Headers"`
-					Body string `json:"Body"`
-				}{
-					Headers: struct {
-						To      []string `json:"To"`
-						From    []string `json:"From"`
-						Subject []string `json:"Subject"`
-					}{
-						To:      []string{},
-						From:    []string{"sender@example.com"},
-						Subject: []string{"Test Subject"},
-					},
-					Body: "Test body",
-				},
+				ID:      "msg-error",
+				Subject: "Test Subject",
+				From:    EmailAddress{Name: "Sender", Email: "sender@example.com"},
+				To:      []EmailAddress{{Name: "User", Email: "user@example.com"}},
 			},
-			expected: []Message{},
+			fetcherErr: errors.New("fetch failed"),
+			expected:   []Message{},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			mockFetcher := &mockMessageFetcher{
+				messages: tt.fetcherMsgs,
+				err:      tt.fetcherErr,
+			}
+
+			logger := &mockLogger{}
+			processor := &MessageProcessor{
+				jobRepo: nil,
+				logger:  logger,
+				fetcher: mockFetcher,
+			}
+
 			result := processor.ParseRawMessage(tt.rawMsg)
 
 			if len(result) != len(tt.expected) {
@@ -254,7 +266,11 @@ func TestMessageProcessor_ProcessMessage(t *testing.T) {
 			}
 
 			logger := &mockLogger{}
-			processor := NewMessageProcessor(mockRepo, logger)
+			processor := &MessageProcessor{
+				jobRepo: mockRepo,
+				logger:  logger,
+				fetcher: nil, // Not needed for ProcessMessage tests
+			}
 
 			results, err := processor.ProcessMessage(context.Background(), tt.message)
 
@@ -289,7 +305,11 @@ func TestMessageProcessor_ProcessMessage(t *testing.T) {
 }
 
 func TestMessageProcessor_generatePayload(t *testing.T) {
-	processor := NewMessageProcessor(nil, &mockLogger{})
+	processor := &MessageProcessor{
+		jobRepo: nil,
+		logger:  &mockLogger{},
+		fetcher: nil,
+	}
 
 	msg := Message{
 		From:    "sender@example.com",

@@ -10,14 +10,42 @@ import (
 )
 
 type RawMessage struct {
-	Content struct {
-		Headers struct {
-			To      []string `json:"To"`
-			From    []string `json:"From"`
-			Subject []string `json:"Subject"`
-		} `json:"Headers"`
-		Body string `json:"Body"`
-	} `json:"Content"`
+	ID                 string `json:"id"`
+	Time               int64  `json:"time"`
+	From               EmailAddress `json:"from"`
+	To                 []EmailAddress `json:"to"`
+	Subject            string `json:"subject"`
+	Date               string `json:"date"`
+	Size               string `json:"size"`
+	Opened             bool   `json:"opened"`
+	HasHTML            bool   `json:"has_html"`
+	HasPlain           bool   `json:"has_plain"`
+	Attachments        []interface{} `json:"attachments"`
+	EnvelopeFrom       string `json:"envelope_from"`
+	EnvelopeRecipients []string `json:"envelope_recipients"`
+}
+
+type EmailAddress struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
+type MailcrabMessage struct {
+	ID          string                 `json:"id"`
+	Time        int64                  `json:"time"`
+	From        EmailAddress           `json:"from"`
+	To          []EmailAddress         `json:"to"`
+	Subject     string                 `json:"subject"`
+	Date        string                 `json:"date"`
+	Size        string                 `json:"size"`
+	Opened      bool                   `json:"opened"`
+	Headers     map[string]string      `json:"headers"`
+	Text        string                 `json:"text"`
+	HTML        string                 `json:"html"`
+	Attachments []interface{}          `json:"attachments"`
+	Raw         string                 `json:"raw"`
+	EnvelopeFrom       string         `json:"envelope_from"`
+	EnvelopeRecipients []string       `json:"envelope_recipients"`
 }
 
 type Message struct {
@@ -29,6 +57,7 @@ type Message struct {
 
 type Config struct {
 	WebSocketURL    string
+	APIURL          string
 	HTTPTimeout     time.Duration
 	MaxRetries      int
 	BufferSize      int
@@ -57,6 +86,11 @@ type WSClient interface {
 
 type JobRepository interface {
 	GetActiveJobs(ctx context.Context, email string) ([]*ent.Job, error)
+}
+
+type MessageFetcherInterface interface {
+	FetchMessage(messageID string) (*MailcrabMessage, error)
+	GetMessageBody(msg *MailcrabMessage) string
 }
 
 type Logger interface {

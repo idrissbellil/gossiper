@@ -7,7 +7,7 @@ toolchain go1.23.1
 require (
 	entgo.io/ent v0.14.1
 	github.com/Masterminds/sprig v2.22.0+incompatible
-	github.com/PuerkitoBio/goquery v1.9.1
+	github.com/PuerkitoBio/goquery v1.9.2
 	github.com/go-mail/mail v2.3.1+incompatible
 	github.com/go-playground/validator/v10 v10.19.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
@@ -27,6 +27,7 @@ require (
 
 require (
 	ariga.io/atlas v0.21.1 // indirect
+	github.com/JohannesKaufmann/html-to-markdown v1.6.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect

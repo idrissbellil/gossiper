@@ -9,15 +9,11 @@ services:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
       - POSTGRES_DB=app_test
-  mailhog:
-    image: mailhog/mailhog:latest
+  mailcrab:
+    image: marlonb/mailcrab:latest
     ports:
-      - "1025:1025"  # SMTP port
-      - "8025:8025"  # Web UI port
+      - "1025:1025" # SMTP port
+      - "8025:1080" # Web UI port
     restart: unless-stopped
     depends_on:
       - db
-    environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=admin
-      - POSTGRES_DB=app_test

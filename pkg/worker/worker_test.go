@@ -46,25 +46,10 @@ func TestWorker_Integration(t *testing.T) {
 	method := job.MethodPOST
 
 	testMessage := RawMessage{
-		Content: struct {
-			Headers struct {
-				To      []string `json:"To"`
-				From    []string `json:"From"`
-				Subject []string `json:"Subject"`
-			} `json:"Headers"`
-			Body string `json:"Body"`
-		}{
-			Headers: struct {
-				To      []string `json:"To"`
-				From    []string `json:"From"`
-				Subject []string `json:"Subject"`
-			}{
-				To:      []string{"webhook@example.com"},
-				From:    []string{"sender@example.com"},
-				Subject: []string{"Test Alert"},
-			},
-			Body: "Alert: Something happened",
-		},
+		ID:      "test-msg-123",
+		Subject: "Test Alert",
+		From:    EmailAddress{Name: "Sender", Email: "sender@example.com"},
+		To:      []EmailAddress{{Name: "Webhook", Email: "webhook@example.com"}},
 	}
 
 	mockJob := &ent.Job{
@@ -77,11 +62,18 @@ func TestWorker_Integration(t *testing.T) {
 	}
 
 	deps := newMockWorkerDeps()
+	deps.config.APIURL = "http://mailcrab.example.com/api"
 
 	deps.jobRepo.jobs["webhook@example.com"] = []*ent.Job{mockJob}
 
 	deps.wsDialer.conn = &mockWSConn{
 		messages: []interface{}{testMessage},
+	}
+
+	// Mock Mailcrab API response for fetching message body
+	deps.httpClient.responses["http://mailcrab.example.com/api/message/test-msg-123"] = &http.Response{
+		StatusCode: 200,
+		Body:       io.NopCloser(strings.NewReader(`{"id":"test-msg-123","text":"Alert: Something happened","html":"","from":{"email":"sender@example.com"},"to":[{"email":"webhook@example.com"}],"subject":"Test Alert"}`)),
 	}
 
 	deps.httpClient.responses["http://webhook.example.com/notify"] = &http.Response{
@@ -112,17 +104,24 @@ func TestWorker_Integration(t *testing.T) {
 		t.Errorf("unexpected worker error: %v", workerErr)
 	}
 
-	if len(deps.httpClient.requests) != 1 {
-		t.Errorf("expected 1 HTTP request, got %d", len(deps.httpClient.requests))
+	// Expect 2 requests: 1 to fetch message from Mailcrab API, 1 to send webhook
+	if len(deps.httpClient.requests) != 2 {
+		t.Errorf("expected 2 HTTP requests (1 Mailcrab API + 1 webhook), got %d", len(deps.httpClient.requests))
 		return
 	}
 
-	req := deps.httpClient.requests[0]
-	if req.URL.String() != "http://webhook.example.com/notify" {
-		t.Errorf("expected webhook URL, got %s", req.URL.String())
+	// First request should be to Mailcrab API
+	if !strings.Contains(deps.httpClient.requests[0].URL.String(), "mailcrab.example.com/api/message") {
+		t.Errorf("expected first request to Mailcrab API, got %s", deps.httpClient.requests[0].URL.String())
 	}
 
-	if req.Header.Get("X-API-Key") != "secret" {
+	// Second request should be to webhook
+	webhookReq := deps.httpClient.requests[1]
+	if webhookReq.URL.String() != "http://webhook.example.com/notify" {
+		t.Errorf("expected webhook URL, got %s", webhookReq.URL.String())
+	}
+
+	if webhookReq.Header.Get("X-API-Key") != "secret" {
 		t.Errorf("expected API key header to be preserved")
 	}
 }
@@ -174,25 +173,10 @@ func TestWorker_MessageProcessingWithMultipleJobs(t *testing.T) {
 	method := job.MethodPOST
 
 	testMessage := RawMessage{
-		Content: struct {
-			Headers struct {
-				To      []string `json:"To"`
-				From    []string `json:"From"`
-				Subject []string `json:"Subject"`
-			} `json:"Headers"`
-			Body string `json:"Body"`
-		}{
-			Headers: struct {
-				To      []string `json:"To"`
-				From    []string `json:"From"`
-				Subject []string `json:"Subject"`
-			}{
-				To:      []string{"alert@example.com"},
-				From:    []string{"system@example.com"},
-				Subject: []string{"System Alert"},
-			},
-			Body: "Critical alert",
-		},
+		ID:      "test-msg-456",
+		Subject: "System Alert",
+		From:    EmailAddress{Name: "System", Email: "system@example.com"},
+		To:      []EmailAddress{{Name: "Alert", Email: "alert@example.com"}},
 	}
 
 	job1 := &ent.Job{
@@ -214,9 +198,16 @@ func TestWorker_MessageProcessingWithMultipleJobs(t *testing.T) {
 	}
 
 	deps := newMockWorkerDeps()
+	deps.config.APIURL = "http://mailcrab.example.com/api"
 	deps.jobRepo.jobs["alert@example.com"] = []*ent.Job{job1, job2}
 	deps.wsDialer.conn = &mockWSConn{
 		messages: []interface{}{testMessage},
+	}
+
+	// Mock Mailcrab API response
+	deps.httpClient.responses["http://mailcrab.example.com/api/message/test-msg-456"] = &http.Response{
+		StatusCode: 200,
+		Body:       io.NopCloser(strings.NewReader(`{"id":"test-msg-456","text":"Critical alert","html":"","from":{"email":"system@example.com"},"to":[{"email":"alert@example.com"}],"subject":"System Alert"}`)),
 	}
 
 	deps.httpClient.responses["http://webhook1.example.com/notify"] = &http.Response{
@@ -242,8 +233,9 @@ func TestWorker_MessageProcessingWithMultipleJobs(t *testing.T) {
 
 	time.Sleep(100 * time.Millisecond)
 
-	if len(deps.httpClient.requests) != 2 {
-		t.Errorf("expected 2 HTTP requests, got %d", len(deps.httpClient.requests))
+	// Expect 3 requests: 1 to Mailcrab API + 2 to webhooks
+	if len(deps.httpClient.requests) != 3 {
+		t.Errorf("expected 3 HTTP requests (1 Mailcrab API + 2 webhooks), got %d", len(deps.httpClient.requests))
 	}
 
 	urls := make(map[string]bool)
@@ -265,29 +257,22 @@ func TestWorker_MessageProcessingWithMultipleJobs(t *testing.T) {
 
 func TestWorker_NoMatchingJobs(t *testing.T) {
 	testMessage := RawMessage{
-		Content: struct {
-			Headers struct {
-				To      []string `json:"To"`
-				From    []string `json:"From"`
-				Subject []string `json:"Subject"`
-			} `json:"Headers"`
-			Body string `json:"Body"`
-		}{
-			Headers: struct {
-				To      []string `json:"To"`
-				From    []string `json:"From"`
-				Subject []string `json:"Subject"`
-			}{
-				To:   []string{"nobody@example.com"},
-				From: []string{"sender@example.com"},
-			},
-			Body: "Test message",
-		},
+		ID:      "test-msg-789",
+		Subject: "Test",
+		From:    EmailAddress{Name: "Sender", Email: "sender@example.com"},
+		To:      []EmailAddress{{Name: "Nobody", Email: "nobody@example.com"}},
 	}
 
 	deps := newMockWorkerDeps()
+	deps.config.APIURL = "http://mailcrab.example.com/api"
 	deps.wsDialer.conn = &mockWSConn{
 		messages: []interface{}{testMessage},
+	}
+
+	// Mock Mailcrab API response
+	deps.httpClient.responses["http://mailcrab.example.com/api/message/test-msg-789"] = &http.Response{
+		StatusCode: 200,
+		Body:       io.NopCloser(strings.NewReader(`{"id":"test-msg-789","text":"Test message","html":"","from":{"email":"sender@example.com"},"to":[{"email":"nobody@example.com"}],"subject":"Test"}`)),
 	}
 
 	worker := NewWorker(deps.toDependencies())
@@ -304,8 +289,14 @@ func TestWorker_NoMatchingJobs(t *testing.T) {
 
 	time.Sleep(100 * time.Millisecond)
 
-	if len(deps.httpClient.requests) != 0 {
-		t.Errorf("expected no HTTP requests for no matching jobs, got %d", len(deps.httpClient.requests))
+	// Expect 1 request to Mailcrab API to fetch the message, but no webhook requests
+	if len(deps.httpClient.requests) != 1 {
+		t.Errorf("expected 1 HTTP request (Mailcrab API only), got %d", len(deps.httpClient.requests))
+	}
+
+	// Verify the request was to Mailcrab API
+	if len(deps.httpClient.requests) > 0 && !strings.Contains(deps.httpClient.requests[0].URL.String(), "mailcrab.example.com/api/message") {
+		t.Errorf("expected request to Mailcrab API, got %s", deps.httpClient.requests[0].URL.String())
 	}
 
 	if len(deps.logger.messages) == 0 {
@@ -315,19 +306,22 @@ func TestWorker_NoMatchingJobs(t *testing.T) {
 
 func TestWorker_ContextCancellation(t *testing.T) {
 	testMessage := RawMessage{
-		Content: struct {
-			Headers struct {
-				To      []string `json:"To"`
-				From    []string `json:"From"`
-				Subject []string `json:"Subject"`
-			} `json:"Headers"`
-			Body string `json:"Body"`
-		}{},
+		ID:      "test-msg-000",
+		Subject: "Test",
+		From:    EmailAddress{Email: "test@example.com"},
+		To:      []EmailAddress{{Email: "test@example.com"}},
 	}
 
 	deps := newMockWorkerDeps()
+	deps.config.APIURL = "http://mailcrab.example.com/api"
 	deps.wsDialer.conn = &mockWSConn{
 		messages: []interface{}{testMessage, testMessage, testMessage},
+	}
+
+	// Mock Mailcrab API response
+	deps.httpClient.responses["http://mailcrab.example.com/api/message/test-msg-000"] = &http.Response{
+		StatusCode: 200,
+		Body:       io.NopCloser(strings.NewReader(`{"id":"test-msg-000","text":"Test","html":"","from":{"email":"test@example.com"},"to":[{"email":"test@example.com"}],"subject":"Test"}`)),
 	}
 
 	worker := NewWorker(deps.toDependencies())
