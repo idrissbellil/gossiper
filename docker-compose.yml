@@ -115,22 +115,18 @@ services:
       - traefik-public
       - backend
 
-  pgadmin:
-    image: dpage/pgadmin4:latest
+  pgweb:
+    image: sosedoff/pgweb:latest
     restart: unless-stopped
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
-      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
-      - PGADMIN_CONFIG_SERVER_MODE=True
-      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=True
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.pgadmin.rule=Host(`db.g.v3m.net`)"
-      - "traefik.http.routers.pgadmin.entrypoints=web-secure"
-      - "traefik.http.routers.pgadmin.tls.certresolver=default"
-      - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
+      - "traefik.http.routers.pgweb.rule=Host(`db.g.v3m.net`)"
+      - "traefik.http.routers.pgweb.entrypoints=web-secure"
+      - "traefik.http.routers.pgweb.tls.certresolver=default"
+      - "traefik.http.services.pgweb.loadbalancer.server.port=8081"
+      - "traefik.http.routers.pgweb.middlewares=beszel-auth"
+    environment:
+      - DATABASE_URL=postgres://admin:admin@db:5432/app_test?sslmode=disable
     networks:
       - traefik-public
       - backend
