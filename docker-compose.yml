@@ -59,34 +59,40 @@ services:
       - db
       - mailcrab
 
-  netdata:
-    image: netdata/netdata:latest
+  beszel:
+    image: henrygd/beszel:latest
     restart: unless-stopped
-    hostname: gossiper-netdata
-    cap_add:
-      - SYS_PTRACE
-      - SYS_ADMIN
+    hostname: gossiper-beszel
     security_opt:
       - apparmor:unconfined
     volumes:
-      - netdataconfig:/etc/netdata
-      - netdatalib:/var/lib/netdata
-      - netdatacache:/var/cache/netdata
-      - /etc/passwd:/host/etc/passwd:ro
-      - /etc/group:/host/etc/group:ro
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./beszel_data:/beszel_data
+      - ./beszel_socket:/beszel_socket
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.netdata.rule=Host(`netdata.g.v3m.net`)"
-      - "traefik.http.routers.netdata.entrypoints=web-secure"
-      - "traefik.http.routers.netdata.tls.certresolver=default"
-      - "traefik.http.services.netdata.loadbalancer.server.port=19999"
-      - "traefik.http.routers.netdata.middlewares=netdata-auth"
-      - "traefik.http.middlewares.netdata-auth.basicauth.users=${NETDATA_BASIC_AUTH}"
+      - "traefik.http.routers.beszel.rule=Host(`beszel.g.v3m.net`)"
+      - "traefik.http.routers.beszel.entrypoints=web-secure"
+      - "traefik.http.routers.beszel.tls.certresolver=default"
+      - "traefik.http.services.beszel.loadbalancer.server.port=8090"
+      # - "traefik.http.routers.beszel.middlewares=beszel-auth"
     networks:
       - traefik-public
+      - backend
+
+  beszel-agent:
+    image: henrygd/beszel-agent:latest
+    restart: unless-stopped
+    hostname: gossiper-beszel-agent
+    volumes:
+      - ./beszel_socket:/beszel_socket
+      - ./beszel_agent_data:/var/lib/beszel-agent
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      LISTEN: /beszel_socket/beszel.sock
+      HUB_URL: http://beszel:8090
+      TOKEN: 7a254dba-59b1-4189-b893-54f0fde3f666
+      KEY: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEwC/iro3FLQpSnHuMrgr0J8K1W+8Gi3qr2Lll2Rwnkq"
+    networks:
       - backend
 
   dozzle:
@@ -103,7 +109,8 @@ services:
       - "traefik.http.routers.dozzle.entrypoints=web-secure"
       - "traefik.http.routers.dozzle.tls.certresolver=default"
       - "traefik.http.services.dozzle.loadbalancer.server.port=8080"
-      - "traefik.http.routers.dozzle.middlewares=netdata-auth"
+      - "traefik.http.routers.dozzle.middlewares=beszel-auth"
+      - "traefik.http.middlewares.beszel-auth.basicauth.users=${NETDATA_BASIC_AUTH}"
     networks:
       - traefik-public
       - backend
