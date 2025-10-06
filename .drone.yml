@@ -116,7 +116,7 @@ steps:
   - name: copy-compose
     image: appleboy/drone-scp
     settings:
-      host: 37.221.67.221
+      host: 151.243.109.60
       username: idriss
       key:
         from_secret: DOCKER_DEPLOY_SSH_KEY
@@ -142,9 +142,17 @@ steps:
       PGADMIN_PASSWORD:
         from_secret: PGADMIN_PASSWORD
     settings:
-      host: 37.221.67.221
+      host: 151.243.109.60
       username: idriss
-      envs: [GOSSIP_MAIL_PASSWORD, NETDATA_BASIC_AUTH, DOZZLE_USERNAME, DOZZLE_PASSWORD, PGADMIN_EMAIL, PGADMIN_PASSWORD]
+      envs:
+        [
+          GOSSIP_MAIL_PASSWORD,
+          NETDATA_BASIC_AUTH,
+          DOZZLE_USERNAME,
+          DOZZLE_PASSWORD,
+          PGADMIN_EMAIL,
+          PGADMIN_PASSWORD,
+        ]
       key:
         from_secret: DOCKER_DEPLOY_SSH_KEY
       port: 7777

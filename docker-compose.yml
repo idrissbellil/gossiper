@@ -14,7 +14,7 @@ services:
     image: gitea.v3m.net/idriss/gossip-web:latest
     restart: unless-stopped
     environment:
-      GOSSIP_HTTP_HOSTNAME: g.v3m.net
+      GOSSIP_HTTP_HOSTNAME: app.v3m.pw
       GOSSIP_APP_ENVIRONMENT: prod
       GOSSIP_DATABASE_DRIVER: postgres
       GOSSIP_DATABASE_TESTCONNECTION: host=db port=5432 user=admin dbname=app_test password=admin sslmode=disable
@@ -25,12 +25,12 @@ services:
       GOSSIP_MAIL_PASSWORD: ${GOSSIP_MAIL_PASSWORD}
       GOSSIP_MAIL_FROMADDRESS: noreply@risky.info
       GOSSIP_MAIL_SKIPTLSVERIFY: "true"
-      GOSSIP_MAILCRAB_HOSTNAME: g.v3m.net
+      GOSSIP_MAILCRAB_HOSTNAME: v3m.pw
     depends_on:
       - db
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.gossip.rule=Host(`g.v3m.net`)"
+      - "traefik.http.routers.gossip.rule=Host(`app.v3m.pw`)"
       - "traefik.http.routers.gossip.entrypoints=web-secure"
       - "traefik.http.routers.gossip.tls.certresolver=default"
       - "traefik.http.services.gossip.loadbalancer.server.port=8000"
@@ -59,72 +59,17 @@ services:
       - db
       - mailcrab
 
-  beszel:
-    image: henrygd/beszel:latest
-    restart: unless-stopped
-    hostname: gossiper-beszel
-    security_opt:
-      - apparmor:unconfined
-    volumes:
-      - ./beszel_data:/beszel_data
-      - ./beszel_socket:/beszel_socket
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.beszel.rule=Host(`beszel.g.v3m.net`)"
-      - "traefik.http.routers.beszel.entrypoints=web-secure"
-      - "traefik.http.routers.beszel.tls.certresolver=default"
-      - "traefik.http.services.beszel.loadbalancer.server.port=8090"
-      # - "traefik.http.routers.beszel.middlewares=beszel-auth"
-    networks:
-      - traefik-public
-      - backend
-
-  beszel-agent:
-    image: henrygd/beszel-agent:latest
-    restart: unless-stopped
-    hostname: gossiper-beszel-agent
-    volumes:
-      - ./beszel_socket:/beszel_socket
-      - ./beszel_agent_data:/var/lib/beszel-agent
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    environment:
-      LISTEN: /beszel_socket/beszel.sock
-      HUB_URL: http://beszel:8090
-      TOKEN: 7a254dba-59b1-4189-b893-54f0fde3f666
-      KEY: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEwC/iro3FLQpSnHuMrgr0J8K1W+8Gi3qr2Lll2Rwnkq"
-    networks:
-      - backend
-
-  dozzle:
-    image: amir20/dozzle:latest
-    restart: unless-stopped
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    environment:
-      - DOZZLE_USERNAME=${DOZZLE_USERNAME}
-      - DOZZLE_PASSWORD=${DOZZLE_PASSWORD}
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.dozzle.rule=Host(`logs.g.v3m.net`)"
-      - "traefik.http.routers.dozzle.entrypoints=web-secure"
-      - "traefik.http.routers.dozzle.tls.certresolver=default"
-      - "traefik.http.services.dozzle.loadbalancer.server.port=8080"
-      - "traefik.http.routers.dozzle.middlewares=beszel-auth"
-      - "traefik.http.middlewares.beszel-auth.basicauth.users=${NETDATA_BASIC_AUTH}"
-    networks:
-      - traefik-public
-      - backend
-
   pgweb:
     image: sosedoff/pgweb:latest
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.pgweb.rule=Host(`db.g.v3m.net`)"
+      - "traefik.http.routers.pgweb.rule=Host(`db.v3m.pw`)"
       - "traefik.http.routers.pgweb.entrypoints=web-secure"
       - "traefik.http.routers.pgweb.tls.certresolver=default"
       - "traefik.http.services.pgweb.loadbalancer.server.port=8081"
       - "traefik.http.routers.pgweb.middlewares=beszel-auth"
+      - "traefik.http.middlewares.beszel-auth.basicauth.users=${NETDATA_BASIC_AUTH}"
     environment:
       - DATABASE_URL=postgres://admin:admin@db:5432/app_test?sslmode=disable
     networks:
@@ -142,7 +87,3 @@ networks:
 
 volumes:
   postgres_data:
-  pgadmin_data:
-  netdataconfig:
-  netdatalib:
-  netdatacache:

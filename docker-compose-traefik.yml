@@ -3,92 +3,93 @@ services:
     image: traefik:v3.0
     command:
       - "--providers.docker=true"
-      - "--providers.docker.network=traefik-public"
+      - "--providers.docker.network=traefik"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=idriss@risky.info"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-      # Dashboard config
+      - "--entrypoints.web-secure.address=:443"
+      - "--certificatesresolvers.default.acme.tlschallenge=true"
+      - "--certificatesresolvers.default.acme.email=idriss@risky.info"
+      - "--certificatesresolvers.default.acme.storage=/letsencrypt/acme.json"
       - "--api.dashboard=true"
-      # Log config
-      - --log.level=INFO
+      - "--log.level=INFO"
       - "--accesslog=true"
-      - "--log.format=json"
-      - "--accesslog.format=json"
-      # Metrics config
-      - "--metrics.prometheus=true"
-      - "--metrics.prometheus.addEntryPointsLabels=true"
-      - "--metrics.prometheus.addServicesLabels=true"
     ports:
       - "80:80"
       - "443:443"
-      # Dashboard port (you can restrict this to localhost)
       - "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "letsencrypt:/letsencrypt"
-      - "traefik-logs:/logs"  # New volume for logs
+      - "./docker-data/traefik/letsencrypt:/letsencrypt"
+      - "traefik-logs:/logs" # New volume for logs
     networks:
-      - traefik-public
-    # Add labels to secure the dashboard
+      - traefik
     labels:
       - "traefik.enable=true"
-      # Dashboard router
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.g.v3m.net`)"
-      - "traefik.http.routers.dashboard.service=api@internal"
-      - "traefik.http.routers.dashboard.entrypoints=websecure"
-      - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
-      # Basic auth middleware (recommended)
-      - "traefik.http.middlewares.auth.basicauth.users=idriss:$$apr1$$cIdOPlj3$$yDdeEu0GJR19jT6RW8pY8/"  # Generate this with htpasswd
+      - "traefik.http.middlewares.auth.basicauth.users=idriss:$$apr1$$cIdOPlj3$$yDdeEu0GJR19jT6RW8pY8/"
       - "traefik.http.routers.dashboard.middlewares=auth@docker"
-    logging:
-      driver: loki
-      options:
-        loki-url: http://127.0.0.1:3100/loki/api/v1/push
+      - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.http-catchall.entrypoints=web"
+      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
-  prometheus:
-    image: prom/prometheus:latest
+  beszel:
+    image: henrygd/beszel:latest
+    restart: unless-stopped
+    hostname: beszel
+    security_opt:
+      - apparmor:unconfined
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus-data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-    networks:
-      - traefik-public
-
-  loki:
-    image: grafana/loki:latest
-    ports:
-      - "127.0.0.1:3100:3100"
-    volumes:
-      - loki-data:/loki
-    networks:
-      - traefik-public
-
-  grafana:
-    image: grafana/grafana:latest
-    volumes:
-      - grafana-data:/var/lib/grafana
-    networks:
-      - traefik-public
+      - ./beszel_data:/beszel_data
+      - ./beszel_socket:/beszel_socket
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.grafana.rule=Host(`grafana.g.v3m.net`)"
-      - "traefik.http.routers.grafana.entrypoints=websecure"
-      - "traefik.http.routers.grafana.tls.certresolver=myresolver"
-      - "traefik.http.routers.grafana.middlewares=auth@docker"
-      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      - "traefik.http.routers.beszel.rule=Host(`beszel.v3m.pw`)"
+      - "traefik.http.routers.beszel.entrypoints=web-secure"
+      - "traefik.http.routers.beszel.tls.certresolver=default"
+      - "traefik.http.services.beszel.loadbalancer.server.port=8090"
+    networks:
+      - traefik
+
+  beszel-agent:
+    image: henrygd/beszel-agent:latest
+    restart: unless-stopped
+    hostname: beszel-agent
+    volumes:
+      - ./beszel_socket:/beszel_socket
+      - ./beszel_agent_data:/var/lib/beszel-agent
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      LISTEN: /beszel_socket/beszel.sock
+      HUB_URL: http://beszel:8090
+      TOKEN: c47aaea6-85d0-4850-85b2-2158896873d0
+      KEY: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKaChqS7LRis0fagjjnAanl8UsTBsAuBT6dHvVVSfsaV"
+    networks:
+      - traefik
+
+  dozzle:
+    image: amir20/dozzle:latest
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - DOZZLE_USERNAME=${DOZZLE_USERNAME}
+      - DOZZLE_PASSWORD=${DOZZLE_PASSWORD}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dozzle.rule=Host(`logs.v3m.pw`)"
+      - "traefik.http.routers.dozzle.entrypoints=web-secure"
+      - "traefik.http.routers.dozzle.tls.certresolver=default"
+      - "traefik.http.services.dozzle.loadbalancer.server.port=8080"
+      - "traefik.http.routers.dozzle.middlewares=beszel-auth"
+      - "traefik.http.middlewares.beszel-auth.basicauth.users=${NETDATA_BASIC_AUTH}"
+    networks:
+      - traefik
 
 networks:
-  traefik-public:
-    name: traefik-public
+  traefik:
+    name: traefik
     external: false
 
 volumes:
   letsencrypt:
   traefik-logs:
-  loki-data:
-  prometheus-data:
-  grafana-data:
