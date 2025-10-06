@@ -69,7 +69,6 @@ services:
       - "traefik.http.routers.pgweb.tls.certresolver=default"
       - "traefik.http.services.pgweb.loadbalancer.server.port=8081"
       - "traefik.http.routers.pgweb.middlewares=beszel-auth"
-      - "traefik.http.middlewares.beszel-auth.basicauth.users=${NETDATA_BASIC_AUTH}"
     environment:
       - DATABASE_URL=postgres://admin:admin@db:5432/app_test?sslmode=disable
     networks:
