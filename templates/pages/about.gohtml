@@ -1,3 +1,61 @@
 {{define "content"}}
-        <p class="mb-4">Email -> API connector. More connectors are coming soon (API -> email, email -> matrix, slack, ...).</p>
+<div class="container">
+    <section class="section">
+        <h1 class="title">Gossiper</h1>
+        <p class="subtitle">Transform emails into webhooks. Bridge your inbox to any API.</p>
+
+        <div class="content">
+            <p>Gossiper generates unique email addresses that trigger webhooks when they receive mail. Perfect for integrating email-based systems with modern APIs.</p>
+        </div>
+
+        <!-- Mermaid Sequence Diagram -->
+        <div class="box">
+            <h2 class="title is-4">How It Works</h2>
+            <div class="mermaid">
+sequenceDiagram
+    participant You
+    participant Gossiper
+    participant Email
+    participant Webhook
+
+    You->>Gossiper: 1. Login & create job
+    Gossiper->>You: 2. Get unique email address
+    Email->>Gossiper: 3. Send email to address
+    Gossiper->>Webhook: 4. Trigger your webhook
+    Webhook->>You: 5. Process notification
+            </div>
+        </div>
+
+        <!-- Video Embed -->
+        <div class="box">
+            <h2 class="title is-4">Demo Video</h2>
+            <iframe id="odysee-iframe" style="width:100%; aspect-ratio:16 / 9;" src="https://odysee.com/$/embed/@jostiniane:a/gossip_dispatch:3?r=GFesV9KqcY3CpJxvLmxNPcr1kvUwKXek&autoplay=true" allowfullscreen></iframe>
+        </div>
+
+        <!-- Use Cases -->
+        <div class="box">
+            <h2 class="title is-4">Use Cases</h2>
+            <div class="content">
+                <ul>
+                    <li><strong>DevOps teams:</strong> Server alerts → Slack/PagerDuty</li>
+                    <li><strong>Customer support:</strong> Support emails → Ticketing system</li>
+                    <li><strong>Sales teams:</strong> Lead forms → CRM webhooks</li>
+                    <li><strong>IoT/embedded:</strong> Device alerts → Monitoring dashboard</li>
+                    <li><strong>Newsletter routing:</strong> Email subscriptions → Custom handlers</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Contact -->
+        <footer class="mt-6 pt-5" style="border-top: 1px solid #dbdbdb;">
+            <div class="content has-text-centered">
+                <p>
+                    <strong>Get in touch:</strong><br>
+                    Email: idriss [at] v3m [dot] net<br>
+                    Matrix: @bidriss:matrix.org
+                </p>
+            </div>
+        </footer>
+    </section>
+</div>
 {{end}}

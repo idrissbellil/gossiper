@@ -76,11 +76,11 @@ func (h *Pages) Init(c *services.Container) error {
 }
 
 func (h *Pages) Routes(g *echo.Group) {
-	g.GET("/", h.Home, middleware.RequireAuthentication()).Name = routeNameHome
+	g.GET("/dashboard", h.Home, middleware.RequireAuthentication()).Name = routeNameHome
 	g.POST("/jobs", h.JobAdd, middleware.RequireAuthentication()).Name = "jobadd"
 	g.DELETE("/jobs/:id", h.JobDelete, middleware.RequireAuthentication()).Name = "jobdelete"
 	// Require authentication on the following once the testing is figured out
-	g.GET("/about", h.About).Name = routeNameAbout
+	g.GET("/", h.About).Name = routeNameAbout
 }
 
 func generateRandomEmail(hostname string) string {
@@ -182,7 +182,7 @@ func (h *Pages) About(ctx echo.Context) error {
 	p := page.New(ctx)
 	p.Layout = templates.LayoutMain
 	p.Name = templates.PageAbout
-	p.Title = "About"
+	p.Title = "Home"
 
 	// This page will be cached!
 	p.Cache.Enabled = true
