@@ -34,6 +34,7 @@ services:
       - "traefik.http.routers.gossip.entrypoints=web-secure"
       - "traefik.http.routers.gossip.tls.certresolver=default"
       - "traefik.http.services.gossip.loadbalancer.server.port=8000"
+      - "traefik.http.routers.gossip.middlewares=rate-limit"
     networks:
       - traefik-public
       - backend
@@ -41,6 +42,8 @@ services:
     image: marlonb/mailcrab:latest
     ports:
       - "25:1025" # SMTP port
+    environment:
+      MAILCRAB_RETENTION_PERIOD: 50
     networks:
       - backend
   worker:
@@ -69,6 +72,7 @@ services:
       - "traefik.http.routers.pgweb.tls.certresolver=default"
       - "traefik.http.services.pgweb.loadbalancer.server.port=8081"
       - "traefik.http.routers.pgweb.middlewares=beszel-auth"
+      - "traefik.http.routers.pgweb.middlewares=rate-limit"
     environment:
       - DATABASE_URL=postgres://admin:admin@db:5432/app_test?sslmode=disable
     networks:

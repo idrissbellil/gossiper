@@ -31,6 +31,8 @@ services:
       - "traefik.http.routers.http-catchall.entrypoints=web"
       - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.rate-limit.ratelimit.average=10"
+      - "traefik.http.middlewares.rate-limit.ratelimit.period=1m"
 
   beszel:
     image: henrygd/beszel:latest
@@ -47,6 +49,8 @@ services:
       - "traefik.http.routers.beszel.entrypoints=web-secure"
       - "traefik.http.routers.beszel.tls.certresolver=default"
       - "traefik.http.services.beszel.loadbalancer.server.port=8090"
+      - "traefik.http.routers.beszel.middlewares=rate-limit"
+      - "traefik.http.routers.beszel.middlewares=redirect-to-https"
     networks:
       - traefik
 
@@ -82,6 +86,8 @@ services:
       - "traefik.http.services.dozzle.loadbalancer.server.port=8080"
       - "traefik.http.routers.dozzle.middlewares=beszel-auth"
       - "traefik.http.middlewares.beszel-auth.basicauth.users=${NETDATA_BASIC_AUTH}"
+      - "traefik.http.routers.dozzle.middlewares=rate-limit"
+      - "traefik.http.routers.dozzle.middlewares=redirect-to-https"
     networks:
       - traefik
 
