@@ -9,6 +9,9 @@ services:
       - backend
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    dns:
+      - "8.8.8.8"
+      - "8.8.4.4"
 
   web:
     image: gitea.v3m.net/idriss/gossip-web:latest
@@ -26,6 +29,9 @@ services:
       GOSSIP_MAIL_FROMADDRESS: noreply@risky.info
       GOSSIP_MAIL_SKIPTLSVERIFY: "true"
       GOSSIP_MAILCRAB_HOSTNAME: v3m.pw
+    dns:
+      - "8.8.8.8"
+      - "8.8.4.4"
     depends_on:
       - db
     labels:
@@ -45,6 +51,9 @@ services:
       MAILCRAB_RETENTION_PERIOD: 50
     networks:
       - backend
+    dns:
+      - "8.8.8.8"
+      - "8.8.4.4"
   worker:
     image: gitea.v3m.net/idriss/gossip-worker:latest
     restart: unless-stopped
@@ -60,6 +69,9 @@ services:
     depends_on:
       - db
       - mailcrab
+    dns:
+      - "8.8.8.8"
+      - "8.8.4.4"
 
   pgweb:
     image: sosedoff/pgweb:latest
@@ -78,6 +90,9 @@ services:
       - backend
     depends_on:
       - db
+    dns:
+      - "8.8.8.8"
+      - "8.8.4.4"
 
 networks:
   traefik-public:
