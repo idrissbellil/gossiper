@@ -34,7 +34,6 @@ services:
       - "traefik.http.routers.gossip.entrypoints=web-secure"
       - "traefik.http.routers.gossip.tls.certresolver=default"
       - "traefik.http.services.gossip.loadbalancer.server.port=8000"
-      - "traefik.http.routers.gossip.middlewares=rate-limit"
     networks:
       - traefik-public
       - backend
@@ -71,10 +70,9 @@ services:
       - "traefik.http.routers.pgweb.entrypoints=web-secure"
       - "traefik.http.routers.pgweb.tls.certresolver=default"
       - "traefik.http.services.pgweb.loadbalancer.server.port=8081"
-      - "traefik.http.routers.pgweb.middlewares=beszel-auth"
-      - "traefik.http.routers.pgweb.middlewares=rate-limit"
+      - "traefik.http.routers.pgweb.middlewares=auth"
     environment:
-      - DATABASE_URL=postgres://${PGADMIN_EMAIL}:${PGADMIN_PASSWORD}@db:5432/app_test?sslmode=disable
+      - DATABASE_URL=postgres://admin:admin@db:5432/app_test?sslmode=disable
     networks:
       - traefik-public
       - backend
