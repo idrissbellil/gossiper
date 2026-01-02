@@ -132,9 +132,3 @@ func (p *MessageProcessor) executeTemplate(templateStr string, msg Message) (str
 	return buf.String(), nil
 }
 
-func firstOrEmpty(arr []string) string {
-	if len(arr) > 0 {
-		return arr[0]
-	}
-	return ""
-}
