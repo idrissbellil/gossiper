@@ -116,7 +116,7 @@ steps:
   - name: copy-compose
     image: appleboy/drone-scp
     settings:
-      host: 151.243.109.60
+      host: app.v3m.pw
       username: idriss
       key:
         from_secret: DOCKER_DEPLOY_SSH_KEY
