@@ -74,7 +74,7 @@ services:
       - "traefik.http.routers.pgweb.middlewares=beszel-auth"
       - "traefik.http.routers.pgweb.middlewares=rate-limit"
     environment:
-      - DATABASE_URL=postgres://admin:admin@db:5432/app_test?sslmode=disable
+      - DATABASE_URL=postgres://${PGADMIN_EMAIL}:${PGADMIN_PASSWORD}@db:5432/app_test?sslmode=disable
     networks:
       - traefik-public
       - backend

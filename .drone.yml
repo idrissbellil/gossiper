@@ -130,37 +130,20 @@ steps:
     image: appleboy/drone-ssh
     environment:
       GOSSIP_MAIL_PASSWORD:
-        from_secret: MAIL_PASSWORD
-      NETDATA_BASIC_AUTH:
-        from_secret: NETDATA_BASIC_AUTH
-      DOZZLE_USERNAME:
-        from_secret: DOZZLE_USERNAME
-      DOZZLE_PASSWORD:
-        from_secret: DOZZLE_PASSWORD
+        from_secret: GOSSIP_MAIL_PASSWORD
       PGADMIN_EMAIL:
         from_secret: PGADMIN_EMAIL
       PGADMIN_PASSWORD:
         from_secret: PGADMIN_PASSWORD
     settings:
-      host: 151.243.109.60
+      host: app.v3m.pw
       username: idriss
-      envs:
-        [
-          GOSSIP_MAIL_PASSWORD,
-          NETDATA_BASIC_AUTH,
-          DOZZLE_USERNAME,
-          DOZZLE_PASSWORD,
-          PGADMIN_EMAIL,
-          PGADMIN_PASSWORD,
-        ]
+      envs: [GOSSIP_MAIL_PASSWORD, PGADMIN_EMAIL, PGADMIN_PASSWORD]
       key:
         from_secret: DOCKER_DEPLOY_SSH_KEY
       port: 7777
       script:
         - export GOSSIP_MAIL_PASSWORD=$GOSSIP_MAIL_PASSWORD
-        - export NETDATA_BASIC_AUTH=$NETDATA_BASIC_AUTH
-        - export DOZZLE_USERNAME=$DOZZLE_USERNAME
-        - export DOZZLE_PASSWORD=$DOZZLE_PASSWORD
         - export PGADMIN_EMAIL=$PGADMIN_EMAIL
         - export PGADMIN_PASSWORD=$PGADMIN_PASSWORD
         - docker compose -f /home/idriss/services/gossiper/docker-compose.yml down || true
