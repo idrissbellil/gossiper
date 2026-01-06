@@ -12,6 +12,7 @@ type SMTPMessagePoller struct {
 	db              *models.DB
 	processor       *MessageProcessor
 	webhookSender   *WebhookSender
+	emailReplier    *EmailReplier
 	logger          Logger
 	pollInterval    time.Duration
 	batchSize       int
@@ -19,11 +20,12 @@ type SMTPMessagePoller struct {
 }
 
 // NewSMTPMessagePoller creates a new poller
-func NewSMTPMessagePoller(db *models.DB, processor *MessageProcessor, webhookSender *WebhookSender, logger Logger, pollInterval time.Duration) *SMTPMessagePoller {
+func NewSMTPMessagePoller(db *models.DB, processor *MessageProcessor, webhookSender *WebhookSender, emailReplier *EmailReplier, logger Logger, pollInterval time.Duration) *SMTPMessagePoller {
 	return &SMTPMessagePoller{
 		db:            db,
 		processor:     processor,
 		webhookSender: webhookSender,
+		emailReplier:  emailReplier,
 		logger:        logger,
 		pollInterval:  pollInterval,
 		batchSize:     10,
@@ -95,9 +97,17 @@ func (p *SMTPMessagePoller) pollAndProcess(ctx context.Context) error {
 		if len(results) > 0 {
 			// Send webhooks
 			webhookResults := p.webhookSender.SendWebhooks(ctx, results)
+			
+			// Check webhook results and send auto-replies for successful ones
 			for _, result := range webhookResults {
 				if result.Error != nil {
 					p.logger.Printf("webhook error for job %d: %v", result.JobID, result.Error)
+				} else if result.Response != "" {
+					// Webhook succeeded and auto-reply is configured
+					err := p.emailReplier.SendReply(smtpMsg.From, smtpMsg.Subject, result.Response)
+					if err != nil {
+						p.logger.Printf("failed to send auto-reply for job %d: %v", result.JobID, err)
+					}
 				}
 			}
 		} else {

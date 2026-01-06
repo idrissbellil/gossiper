@@ -30,12 +30,13 @@ func NewMessageProcessor(jobRepo JobRepository, logger Logger, fetcher MessageFe
 }
 
 type ProcessResult struct {
-	JobID   int
-	URL     string
-	Method  string
-	Headers map[string]string
-	Payload string
-	Error   error
+	JobID    int
+	URL      string
+	Method   string
+	Headers  map[string]string
+	Payload  string
+	Response string // Auto-reply message to send back to sender
+	Error    error
 }
 
 func (p *MessageProcessor) ParseRawMessage(rawMsg RawMessage) []Message {
@@ -110,10 +111,11 @@ func (p *MessageProcessor) ProcessMessage(ctx context.Context, msg Message) ([]P
 
 	for _, job := range jobs {
 		result := ProcessResult{
-			JobID:   job.ID,
-			URL:     job.URL,
-			Method:  job.Method,
-			Headers: job.Headers,
+			JobID:    job.ID,
+			URL:      job.URL,
+			Method:   job.Method,
+			Headers:  job.Headers,
+			Response: job.Response,
 		}
 
 		if !p.matchesFromRegex(job.FromRegex, msg.From) {

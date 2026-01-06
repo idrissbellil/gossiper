@@ -46,8 +46,18 @@ func main() {
 	httpClient := &http.Client{Timeout: config.HTTPTimeout}
 	webhookSender := worker.NewWebhookSender(httpClient, logger, config)
 
+	// Create email replier for auto-replies
+	emailReplier := worker.NewEmailReplier(
+		c.Config.Mail.Hostname,
+		int(c.Config.Mail.Port),
+		c.Config.Mail.User,
+		c.Config.Mail.Password,
+		c.Config.Mail.FromAddress,
+		logger,
+	)
+
 	// Create poller
-	poller := worker.NewSMTPMessagePoller(c.ORM, processor, webhookSender, logger, 1*time.Second)
+	poller := worker.NewSMTPMessagePoller(c.ORM, processor, webhookSender, emailReplier, logger, 1*time.Second)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

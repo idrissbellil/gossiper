@@ -65,6 +65,7 @@ type Job struct {
 	Method          string            `gorm:"default:'GET'"`
 	Headers         map[string]string `gorm:"serializer:json"`
 	PayloadTemplate string            `gorm:"type:text"`
+	Response        string            `gorm:"type:text"` // Optional: Email response to send back to sender
 	IsActive        bool              `gorm:"default:true"`
 	UserID          int               `gorm:"not null;index"`
 	CreatedAt       time.Time         `gorm:"not null"`

@@ -24,12 +24,14 @@ func NewWebhookSender(httpClient HTTPClient, logger Logger, config Config) *Webh
 type WebhookResult struct {
 	JobID      int
 	StatusCode int
+	Response   string // Auto-reply message to send back to sender
 	Error      error
 }
 
 func (w *WebhookSender) SendWebhook(ctx context.Context, result ProcessResult) WebhookResult {
 	webhookResult := WebhookResult{
-		JobID: result.JobID,
+		JobID:    result.JobID,
+		Response: result.Response,
 	}
 
 	if result.Error != nil {

@@ -51,6 +51,7 @@ type (
 		Headers   string `json:"headers" form:"headers"`
 		Payload   string `json:"payload" form:"payload"`
 		FromRegex string `json:"from_regex" form:"from_regex"`
+		Response  string `json:"response" form:"response"`
 	}
 	inputField struct {
 		Name  string
@@ -113,6 +114,7 @@ func (h *Pages) JobAdd(ctx echo.Context) error {
 		FromRegex:       jobRead.FromRegex,
 		UserID:          user.ID,
 		PayloadTemplate: jobRead.Payload,
+		Response:        jobRead.Response,
 		Headers:         headersMap,
 	}
 	result := h.ORM.WithContext(context.Background()).Create(dbJob)
@@ -155,6 +157,7 @@ func (h *Pages) Home(ctx echo.Context) error {
 			{Name: "from_regex", Label: "From Regex", Type: "input", Extra: ""},
 			{Name: "headers", Label: "Headers", Type: "textarea", Extra: ""},
 			{Name: "payload", Label: "Payload", Type: "textarea", Extra: ""},
+			{Name: "response", Label: "Auto-Reply (optional)", Type: "textarea", Extra: "placeholder='Thank you! Your submission was received.'"},
 		},
 	}
 	return h.RenderPage(ctx, p)
