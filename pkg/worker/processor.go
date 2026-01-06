@@ -7,21 +7,24 @@ import (
 	"fmt"
 	"html/template"
 	"regexp"
+	"strings"
 
 	"gitea.v3m.net/idriss/gossiper/pkg/models"
 )
 
 type MessageProcessor struct {
-	jobRepo JobRepository
-	logger  Logger
-	fetcher MessageFetcherInterface
+	jobRepo         JobRepository
+	logger          Logger
+	fetcher         MessageFetcherInterface
+	allowedHostname string
 }
 
-func NewMessageProcessor(jobRepo JobRepository, logger Logger, fetcher MessageFetcherInterface) *MessageProcessor {
+func NewMessageProcessor(jobRepo JobRepository, logger Logger, fetcher MessageFetcherInterface, allowedHostname string) *MessageProcessor {
 	return &MessageProcessor{
-		jobRepo: jobRepo,
-		logger:  logger,
-		fetcher: fetcher,
+		jobRepo:         jobRepo,
+		logger:          logger,
+		fetcher:         fetcher,
+		allowedHostname: allowedHostname,
 	}
 }
 
@@ -47,8 +50,14 @@ func (p *MessageProcessor) ParseRawMessage(rawMsg RawMessage) []Message {
 	// Get the message body (text or converted HTML)
 	body := p.fetcher.GetMessageBody(fullMsg)
 
-	// Create a message for each recipient
+	// Create a message for each recipient, filtering by allowed hostname
+	suffix := "@" + p.allowedHostname
 	for _, to := range rawMsg.To {
+		// Early filter: reject emails not ending with our hostname
+		if !strings.HasSuffix(to.Email, suffix) {
+			continue
+		}
+		
 		msg := Message{
 			To:      to.Email,
 			From:    rawMsg.From.Email,

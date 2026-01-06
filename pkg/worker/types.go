@@ -58,6 +58,7 @@ type Message struct {
 type Config struct {
 	WebSocketURL    string
 	APIURL          string
+	AllowedHostname string
 	HTTPTimeout     time.Duration
 	MaxRetries      int
 	BufferSize      int

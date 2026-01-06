@@ -25,7 +25,7 @@ func newMockWorkerDeps() mockWorkerDeps {
 	return mockWorkerDeps{
 		jobRepo:    &mockJobRepository{jobs: make(map[string][]*models.Job)},
 		logger:     &mockLogger{},
-		config:     Config{BufferSize: 10, ShutdownTimeout: 1 * time.Second},
+		config:     Config{BufferSize: 10, ShutdownTimeout: 1 * time.Second, AllowedHostname: "example.com"},
 		wsDialer:   &mockWebSocketDialer{},
 		httpClient: &mockHTTPClient{responses: make(map[string]*http.Response)},
 	}

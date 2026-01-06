@@ -56,11 +56,12 @@ func (m *mockMessageFetcher) GetMessageBody(msg *MailcrabMessage) string {
 
 func TestMessageProcessor_ParseRawMessage(t *testing.T) {
 	tests := []struct {
-		name         string
-		rawMsg       RawMessage
-		fetcherMsgs  map[string]*MailcrabMessage
-		fetcherErr   error
-		expected     []Message
+		name            string
+		rawMsg          RawMessage
+		fetcherMsgs     map[string]*MailcrabMessage
+		fetcherErr      error
+		allowedHostname string
+		expected        []Message
 	}{
 		{
 			name: "single recipient with text body",
@@ -80,6 +81,7 @@ func TestMessageProcessor_ParseRawMessage(t *testing.T) {
 					To:      []EmailAddress{{Name: "User", Email: "user@example.com"}},
 				},
 			},
+			allowedHostname: "example.com",
 			expected: []Message{
 				{
 					To:      "user@example.com",
@@ -109,6 +111,7 @@ func TestMessageProcessor_ParseRawMessage(t *testing.T) {
 					From:    EmailAddress{Name: "Sender", Email: "sender@example.com"},
 				},
 			},
+			allowedHostname: "example.com",
 			expected: []Message{
 				{
 					To:      "user1@example.com",
@@ -125,6 +128,59 @@ func TestMessageProcessor_ParseRawMessage(t *testing.T) {
 			},
 		},
 		{
+			name: "filtered recipient - wrong hostname",
+			rawMsg: RawMessage{
+				ID:      "msg-789",
+				Subject: "Test Subject",
+				From:    EmailAddress{Name: "Sender", Email: "sender@example.com"},
+				To: []EmailAddress{
+					{Name: "User1", Email: "user1@example.com"},
+					{Name: "Spam", Email: "spam@malicious.com"},
+				},
+			},
+			fetcherMsgs: map[string]*MailcrabMessage{
+				"msg-789": {
+					ID:      "msg-789",
+					Text:    "Test body",
+					HTML:    "",
+					Subject: "Test Subject",
+					From:    EmailAddress{Name: "Sender", Email: "sender@example.com"},
+				},
+			},
+			allowedHostname: "example.com",
+			expected: []Message{
+				{
+					To:      "user1@example.com",
+					From:    "sender@example.com",
+					Subject: "Test Subject",
+					Body:    "Test body",
+				},
+			},
+		},
+		{
+			name: "all recipients filtered out",
+			rawMsg: RawMessage{
+				ID:      "msg-spam",
+				Subject: "Spam Subject",
+				From:    EmailAddress{Name: "Spammer", Email: "spam@malicious.com"},
+				To: []EmailAddress{
+					{Name: "Victim1", Email: "victim@malicious.com"},
+					{Name: "Victim2", Email: "target@spam.net"},
+				},
+			},
+			fetcherMsgs: map[string]*MailcrabMessage{
+				"msg-spam": {
+					ID:      "msg-spam",
+					Text:    "Spam body",
+					HTML:    "",
+					Subject: "Spam Subject",
+					From:    EmailAddress{Name: "Spammer", Email: "spam@malicious.com"},
+				},
+			},
+			allowedHostname: "example.com",
+			expected:        []Message{},
+		},
+		{
 			name: "fetch error",
 			rawMsg: RawMessage{
 				ID:      "msg-error",
@@ -132,8 +188,9 @@ func TestMessageProcessor_ParseRawMessage(t *testing.T) {
 				From:    EmailAddress{Name: "Sender", Email: "sender@example.com"},
 				To:      []EmailAddress{{Name: "User", Email: "user@example.com"}},
 			},
-			fetcherErr: errors.New("fetch failed"),
-			expected:   []Message{},
+			fetcherErr:      errors.New("fetch failed"),
+			allowedHostname: "example.com",
+			expected:        []Message{},
 		},
 	}
 
@@ -146,9 +203,10 @@ func TestMessageProcessor_ParseRawMessage(t *testing.T) {
 
 			logger := &mockLogger{}
 			processor := &MessageProcessor{
-				jobRepo: nil,
-				logger:  logger,
-				fetcher: mockFetcher,
+				jobRepo:         nil,
+				logger:          logger,
+				fetcher:         mockFetcher,
+				allowedHostname: tt.allowedHostname,
 			}
 
 			result := processor.ParseRawMessage(tt.rawMsg)
@@ -266,9 +324,10 @@ func TestMessageProcessor_ProcessMessage(t *testing.T) {
 
 			logger := &mockLogger{}
 			processor := &MessageProcessor{
-				jobRepo: mockRepo,
-				logger:  logger,
-				fetcher: nil, // Not needed for ProcessMessage tests
+				jobRepo:         mockRepo,
+				logger:          logger,
+				fetcher:         nil, // Not needed for ProcessMessage tests
+				allowedHostname: "example.com",
 			}
 
 			results, err := processor.ProcessMessage(context.Background(), tt.message)
@@ -305,9 +364,10 @@ func TestMessageProcessor_ProcessMessage(t *testing.T) {
 
 func TestMessageProcessor_generatePayload(t *testing.T) {
 	processor := &MessageProcessor{
-		jobRepo: nil,
-		logger:  &mockLogger{},
-		fetcher: nil,
+		jobRepo:         nil,
+		logger:          &mockLogger{},
+		fetcher:         nil,
+		allowedHostname: "example.com",
 	}
 
 	msg := Message{

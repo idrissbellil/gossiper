@@ -29,7 +29,7 @@ type WorkerDependencies struct {
 func NewWorker(deps WorkerDependencies) *Worker {
 	wsClient := NewWebSocketClient(deps.WSDialer, deps.Logger, deps.Config)
 	fetcher := NewMessageFetcher(deps.HTTPClient, deps.Config.APIURL, deps.Logger)
-	processor := NewMessageProcessor(deps.JobRepo, deps.Logger, fetcher)
+	processor := NewMessageProcessor(deps.JobRepo, deps.Logger, fetcher, deps.Config.AllowedHostname)
 	webhookSender := NewWebhookSender(deps.HTTPClient, deps.Logger, deps.Config)
 
 	return &Worker{
