@@ -78,7 +78,7 @@
                                     </tr>
                                     <tr>
                                         <td><label class="label" for="headers">Headers</label></td>
-                                        <td><textarea class="input" id="headers" name="headers">{{ .Headers }}</textarea></td>
+                                        <td><textarea class="textarea" id="headers" name="headers">{{ toJSON .Headers }}</textarea></td>
                                     </tr>
                                     </table>
                                 </form>

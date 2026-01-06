@@ -1,6 +1,7 @@
 package funcmap
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"reflect"
@@ -33,6 +34,7 @@ func NewFuncMap(web *echo.Echo) template.FuncMap {
 	funcs["file"] = fm.file
 	funcs["link"] = fm.link
 	funcs["url"] = fm.url
+	funcs["toJSON"] = fm.toJSON
 
 	return funcs
 }
@@ -67,4 +69,18 @@ func (fm *funcMap) link(url, text, currentPath string, classes ...string) templa
 // url generates a URL from a given route name and optional parameters
 func (fm *funcMap) url(routeName string, params ...any) string {
 	return fm.web.Reverse(routeName, params...)
+}
+
+// toJSON converts any value to a pretty-printed JSON string
+func (fm *funcMap) toJSON(v any) string {
+	if v == nil {
+		return ""
+	}
+	
+	jsonBytes, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		return fmt.Sprintf("%v", v)
+	}
+	
+	return string(jsonBytes)
 }
