@@ -59,9 +59,6 @@ services:
       - backend
     depends_on:
       - db
-    dns:
-      - "8.8.8.8"
-      - "8.8.4.4"
 
   worker:
     image: gitea.v3m.net/idriss/gossip-worker:latest
@@ -77,9 +74,6 @@ services:
     depends_on:
       - db
       - smtp
-    dns:
-      - "8.8.8.8"
-      - "8.8.4.4"
 
   pgweb:
     image: sosedoff/pgweb:latest
