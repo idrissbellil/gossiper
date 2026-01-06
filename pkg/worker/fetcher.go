@@ -24,7 +24,7 @@ func NewMessageFetcher(httpClient HTTPClient, apiURL string, logger Logger) *Mes
 	}
 }
 
-func (f *MessageFetcher) FetchMessage(messageID string) (*MailcrabMessage, error) {
+func (f *MessageFetcher) FetchMessage(messageID string) (*EmailEnvelope, error) {
 	url := fmt.Sprintf("%s/message/%s", f.apiURL, messageID)
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -47,7 +47,7 @@ func (f *MessageFetcher) FetchMessage(messageID string) (*MailcrabMessage, error
 		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 
-	var msg MailcrabMessage
+	var msg EmailEnvelope
 	if err := json.Unmarshal(body, &msg); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal message: %w", err)
 	}
@@ -55,7 +55,7 @@ func (f *MessageFetcher) FetchMessage(messageID string) (*MailcrabMessage, error
 	return &msg, nil
 }
 
-func (f *MessageFetcher) GetMessageBody(msg *MailcrabMessage) string {
+func (f *MessageFetcher) GetMessageBody(msg *EmailEnvelope) string {
 	// Prefer text version if available
 	if msg.Text != "" {
 		return msg.Text

@@ -28,7 +28,7 @@ services:
       GOSSIP_MAIL_PASSWORD: ${GOSSIP_MAIL_PASSWORD}
       GOSSIP_MAIL_FROMADDRESS: noreply@risky.info
       GOSSIP_MAIL_SKIPTLSVERIFY: "true"
-      GOSSIP_MAILCRAB_HOSTNAME: v3m.pw
+      GOSSIP_SMTP_HOSTNAME: v3m.pw
     dns:
       - "8.8.8.8"
       - "8.8.4.4"
@@ -43,17 +43,26 @@ services:
     networks:
       - traefik-public
       - backend
-  mailcrab:
-    image: marlonb/mailcrab:latest
+
+  smtp:
+    image: gitea.v3m.net/idriss/gossip-smtp:latest
+    restart: unless-stopped
     ports:
-      - "25:1025" # SMTP port
+      - "25:25"
     environment:
-      MAILCRAB_RETENTION_PERIOD: 50
+      GOSSIP_APP_ENVIRONMENT: prod
+      GOSSIP_DATABASE_DRIVER: postgres
+      GOSSIP_DATABASE_TESTCONNECTION: host=db port=5432 user=admin dbname=app_test password=admin sslmode=disable
+      GOSSIP_DATABASE_CONNECTION: host=db port=5432 user=admin dbname=app_test password=admin sslmode=disable
+      GOSSIP_SMTP_HOSTNAME: v3m.pw
     networks:
       - backend
+    depends_on:
+      - db
     dns:
       - "8.8.8.8"
       - "8.8.4.4"
+
   worker:
     image: gitea.v3m.net/idriss/gossip-worker:latest
     restart: unless-stopped
@@ -62,14 +71,12 @@ services:
       GOSSIP_DATABASE_DRIVER: postgres
       GOSSIP_DATABASE_TESTCONNECTION: host=db port=5432 user=admin dbname=app_test password=admin sslmode=disable
       GOSSIP_DATABASE_CONNECTION: host=db port=5432 user=admin dbname=app_test password=admin sslmode=disable
-      GOSSIP_MAILCRAB_WS: ws://mailcrab:1080/ws
-      GOSSIP_MAILCRAB_API: http://mailcrab:1080/api
-      GOSSIP_MAILCRAB_HOSTNAME: v3m.pw
+      GOSSIP_SMTP_HOSTNAME: v3m.pw
     networks:
       - backend
     depends_on:
       - db
-      - mailcrab
+      - smtp
     dns:
       - "8.8.8.8"
       - "8.8.4.4"

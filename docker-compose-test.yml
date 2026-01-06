@@ -1,6 +1,5 @@
 services:
   db:
-    # PG 16 is currenly not supported https://github.com/ent/ent/issues/3750
     image: postgres:16-alpine
     container_name: gossip_db
     ports:
@@ -9,11 +8,32 @@ services:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
       - POSTGRES_DB=app_test
-  mailcrab:
-    image: marlonb/mailcrab:latest
+
+  smtp:
+    build:
+      context: .
+      dockerfile: smtp.dockerfile
+    container_name: gossip_smtp
     ports:
-      - "1025:1025" # SMTP port
-      - "8025:1080" # Web UI port
-    restart: unless-stopped
+      - "1025:25" # SMTP port (using 1025 for testing, non-privileged port)
+    environment:
+      GOSSIP_APP_ENVIRONMENT: local
+      GOSSIP_DATABASE_DRIVER: postgres
+      GOSSIP_DATABASE_CONNECTION: host=db port=5432 user=admin dbname=app_test password=admin sslmode=disable
+      GOSSIP_SMTP_HOSTNAME: example.com
     depends_on:
       - db
+
+  worker:
+    build:
+      context: .
+      dockerfile: worker.dockerfile
+    container_name: gossip_worker
+    environment:
+      GOSSIP_APP_ENVIRONMENT: local
+      GOSSIP_DATABASE_DRIVER: postgres
+      GOSSIP_DATABASE_CONNECTION: host=db port=5432 user=admin dbname=app_test password=admin sslmode=disable
+      GOSSIP_SMTP_HOSTNAME: example.com
+    depends_on:
+      - db
+      - smtp

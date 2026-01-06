@@ -113,6 +113,19 @@ steps:
       password:
         from_secret: DOCKER_REGISTRY_PASSWORD
 
+  - name: build-smtp
+    image: plugins/docker
+    settings:
+      repo: gitea.v3m.net/idriss/gossip-smtp
+      tags: latest
+      registry: gitea.v3m.net
+      dockerfile: ./smtp.dockerfile
+      context: .
+      username:
+        from_secret: DOCKER_REGISTRY_USERNAME
+      password:
+        from_secret: DOCKER_REGISTRY_PASSWORD
+
   - name: copy-compose
     image: appleboy/drone-scp
     settings:

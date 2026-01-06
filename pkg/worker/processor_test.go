@@ -33,11 +33,11 @@ func (m *mockLogger) Println(args ...interface{}) {
 }
 
 type mockMessageFetcher struct {
-	messages map[string]*MailcrabMessage
+	messages map[string]*EmailEnvelope
 	err      error
 }
 
-func (m *mockMessageFetcher) FetchMessage(messageID string) (*MailcrabMessage, error) {
+func (m *mockMessageFetcher) FetchMessage(messageID string) (*EmailEnvelope, error) {
 	if m.err != nil {
 		return nil, m.err
 	}
@@ -47,7 +47,7 @@ func (m *mockMessageFetcher) FetchMessage(messageID string) (*MailcrabMessage, e
 	return nil, errors.New("message not found")
 }
 
-func (m *mockMessageFetcher) GetMessageBody(msg *MailcrabMessage) string {
+func (m *mockMessageFetcher) GetMessageBody(msg *EmailEnvelope) string {
 	if msg.Text != "" {
 		return msg.Text
 	}
@@ -58,7 +58,7 @@ func TestMessageProcessor_ParseRawMessage(t *testing.T) {
 	tests := []struct {
 		name            string
 		rawMsg          RawMessage
-		fetcherMsgs     map[string]*MailcrabMessage
+		fetcherMsgs     map[string]*EmailEnvelope
 		fetcherErr      error
 		allowedHostname string
 		expected        []Message
@@ -71,7 +71,7 @@ func TestMessageProcessor_ParseRawMessage(t *testing.T) {
 				From:    EmailAddress{Name: "Sender", Email: "sender@example.com"},
 				To:      []EmailAddress{{Name: "User", Email: "user@example.com"}},
 			},
-			fetcherMsgs: map[string]*MailcrabMessage{
+			fetcherMsgs: map[string]*EmailEnvelope{
 				"msg-123": {
 					ID:      "msg-123",
 					Text:    "Test body",
@@ -102,7 +102,7 @@ func TestMessageProcessor_ParseRawMessage(t *testing.T) {
 					{Name: "User2", Email: "user2@example.com"},
 				},
 			},
-			fetcherMsgs: map[string]*MailcrabMessage{
+			fetcherMsgs: map[string]*EmailEnvelope{
 				"msg-456": {
 					ID:      "msg-456",
 					Text:    "Test body",
@@ -138,7 +138,7 @@ func TestMessageProcessor_ParseRawMessage(t *testing.T) {
 					{Name: "Spam", Email: "spam@malicious.com"},
 				},
 			},
-			fetcherMsgs: map[string]*MailcrabMessage{
+			fetcherMsgs: map[string]*EmailEnvelope{
 				"msg-789": {
 					ID:      "msg-789",
 					Text:    "Test body",
@@ -168,7 +168,7 @@ func TestMessageProcessor_ParseRawMessage(t *testing.T) {
 					{Name: "Victim2", Email: "target@spam.net"},
 				},
 			},
-			fetcherMsgs: map[string]*MailcrabMessage{
+			fetcherMsgs: map[string]*EmailEnvelope{
 				"msg-spam": {
 					ID:      "msg-spam",
 					Text:    "Spam body",

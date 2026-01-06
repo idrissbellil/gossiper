@@ -107,7 +107,7 @@ func (h *Pages) JobAdd(ctx echo.Context) error {
 		}
 	}
 	dbJob := &models.Job{
-		Email:           generateRandomEmail(h.Config.Mailcrab.Hostname),
+		Email:           generateRandomEmail(h.Config.SMTP.Hostname),
 		URL:             jobRead.URL,
 		Method:          jobRead.Method,
 		FromRegex:       jobRead.FromRegex,

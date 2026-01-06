@@ -1,0 +1,9 @@
+From: Spammer <spam@malicious.com>
+To: Victim <victim@malicious.com>
+Subject: SPAM - This should be rejected!
+Date: Mon, 06 Jan 2026 20:00:00 +0000
+
+This is spam email sent to a non-example.com recipient.
+This should be REJECTED at RCPT TO stage with 550 error.
+
+You should never see this message body!

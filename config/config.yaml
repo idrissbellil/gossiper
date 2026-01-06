@@ -40,9 +40,7 @@ tasks:
   maxRetries: 10
   goroutines: 1
 
-mailcrab:
-  ws: ws://127.0.0.1:8025/ws
-  api: http://127.0.0.1:8025/api
+smtp:
   hostname: localhost
 
 mail:

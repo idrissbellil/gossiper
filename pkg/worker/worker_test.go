@@ -61,7 +61,7 @@ func TestWorker_Integration(t *testing.T) {
 	}
 
 	deps := newMockWorkerDeps()
-	deps.config.APIURL = "http://mailcrab.example.com/api"
+	deps.config.APIURL = "http://email-api.example.com/api"
 
 	deps.jobRepo.jobs["webhook@example.com"] = []*models.Job{mockJob}
 
@@ -69,8 +69,8 @@ func TestWorker_Integration(t *testing.T) {
 		messages: []interface{}{testMessage},
 	}
 
-	// Mock Mailcrab API response for fetching message body
-	deps.httpClient.responses["http://mailcrab.example.com/api/message/test-msg-123"] = &http.Response{
+	// Mock Email API response for fetching message body
+	deps.httpClient.responses["http://email-api.example.com/api/message/test-msg-123"] = &http.Response{
 		StatusCode: 200,
 		Body:       io.NopCloser(strings.NewReader(`{"id":"test-msg-123","text":"Alert: Something happened","html":"","from":{"email":"sender@example.com"},"to":[{"email":"webhook@example.com"}],"subject":"Test Alert"}`)),
 	}
@@ -103,15 +103,15 @@ func TestWorker_Integration(t *testing.T) {
 		t.Errorf("unexpected worker error: %v", workerErr)
 	}
 
-	// Expect 2 requests: 1 to fetch message from Mailcrab API, 1 to send webhook
+	// Expect 2 requests: 1 to fetch message from Email API, 1 to send webhook
 	if len(deps.httpClient.requests) != 2 {
-		t.Errorf("expected 2 HTTP requests (1 Mailcrab API + 1 webhook), got %d", len(deps.httpClient.requests))
+		t.Errorf("expected 2 HTTP requests (1 Email API + 1 webhook), got %d", len(deps.httpClient.requests))
 		return
 	}
 
-	// First request should be to Mailcrab API
-	if !strings.Contains(deps.httpClient.requests[0].URL.String(), "mailcrab.example.com/api/message") {
-		t.Errorf("expected first request to Mailcrab API, got %s", deps.httpClient.requests[0].URL.String())
+	// First request should be to Email API
+	if !strings.Contains(deps.httpClient.requests[0].URL.String(), "email-api.example.com/api/message") {
+		t.Errorf("expected first request to Email API, got %s", deps.httpClient.requests[0].URL.String())
 	}
 
 	// Second request should be to webhook
@@ -197,14 +197,14 @@ func TestWorker_MessageProcessingWithMultipleJobs(t *testing.T) {
 	}
 
 	deps := newMockWorkerDeps()
-	deps.config.APIURL = "http://mailcrab.example.com/api"
+	deps.config.APIURL = "http://email-api.example.com/api"
 	deps.jobRepo.jobs["alert@example.com"] = []*models.Job{job1, job2}
 	deps.wsDialer.conn = &mockWSConn{
 		messages: []interface{}{testMessage},
 	}
 
-	// Mock Mailcrab API response
-	deps.httpClient.responses["http://mailcrab.example.com/api/message/test-msg-456"] = &http.Response{
+	// Mock Email API response
+	deps.httpClient.responses["http://email-api.example.com/api/message/test-msg-456"] = &http.Response{
 		StatusCode: 200,
 		Body:       io.NopCloser(strings.NewReader(`{"id":"test-msg-456","text":"Critical alert","html":"","from":{"email":"system@example.com"},"to":[{"email":"alert@example.com"}],"subject":"System Alert"}`)),
 	}
@@ -232,9 +232,9 @@ func TestWorker_MessageProcessingWithMultipleJobs(t *testing.T) {
 
 	time.Sleep(100 * time.Millisecond)
 
-	// Expect 3 requests: 1 to Mailcrab API + 2 to webhooks
+	// Expect 3 requests: 1 to Email API + 2 to webhooks
 	if len(deps.httpClient.requests) != 3 {
-		t.Errorf("expected 3 HTTP requests (1 Mailcrab API + 2 webhooks), got %d", len(deps.httpClient.requests))
+		t.Errorf("expected 3 HTTP requests (1 Email API + 2 webhooks), got %d", len(deps.httpClient.requests))
 	}
 
 	urls := make(map[string]bool)
@@ -263,13 +263,13 @@ func TestWorker_NoMatchingJobs(t *testing.T) {
 	}
 
 	deps := newMockWorkerDeps()
-	deps.config.APIURL = "http://mailcrab.example.com/api"
+	deps.config.APIURL = "http://email-api.example.com/api"
 	deps.wsDialer.conn = &mockWSConn{
 		messages: []interface{}{testMessage},
 	}
 
-	// Mock Mailcrab API response
-	deps.httpClient.responses["http://mailcrab.example.com/api/message/test-msg-789"] = &http.Response{
+	// Mock Email API response
+	deps.httpClient.responses["http://email-api.example.com/api/message/test-msg-789"] = &http.Response{
 		StatusCode: 200,
 		Body:       io.NopCloser(strings.NewReader(`{"id":"test-msg-789","text":"Test message","html":"","from":{"email":"sender@example.com"},"to":[{"email":"nobody@example.com"}],"subject":"Test"}`)),
 	}
@@ -288,14 +288,14 @@ func TestWorker_NoMatchingJobs(t *testing.T) {
 
 	time.Sleep(100 * time.Millisecond)
 
-	// Expect 1 request to Mailcrab API to fetch the message, but no webhook requests
+	// Expect 1 request to Email API to fetch the message, but no webhook requests
 	if len(deps.httpClient.requests) != 1 {
-		t.Errorf("expected 1 HTTP request (Mailcrab API only), got %d", len(deps.httpClient.requests))
+		t.Errorf("expected 1 HTTP request (Email API only), got %d", len(deps.httpClient.requests))
 	}
 
-	// Verify the request was to Mailcrab API
-	if len(deps.httpClient.requests) > 0 && !strings.Contains(deps.httpClient.requests[0].URL.String(), "mailcrab.example.com/api/message") {
-		t.Errorf("expected request to Mailcrab API, got %s", deps.httpClient.requests[0].URL.String())
+	// Verify the request was to Email API
+	if len(deps.httpClient.requests) > 0 && !strings.Contains(deps.httpClient.requests[0].URL.String(), "email-api.example.com/api/message") {
+		t.Errorf("expected request to Email API, got %s", deps.httpClient.requests[0].URL.String())
 	}
 
 	if len(deps.logger.messages) == 0 {
@@ -312,13 +312,13 @@ func TestWorker_ContextCancellation(t *testing.T) {
 	}
 
 	deps := newMockWorkerDeps()
-	deps.config.APIURL = "http://mailcrab.example.com/api"
+	deps.config.APIURL = "http://email-api.example.com/api"
 	deps.wsDialer.conn = &mockWSConn{
 		messages: []interface{}{testMessage, testMessage, testMessage},
 	}
 
-	// Mock Mailcrab API response
-	deps.httpClient.responses["http://mailcrab.example.com/api/message/test-msg-000"] = &http.Response{
+	// Mock Email API response
+	deps.httpClient.responses["http://email-api.example.com/api/message/test-msg-000"] = &http.Response{
 		StatusCode: 200,
 		Body:       io.NopCloser(strings.NewReader(`{"id":"test-msg-000","text":"Test","html":"","from":{"email":"test@example.com"},"to":[{"email":"test@example.com"}],"subject":"Test"}`)),
 	}

@@ -30,7 +30,7 @@ type EmailAddress struct {
 	Email string `json:"email"`
 }
 
-type MailcrabMessage struct {
+type EmailEnvelope struct {
 	ID          string                 `json:"id"`
 	Time        int64                  `json:"time"`
 	From        EmailAddress           `json:"from"`
@@ -90,8 +90,8 @@ type JobRepository interface {
 }
 
 type MessageFetcherInterface interface {
-	FetchMessage(messageID string) (*MailcrabMessage, error)
-	GetMessageBody(msg *MailcrabMessage) string
+	FetchMessage(messageID string) (*EmailEnvelope, error)
+	GetMessageBody(msg *EmailEnvelope) string
 }
 
 type Logger interface {

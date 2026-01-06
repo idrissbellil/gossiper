@@ -31,25 +31,23 @@ func main() {
 		}
 	}()
 
+	logger := StdLogger{}
+	
+	// Create processor (no fetcher needed anymore!)
+	jobRepo := worker.NewEntJobRepository(c.ORM)
+	processor := worker.NewMessageProcessor(jobRepo, logger, nil, c.Config.SMTP.Hostname)
+	
+	// Create webhook sender
 	config := worker.Config{
-		WebSocketURL:    c.Config.Mailcrab.Ws,
-		APIURL:          c.Config.Mailcrab.Api,
-		AllowedHostname: c.Config.Mailcrab.Hostname,
 		HTTPTimeout:     30 * time.Second,
 		MaxRetries:      3,
-		BufferSize:      100,
 		ShutdownTimeout: 10 * time.Second,
 	}
+	httpClient := &http.Client{Timeout: config.HTTPTimeout}
+	webhookSender := worker.NewWebhookSender(httpClient, logger, config)
 
-	deps := worker.WorkerDependencies{
-		JobRepo:    worker.NewEntJobRepository(c.ORM),
-		Logger:     StdLogger{},
-		Config:     config,
-		WSDialer:   worker.DefaultWebSocketDialer{},
-		HTTPClient: &http.Client{Timeout: config.HTTPTimeout},
-	}
-
-	w := worker.NewWorker(deps)
+	// Create poller
+	poller := worker.NewSMTPMessagePoller(c.ORM, processor, webhookSender, logger, 1*time.Second)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -60,14 +58,13 @@ func main() {
 	go func() {
 		<-sigChan
 		log.Println("received shutdown signal")
-		w.Shutdown()
+		poller.Shutdown()
 		cancel()
 	}()
 
-	if err := w.Start(ctx); err != nil && err != context.Canceled {
-		log.Fatalf("worker error: %v", err)
+	if err := poller.Start(ctx); err != nil && err != context.Canceled {
+		log.Fatalf("poller error: %v", err)
 	}
 
-	w.WaitForShutdown()
 	log.Println("worker shutdown complete")
 }

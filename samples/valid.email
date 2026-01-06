@@ -1,0 +1,10 @@
+From: Test Sender <sender@test.com>
+To: Receiver <receiver@example.com>
+Subject: Test Email - Valid Recipient
+Date: Mon, 06 Jan 2026 20:00:00 +0000
+
+This is a test email sent to a valid @example.com recipient.
+This should be accepted and stored in the database.
+
+Best regards,
+Test System

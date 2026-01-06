@@ -58,7 +58,7 @@ type (
 		Cache         CacheConfig
 		Database      DatabaseConfig
 		QueueDatabase DatabaseConfig
-		Mailcrab      MailcrabConfig
+		SMTP          SMTPConfig
 		Tasks         TasksConfig
 		Mail          MailConfig
 	}
@@ -113,11 +113,9 @@ type (
 		Goroutines   int
 	}
 
-	// TasksConfig stores the tasks configuration
-	MailcrabConfig struct {
-		Ws       string
-		Api      string
-		Hostname string
+	// SMTPConfig stores the SMTP server configuration
+	SMTPConfig struct {
+		Hostname string // Domain to accept emails for (e.g., "v3m.pw")
 	}
 
 	// MailConfig stores the mail configuration

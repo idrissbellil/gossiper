@@ -81,6 +81,25 @@ func (j *Job) BeforeCreate(tx *gorm.DB) error {
 	return nil
 }
 
+// SMTPMessage represents an incoming SMTP message waiting to be processed
+type SMTPMessage struct {
+	ID        int       `gorm:"primaryKey"`
+	To        string    `gorm:"not null;index"` // Recipient email (already filtered for valid hostname)
+	From      string    `gorm:"not null"`
+	Subject   string    `gorm:"not null"`
+	Body      string    `gorm:"type:text;not null"`
+	Processed bool      `gorm:"default:false;index"`
+	CreatedAt time.Time `gorm:"not null;index"`
+}
+
+// BeforeCreate is a GORM hook that sets the created_at timestamp
+func (sm *SMTPMessage) BeforeCreate(tx *gorm.DB) error {
+	if sm.CreatedAt.IsZero() {
+		sm.CreatedAt = time.Now()
+	}
+	return nil
+}
+
 // DB wraps gorm.DB with additional helper methods
 type DB struct {
 	*gorm.DB
@@ -102,5 +121,6 @@ func (db *DB) AutoMigrate() error {
 		&User{},
 		&PasswordToken{},
 		&Job{},
+		&SMTPMessage{},
 	)
 }
