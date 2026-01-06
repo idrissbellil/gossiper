@@ -202,12 +202,7 @@ func TestMessageProcessor_ParseRawMessage(t *testing.T) {
 			}
 
 			logger := &mockLogger{}
-			processor := &MessageProcessor{
-				jobRepo:         nil,
-				logger:          logger,
-				fetcher:         mockFetcher,
-				allowedHostname: tt.allowedHostname,
-			}
+			processor := NewMessageProcessor(nil, logger, mockFetcher, tt.allowedHostname)
 
 			result := processor.ParseRawMessage(tt.rawMsg)
 

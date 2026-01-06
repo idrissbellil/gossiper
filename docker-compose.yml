@@ -64,6 +64,7 @@ services:
       GOSSIP_DATABASE_CONNECTION: host=db port=5432 user=admin dbname=app_test password=admin sslmode=disable
       GOSSIP_MAILCRAB_WS: ws://mailcrab:1080/ws
       GOSSIP_MAILCRAB_API: http://mailcrab:1080/api
+      GOSSIP_MAILCRAB_HOSTNAME: v3m.pw
     networks:
       - backend
     depends_on:

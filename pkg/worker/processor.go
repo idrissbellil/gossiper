@@ -7,24 +7,25 @@ import (
 	"fmt"
 	"html/template"
 	"regexp"
-	"strings"
 
 	"gitea.v3m.net/idriss/gossiper/pkg/models"
 )
 
 type MessageProcessor struct {
-	jobRepo         JobRepository
-	logger          Logger
-	fetcher         MessageFetcherInterface
-	allowedHostname string
+	jobRepo            JobRepository
+	logger             Logger
+	fetcher            MessageFetcherInterface
+	allowedHostname    string
+	allowedHostnameFull string // Precomputed "@hostname" for efficiency
 }
 
 func NewMessageProcessor(jobRepo JobRepository, logger Logger, fetcher MessageFetcherInterface, allowedHostname string) *MessageProcessor {
 	return &MessageProcessor{
-		jobRepo:         jobRepo,
-		logger:          logger,
-		fetcher:         fetcher,
-		allowedHostname: allowedHostname,
+		jobRepo:            jobRepo,
+		logger:             logger,
+		fetcher:            fetcher,
+		allowedHostname:    allowedHostname,
+		allowedHostnameFull: "@" + allowedHostname,
 	}
 }
 
@@ -42,10 +43,12 @@ func (p *MessageProcessor) ParseRawMessage(rawMsg RawMessage) []Message {
 
 	// Early filter: check if ANY recipient has our allowed hostname
 	// This prevents unnecessary API calls for spam emails
-	suffix := "@" + p.allowedHostname
+	// Uses precomputed suffix for maximum efficiency
+	suffixLen := len(p.allowedHostnameFull)
 	hasValidRecipient := false
+	
 	for _, to := range rawMsg.To {
-		if strings.HasSuffix(to.Email, suffix) {
+		if p.isValidEmail(to.Email, suffixLen) {
 			hasValidRecipient = true
 			break
 		}
@@ -69,8 +72,7 @@ func (p *MessageProcessor) ParseRawMessage(rawMsg RawMessage) []Message {
 
 	// Create a message for each valid recipient
 	for _, to := range rawMsg.To {
-		// Filter by allowed hostname
-		if !strings.HasSuffix(to.Email, suffix) {
+		if !p.isValidEmail(to.Email, suffixLen) {
 			continue
 		}
 		
@@ -84,6 +86,18 @@ func (p *MessageProcessor) ParseRawMessage(rawMsg RawMessage) []Message {
 	}
 
 	return messages
+}
+
+// isValidEmail checks if email ends with allowed hostname (optimized for speed)
+func (p *MessageProcessor) isValidEmail(email string, suffixLen int) bool {
+	emailLen := len(email)
+	if emailLen < suffixLen {
+		return false
+	}
+	
+	// Direct byte-by-byte comparison of suffix
+	emailSuffix := email[emailLen-suffixLen:]
+	return emailSuffix == p.allowedHostnameFull
 }
 
 func (p *MessageProcessor) ProcessMessage(ctx context.Context, msg Message) ([]ProcessResult, error) {
