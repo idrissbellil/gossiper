@@ -52,7 +52,8 @@ func (p *MessageProcessor) ParseRawMessage(rawMsg RawMessage) []Message {
 	}
 
 	if !hasValidRecipient {
-		// Silently drop - all recipients are for other domains
+		// Log dropped messages for debugging
+		p.logger.Printf("dropping message %s: no recipients match hostname '%s' (recipients: %v)", rawMsg.ID, p.allowedHostname, rawMsg.To)
 		return messages
 	}
 
