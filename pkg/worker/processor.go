@@ -40,6 +40,22 @@ type ProcessResult struct {
 func (p *MessageProcessor) ParseRawMessage(rawMsg RawMessage) []Message {
 	var messages []Message
 
+	// Early filter: check if ANY recipient has our allowed hostname
+	// This prevents unnecessary API calls for spam emails
+	suffix := "@" + p.allowedHostname
+	hasValidRecipient := false
+	for _, to := range rawMsg.To {
+		if strings.HasSuffix(to.Email, suffix) {
+			hasValidRecipient = true
+			break
+		}
+	}
+
+	if !hasValidRecipient {
+		// Silently drop - all recipients are for other domains
+		return messages
+	}
+
 	// Fetch full message details from API
 	fullMsg, err := p.fetcher.FetchMessage(rawMsg.ID)
 	if err != nil {
@@ -50,10 +66,9 @@ func (p *MessageProcessor) ParseRawMessage(rawMsg RawMessage) []Message {
 	// Get the message body (text or converted HTML)
 	body := p.fetcher.GetMessageBody(fullMsg)
 
-	// Create a message for each recipient, filtering by allowed hostname
-	suffix := "@" + p.allowedHostname
+	// Create a message for each valid recipient
 	for _, to := range rawMsg.To {
-		// Early filter: reject emails not ending with our hostname
+		// Filter by allowed hostname
 		if !strings.HasSuffix(to.Email, suffix) {
 			continue
 		}
