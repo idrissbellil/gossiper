@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
@@ -39,11 +40,26 @@ func main() {
 	
 	// Create webhook sender
 	config := worker.Config{
-		HTTPTimeout:     30 * time.Second,
+		HTTPTimeout:     90 * time.Second,
 		MaxRetries:      3,
 		ShutdownTimeout: 10 * time.Second,
 	}
+	
+	// Create HTTP client with optional proxy support
 	httpClient := &http.Client{Timeout: config.HTTPTimeout}
+	
+	// Check for proxy configuration
+	if proxyURL := os.Getenv("HTTP_PROXY"); proxyURL != "" {
+		proxy, err := url.Parse(proxyURL)
+		if err != nil {
+			log.Fatalf("invalid HTTP_PROXY: %v", err)
+		}
+		httpClient.Transport = &http.Transport{
+			Proxy: http.ProxyURL(proxy),
+		}
+		log.Printf("using HTTP proxy: %s", proxyURL)
+	}
+	
 	webhookSender := worker.NewWebhookSender(httpClient, logger, config)
 
 	// Create email replier for auto-replies

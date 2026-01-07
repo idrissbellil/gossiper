@@ -55,6 +55,9 @@ services:
       GOSSIP_DATABASE_TESTCONNECTION: host=db port=5432 user=admin dbname=app_test password=admin sslmode=disable
       GOSSIP_DATABASE_CONNECTION: host=db port=5432 user=admin dbname=app_test password=admin sslmode=disable
       GOSSIP_SMTP_HOSTNAME: v3m.pw
+    dns:
+      - "8.8.8.8"
+      - "8.8.4.4"
     networks:
       - backend
     depends_on:
@@ -75,6 +78,10 @@ services:
       GOSSIP_MAIL_PASSWORD: ${GOSSIP_MAIL_PASSWORD}
       GOSSIP_MAIL_FROMADDRESS: noreply@risky.info
       GOSSIP_MAIL_SKIPTLSVERIFY: "true"
+      HTTP_PROXY: ${HTTP_PROXY:-}
+    dns:
+      - "8.8.8.8"
+      - "8.8.4.4"
     networks:
       - backend
     depends_on:
