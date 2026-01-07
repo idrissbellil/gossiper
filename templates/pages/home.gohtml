@@ -32,67 +32,100 @@
 
 {{define "posts"}}
     <div id="posts">
+        <div class="table-container">
         <table class="table is-fullwidth is-striped is-narrow is-hoverable">
         <thead>
             <tr class="has-text-centered">
                 <th>Email</th>
                 <th>URL</th>
-                <th style="width: 50px;">Method</th>
-                <th style="width: 50px;"></th>
-                <th style="width: 50px;"></th>
+                <th style="width: 80px;">Method</th>
+                <th style="width: 100px;">Actions</th>
             </tr>
         </thead>
         <tbody>
         {{- range .Data.Jobs}}
-            <tr>
+            <tr x-data="{modal:false}">
                 <td>{{ .Email }}</td>
                 <td style="max-width: 300px;"><div class="is-clipped" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ .URL }}</div></td>
                 <td>{{ .Method }}</td>
                 <td>
-                    <button class="button is-danger is-small" hx-delete="/jobs/{{ .ID }}" hx-target="#posts">delete</button>
-                    </td>
-                    <td>
-                        <div class="insert" x-data="{modal:false}">
-                            <button @click="modal = true" class="button is-link is-small">view</button>
-                        <div class="modal" :class="modal ? 'is-active' : ''" x-show="modal == true">
-                            <div class="modal-background"></div>
-                            <div class="modal-content" @click.away="modal = false;">
+                    <div class="buttons are-small" style="margin-bottom: 0; justify-content: center;">
+                        <button @click="modal = true" class="button is-link is-small" title="View/Edit">
+                            <span class="icon is-small">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </span>
+                        </button>
+                        <button class="button is-danger is-small" hx-delete="/jobs/{{ .ID }}" hx-target="#posts" hx-confirm="Are you sure you want to delete this job?" title="Delete">
+                            <span class="icon is-small">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                </svg>
+                            </span>
+                        </button>
+                    </div>
+                    <template x-teleport="body">
+                        <div class="modal" :class="modal ? 'is-active' : ''" x-show="modal" x-cloak>
+                            <div class="modal-background" @click="modal = false"></div>
+                            <div class="modal-content">
                                 <div class="box">
-                                <form hx-put="/jobs/{{ .ID }}" hx-target="#posts">
-                                    <table class="table is-fullwidth">
-                                    <tr>
-                                        <td><label class="label" for="url">URL</label></td>
-                                        <td><input class="input" type="text" id="url" name="url" value="{{ .URL }}"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><label class="label" for="method">Method</label></td>
-                                        <td><input class="input" type="text" id="method" name="method" value="{{ .Method }}"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><label class="label" for="from_regex">From Regex</label></td>
-                                        <td><input class="input" type="text" id="from_regex" name="from_regex" value="{{ .FromRegex }}"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><label class="label" for="payload">Payload</label></td>
-                                        <td><textarea class="input" id="payload" name="payload">{{ .PayloadTemplate }}</textarea></td>
-                                    </tr>
-                                    <tr>
-                                        <td><label class="label" for="headers">Headers</label></td>
-                                        <td><textarea class="textarea" id="headers" name="headers">{{ toJSON .Headers }}</textarea></td>
-                                    </tr>
-                                    </table>
-                                </form>
+                                    <h2 class="title is-5">Edit Job</h2>
+                                    <form hx-put="/jobs/{{ .ID }}" hx-target="#posts" @htmx:after-request="modal = false">
+                                        <div class="field">
+                                            <label class="label" for="url-{{ .ID }}">URL</label>
+                                            <div class="control">
+                                                <input class="input" type="text" id="url-{{ .ID }}" name="url" value="{{ .URL }}">
+                                            </div>
+                                        </div>
+                                        <div class="field">
+                                            <label class="label" for="method-{{ .ID }}">Method</label>
+                                            <div class="control">
+                                                <input class="input" type="text" id="method-{{ .ID }}" name="method" value="{{ .Method }}">
+                                            </div>
+                                        </div>
+                                        <div class="field">
+                                            <label class="label" for="from_regex-{{ .ID }}">From Regex</label>
+                                            <div class="control">
+                                                <input class="input" type="text" id="from_regex-{{ .ID }}" name="from_regex" value="{{ .FromRegex }}">
+                                            </div>
+                                        </div>
+                                        <div class="field">
+                                            <label class="label" for="payload-{{ .ID }}">Payload</label>
+                                            <div class="control">
+                                                <textarea class="textarea" id="payload-{{ .ID }}" name="payload">{{ .PayloadTemplate }}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="field">
+                                            <label class="label" for="headers-{{ .ID }}">Headers</label>
+                                            <div class="control">
+                                                <textarea class="textarea" id="headers-{{ .ID }}" name="headers">{{ toJSON .Headers }}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="field is-grouped">
+                                            <div class="control">
+                                                <button type="submit" class="button is-primary">Save</button>
+                                            </div>
+                                            <div class="control">
+                                                <button type="button" class="button is-light" @click="modal = false">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
-                            <button class="modal-close is-large" aria-label="close"></button>
+                            <button class="modal-close is-large" aria-label="close" @click="modal = false"></button>
                         </div>
-                    </div>
-                    </td>
+                    </template>
                 </td>
             </tr>
         {{- end}}
         </tbody>
         </table>
+        </div>
 
             {{ template "insert" .}}
         <div class="field is-grouped is-grouped-centered">
@@ -115,27 +148,33 @@
     <p class="control">
         <button @click="modal = true" class="button is-primary">Add New</button>
     </p>
-    <div class="modal" :class="modal ? 'is-active' : ''" x-show="modal == true">
-        <div class="modal-background"></div>
-        <div class="modal-content" @click.away="modal = false;">
+    <div class="modal" :class="modal ? 'is-active' : ''" x-show="modal">
+        <div class="modal-background" @click="modal = false"></div>
+        <div class="modal-content">
             <div class="box">
-            <form hx-post="/jobs" hx-target="#posts">
-                <table class="table is-fullwidth">
+                <h2 class="title is-5">Add New Job</h2>
+                <form hx-post="/jobs" hx-target="#posts" @htmx:after-request="modal = false">
                     {{- range .Data.InputFields }}
-                    <tr>
-                        <td><label class="label" for="{{ .Name }}">{{ .Label }}</label></td>
-                        <td>
-                {{ if eq .Type "input" }}<input class="input" type="text" id="{{ .Name }}" name="{{ .Name }}" {{ .Extra }}> {{ end }}
-                {{ if eq .Type "textarea" }}<textarea class="textarea" id="{{ .Name }}" name="{{ .Name }}" {{ .Extra }}></textarea> {{ end }}
-                        </td>
-                    </tr>
+                    <div class="field">
+                        <label class="label" for="{{ .Name }}">{{ .Label }}</label>
+                        <div class="control">
+                            {{ if eq .Type "input" }}<input class="input" type="text" id="{{ .Name }}" name="{{ .Name }}" {{ .Extra }}> {{ end }}
+                            {{ if eq .Type "textarea" }}<textarea class="textarea" id="{{ .Name }}" name="{{ .Name }}" {{ .Extra }}></textarea> {{ end }}
+                        </div>
+                    </div>
                     {{ end }}
-                </table>
-                <button class="button is-primary">Submit</button>
-            </form>
+                    <div class="field is-grouped">
+                        <div class="control">
+                            <button type="submit" class="button is-primary">Submit</button>
+                        </div>
+                        <div class="control">
+                            <button type="button" class="button is-light" @click="modal = false">Cancel</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
-        <button class="modal-close is-large" aria-label="close"></button>
+        <button class="modal-close is-large" aria-label="close" @click="modal = false"></button>
     </div>
 </div>
 {{end}}

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Background -->
+  <rect width="64" height="64" rx="12" fill="#0d1117"/>
+  
+  <!-- Email envelope -->
+  <rect x="12" y="20" width="24" height="18" rx="2" stroke="#58a6ff" stroke-width="2.2" fill="#161b22"/>
+  <path d="M12 22 L24 30 L36 22" stroke="#58a6ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  
+  <!-- Notification dot -->
+  <circle cx="24" cy="29" r="1.5" fill="#3fb950"/>
+  
+  <!-- Arrow -->
+  <path d="M38 29 L46 29" stroke="#58a6ff" stroke-width="2" stroke-linecap="round"/>
+  <path d="M43 26 L46 29 L43 32" stroke="#58a6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  
+  <!-- Webhook symbol -->
+  <circle cx="52" cy="29" r="6" stroke="#58a6ff" stroke-width="2" fill="#161b22"/>
+  <path d="M52 26 L52 29 L55 29" stroke="#3fb950" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="52" cy="29" r="1.2" fill="#3fb950"/>
+</svg>

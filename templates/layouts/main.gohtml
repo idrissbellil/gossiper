@@ -7,11 +7,13 @@
     {{template "js" .}}
 </head>
 
-<body class="has-background-light" style="min-height:100%;">
+<body style="min-height:100%;">
     <nav class="navbar is-dark">
         <div class="container">
             <div class="navbar-brand" hx-boost="true">
-                <a href="{{url " home"}}" class="navbar-item">{{.AppName}}</a>
+                <a href="{{url " home"}}" class="navbar-item">
+                    <img src="{{file "logo.svg"}}" alt="{{.AppName}}" style="height: 2.5rem; max-height: none; width: auto;">
+                </a>
             </div>
             <div id="navbarMenu" class="navbar-menu">
                 <div class="navbar-end">
@@ -28,7 +30,6 @@
                     <p class="menu-label">General</p>
                     <ul class="menu-list">
                         <li>{{link (url "home") "Dashboard" .Path}}</li>
-                        <li>{{link (url "contact") "Contact" .Path}}</li>
                         <li>{{link (url "about") "About" .Path}}</li>
                     </ul>
                     {{- end}}

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" fill="none">
+  <!-- Email icon (left) -->
+  <g id="email">
+    <rect x="10" y="18" width="36" height="24" rx="3" stroke="#58a6ff" stroke-width="2.5" fill="#161b22"/>
+    <path d="M10 21 L28 32 L46 21" stroke="#58a6ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="28" cy="30" r="2" fill="#3fb950"/>
+  </g>
+  
+  <!-- Arrow/Flow (middle) -->
+  <g id="flow">
+    <path d="M52 30 L70 30" stroke="#58a6ff" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M70 30 L78 30" stroke="#58a6ff" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3 3">
+      <animate attributeName="stroke-dashoffset" from="0" to="-12" dur="1.5s" repeatCount="indefinite"/>
+    </path>
+    <path d="M78 30 L96 30" stroke="#58a6ff" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M92 26 L96 30 L92 34" stroke="#58a6ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  
+  <!-- Webhook icon (right) -->
+  <g id="webhook">
+    <circle cx="118" cy="30" r="12" stroke="#58a6ff" stroke-width="2.5" fill="#161b22"/>
+    <path d="M118 24 L118 30 L123 30" stroke="#3fb950" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="118" cy="30" r="2" fill="#3fb950"/>
+  </g>
+  
+  <!-- Text: Gossiper -->
+  <text x="138" y="38" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="600" fill="#e6edf3">Gossiper</text>
+</svg>

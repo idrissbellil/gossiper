@@ -1,0 +1,449 @@
+/* Modern Dark Theme */
+:root {
+    --bg-primary: #0d1117;
+    --bg-secondary: #161b22;
+    --bg-tertiary: #21262d;
+    --bg-hover: #30363d;
+    --border-color: #30363d;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --accent-primary: #58a6ff;
+    --accent-hover: #79c0ff;
+    --success: #3fb950;
+    --warning: #d29922;
+    --danger: #f85149;
+    --info: #58a6ff;
+}
+
+/* Global Styles */
+html, body {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Navbar */
+.navbar.is-dark {
+    background-color: var(--bg-secondary) !important;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.navbar-item, .navbar-link {
+    color: var(--text-primary) !important;
+    transition: background-color 0.2s ease;
+}
+
+.navbar-item:hover, .navbar-link:hover {
+    background-color: var(--bg-hover) !important;
+    color: var(--accent-hover) !important;
+}
+
+/* Sidebar Menu */
+.menu {
+    background-color: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.menu-label {
+    color: var(--text-secondary) !important;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.75rem;
+    margin-top: 1rem;
+}
+
+.menu-label:first-child {
+    margin-top: 0;
+}
+
+.menu-list a {
+    color: var(--text-primary) !important;
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.menu-list a:hover {
+    background-color: var(--bg-hover) !important;
+    color: var(--accent-hover) !important;
+}
+
+.menu-list a.is-active {
+    background-color: var(--accent-primary) !important;
+    color: #fff !important;
+}
+
+/* Box / Cards */
+.box {
+    background-color: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Content areas */
+.content p, .content li {
+    color: var(--text-primary) !important;
+}
+
+.content strong {
+    color: var(--text-primary) !important;
+}
+
+/* Titles */
+.title {
+    color: var(--text-primary) !important;
+    font-weight: 600;
+}
+
+.subtitle {
+    color: var(--text-secondary) !important;
+}
+
+/* Hero Sections */
+.hero.is-info {
+    background: linear-gradient(135deg, #1f6feb 0%, #58a6ff 100%) !important;
+}
+
+.hero.is-info .title, .hero.is-info .subtitle {
+    color: #fff !important;
+}
+
+.hero.is-fullheight {
+    background-color: var(--bg-primary) !important;
+}
+
+/* Tables */
+.table {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color);
+}
+
+.table thead th {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-secondary) !important;
+    border-color: var(--border-color) !important;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.table tbody td {
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.table.is-striped tbody tr:nth-child(even) {
+    background-color: var(--bg-secondary) !important;
+}
+
+.table.is-hoverable tbody tr:hover {
+    background-color: var(--bg-hover) !important;
+}
+
+/* Forms */
+.input, .textarea, .select select {
+    background-color: var(--bg-tertiary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+    transition: all 0.2s ease;
+}
+
+.input:focus, .textarea:focus, .select select:focus {
+    border-color: var(--accent-primary) !important;
+    box-shadow: 0 0 0 0.125em rgba(88, 166, 255, 0.25) !important;
+}
+
+.input::placeholder, .textarea::placeholder {
+    color: var(--text-secondary) !important;
+}
+
+.label {
+    color: var(--text-primary) !important;
+    font-weight: 600;
+}
+
+.help.is-danger {
+    color: var(--danger) !important;
+}
+
+/* Buttons */
+.button {
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 1px solid var(--border-color);
+}
+
+.button.is-primary {
+    background-color: var(--accent-primary) !important;
+    border-color: var(--accent-primary) !important;
+    color: #fff !important;
+}
+
+.button.is-primary:hover {
+    background-color: var(--accent-hover) !important;
+    border-color: var(--accent-hover) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(88, 166, 255, 0.3);
+}
+
+.button.is-danger {
+    background-color: var(--danger) !important;
+    border-color: var(--danger) !important;
+    color: #fff !important;
+}
+
+.button.is-danger:hover {
+    background-color: #ff6b6b !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(248, 81, 73, 0.3);
+}
+
+.button.is-link {
+    background-color: var(--info) !important;
+    border-color: var(--info) !important;
+    color: #fff !important;
+}
+
+.button.is-link:hover {
+    background-color: var(--accent-hover) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(88, 166, 255, 0.3);
+}
+
+.button.is-light {
+    background-color: var(--bg-tertiary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.button.is-light:hover {
+    background-color: var(--bg-hover) !important;
+    border-color: var(--text-secondary) !important;
+}
+
+/* Notifications & Messages */
+.notification {
+    border-radius: 8px;
+    border: 1px solid;
+}
+
+.notification.is-success {
+    background-color: rgba(63, 185, 80, 0.1) !important;
+    border-color: var(--success) !important;
+    color: var(--success) !important;
+}
+
+.notification.is-info {
+    background-color: rgba(88, 166, 255, 0.1) !important;
+    border-color: var(--info) !important;
+    color: var(--info) !important;
+}
+
+.notification.is-warning {
+    background-color: rgba(210, 153, 34, 0.1) !important;
+    border-color: var(--warning) !important;
+    color: var(--warning) !important;
+}
+
+.notification.is-danger {
+    background-color: rgba(248, 81, 73, 0.1) !important;
+    border-color: var(--danger) !important;
+    color: var(--danger) !important;
+}
+
+.message {
+    border-radius: 8px;
+    border: 1px solid;
+}
+
+.message.is-warning {
+    background-color: rgba(210, 153, 34, 0.05) !important;
+}
+
+.message.is-warning .message-header {
+    background-color: var(--warning) !important;
+    color: #0d1117 !important;
+    border: none;
+}
+
+.message.is-warning .message-body {
+    border-color: var(--warning) !important;
+    color: var(--text-primary) !important;
+    background-color: var(--bg-secondary) !important;
+}
+
+/* Modal */
+.modal {
+    z-index: 1000;
+}
+
+.modal-content .box {
+    background-color: var(--bg-secondary) !important;
+}
+
+.modal-background {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+.modal-close {
+    background-color: var(--bg-tertiary);
+}
+
+/* Links */
+a {
+    color: var(--accent-primary) !important;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--accent-hover) !important;
+}
+
+/* Container spacing */
+.container {
+    max-width: 1280px;
+}
+
+/* Responsive improvements */
+@media screen and (max-width: 768px) {
+    .columns {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .column.is-2 {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+    
+    .column.is-10 {
+        width: 100%;
+    }
+    
+    .menu {
+        margin-bottom: 1.5rem;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+    }
+}
+
+/* Scrollbar styling for webkit browsers */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bg-hover);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* Footer borders */
+footer {
+    border-color: var(--border-color) !important;
+}
+
+/* Mermaid diagram dark theme */
+.mermaid {
+    background-color: var(--bg-tertiary) !important;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.mermaid svg {
+    background-color: transparent !important;
+}
+
+/* Mermaid element styling */
+.mermaid .actor {
+    fill: var(--bg-secondary) !important;
+    stroke: var(--accent-primary) !important;
+}
+
+.mermaid .labelText, .mermaid text {
+    fill: var(--text-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+.mermaid .messageText {
+    fill: var(--text-primary) !important;
+    stroke: none !important;
+}
+
+.mermaid .loopText, .mermaid .loopLine, .mermaid .labelBox {
+    fill: var(--bg-tertiary) !important;
+    stroke: var(--accent-primary) !important;
+}
+
+.mermaid line, .mermaid path {
+    stroke: var(--accent-primary) !important;
+}
+
+.mermaid .sequenceNumber {
+    fill: var(--bg-secondary) !important;
+}
+
+.mermaid marker {
+    fill: var(--accent-primary) !important;
+    stroke: var(--accent-primary) !important;
+}
+
+/* Smooth transitions */
+* {
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Alpine.js x-cloak */
+[x-cloak] {
+    display: none !important;
+}
+
+/* Modern Table Enhancements */
+.table-container {
+    border-radius: 8px;
+    overflow: visible;
+}
+
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table thead th {
+    padding: 1rem 0.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.table tbody td {
+    padding: 0.75rem;
+    vertical-align: middle;
+    overflow: visible;
+}
+
+.table tbody tr {
+    transition: all 0.15s ease;
+}
+
+.table.is-hoverable tbody tr:hover {
+    transform: scale(1.005);
+    box-shadow: 0 2px 8px rgba(88, 166, 255, 0.15);
+}
