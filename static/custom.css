@@ -28,6 +28,10 @@ html, body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+.navbar-brand {
+    flex-grow: 1;
+}
+
 .navbar-item, .navbar-link {
     color: var(--text-primary) !important;
     transition: background-color 0.2s ease;
