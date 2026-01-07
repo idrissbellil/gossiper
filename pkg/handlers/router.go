@@ -16,7 +16,7 @@ func BuildRouter(c *services.Container) error {
 	// funcmap.File() should be used in templates to append a cache key to the URL in order to break cache
 	// after each server restart
 	c.Web.Group("", middleware.CacheControl(c.Config.Cache.Expiration.StaticFile)).
-		Static("/"+config.StaticPrefix, config.StaticDir)
+		Static(config.StaticPrefix, config.StaticDir)
 
 	// Non-static file route group
 	g := c.Web.Group("")
