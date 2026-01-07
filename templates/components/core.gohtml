@@ -27,6 +27,19 @@
             startOnLoad: true,
             theme: 'dark'
         });
+
+        // Make mermaid available globally for HTMX integration
+        window.mermaid = mermaid;
+
+        // Re-render Mermaid diagrams after HTMX swaps content
+        document.body.addEventListener('htmx:afterSwap', function(evt) {
+            const mermaidElements = evt.detail.target.querySelectorAll('.mermaid');
+            if (mermaidElements.length > 0) {
+                mermaid.run({
+                    nodes: mermaidElements
+                });
+            }
+        });
     </script>
 {{end}}
 
