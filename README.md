@@ -55,4 +55,4 @@ to your infrastructure.
 
 ## Video Demo
 
-<iframe id="odysee-iframe" style="width:100%; aspect-ratio:16 / 9;" src="https://odysee.com/%24/embed/%40jostiniane%3Aa%2Fgossip_dispatch%3A3?r=ApaoeHUrRuxq8iobUykDYxZFFXnoJgoM&autoplay=true" allowfullscreen></iframe>
+[Video](https://odysee.com/@jostiniane:a/gossip_dispatch:3?r=ApaoeHUrRuxq8iobUykDYxZFFXnoJgoM)
