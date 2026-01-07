@@ -144,8 +144,10 @@ steps:
     environment:
       GOSSIP_MAIL_PASSWORD:
         from_secret: GOSSIP_MAIL_PASSWORD
-      HTTP_PROXY:
-        from_secret: HTTP_PROXY
+      GOSSIP_PROXY_ENABLED:
+        from_secret: GOSSIP_PROXY_ENABLED
+      GOSSIP_PROXY_URL:
+        from_secret: GOSSIP_PROXY_URL
       PGADMIN_EMAIL:
         from_secret: PGADMIN_EMAIL
       PGADMIN_PASSWORD:
@@ -153,13 +155,14 @@ steps:
     settings:
       host: app.v3m.pw
       username: idriss
-      envs: [GOSSIP_MAIL_PASSWORD, HTTP_PROXY, PGADMIN_EMAIL, PGADMIN_PASSWORD]
+      envs: [GOSSIP_MAIL_PASSWORD, GOSSIP_PROXY_ENABLED, GOSSIP_PROXY_URL, PGADMIN_EMAIL, PGADMIN_PASSWORD]
       key:
         from_secret: DOCKER_DEPLOY_SSH_KEY
       port: 7777
       script:
         - export GOSSIP_MAIL_PASSWORD=$GOSSIP_MAIL_PASSWORD
-        - export HTTP_PROXY=$HTTP_PROXY
+        - export GOSSIP_PROXY_ENABLED=$GOSSIP_PROXY_ENABLED
+        - export GOSSIP_PROXY_URL=$GOSSIP_PROXY_URL
         - export PGADMIN_EMAIL=$PGADMIN_EMAIL
         - export PGADMIN_PASSWORD=$PGADMIN_PASSWORD
         - docker compose -f /home/idriss/services/gossiper/docker-compose.yml down || true

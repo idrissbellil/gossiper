@@ -78,7 +78,8 @@ services:
       GOSSIP_MAIL_PASSWORD: ${GOSSIP_MAIL_PASSWORD}
       GOSSIP_MAIL_FROMADDRESS: noreply@risky.info
       GOSSIP_MAIL_SKIPTLSVERIFY: "true"
-      HTTP_PROXY: ${HTTP_PROXY:-}
+      GOSSIP_PROXY_ENABLED: ${GOSSIP_PROXY_ENABLED:-false}
+      GOSSIP_PROXY_URL: ${GOSSIP_PROXY_URL:-}
     dns:
       - "8.8.8.8"
       - "8.8.4.4"

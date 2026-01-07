@@ -49,15 +49,15 @@ func main() {
 	httpClient := &http.Client{Timeout: config.HTTPTimeout}
 	
 	// Check for proxy configuration
-	if proxyURL := os.Getenv("HTTP_PROXY"); proxyURL != "" {
-		proxy, err := url.Parse(proxyURL)
+	if c.Config.Proxy.Enabled && c.Config.Proxy.URL != "" {
+		proxy, err := url.Parse(c.Config.Proxy.URL)
 		if err != nil {
-			log.Fatalf("invalid HTTP_PROXY: %v", err)
+			log.Fatalf("invalid proxy URL: %v", err)
 		}
 		httpClient.Transport = &http.Transport{
 			Proxy: http.ProxyURL(proxy),
 		}
-		log.Printf("using HTTP proxy: %s", proxyURL)
+		log.Printf("using HTTP proxy: %s", c.Config.Proxy.URL)
 	}
 	
 	webhookSender := worker.NewWebhookSender(httpClient, logger, config)

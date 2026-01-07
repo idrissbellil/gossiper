@@ -50,3 +50,7 @@ mail:
   password: "admin"
   fromAddress: "admin@localhost"
   skipTlsVerify: false
+
+proxy:
+  enabled: false
+  url: ""

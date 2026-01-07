@@ -61,6 +61,7 @@ type (
 		SMTP          SMTPConfig
 		Tasks         TasksConfig
 		Mail          MailConfig
+		Proxy         ProxyConfig
 	}
 
 	// HTTPConfig stores HTTP configuration
@@ -126,6 +127,12 @@ type (
 		Password      string
 		FromAddress   string
 		SkipTlsVerify bool
+	}
+
+	// ProxyConfig stores the HTTP proxy configuration
+	ProxyConfig struct {
+		Enabled bool
+		URL     string
 	}
 )
 
