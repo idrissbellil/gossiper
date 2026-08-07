@@ -17,7 +17,7 @@ sequenceDiagram
     Webhook->>You: 5. Process notification
 ```
 
-Feel free to self host it ~or simply use the deployed version: [here](https://app.v3m.pw)~ (it was taken down due to heavy bot activity and low volume of actual users)
+Feel free to self host it ~or simply use the deployed version: [here](https://app.v3m.pw)~ (registration is disabled due to heavy bot activity and low volume of actual users)
 
 ## Project Structure 
 
