@@ -30,7 +30,7 @@ Among the big changes I made, I dropped `Ent` in favor of `Gorm`, I separated th
 task queue from the postgres business DB, and many other things, yet I kept the structure
 of the project because it made sense to me. With that being said, there are things I ported from there but I didn't clean yet
 (like the contact page).
-1. An self explanatory SMPT agent
+1. A self explanatory SMPT agent
 2. A processing worker
 
 
