@@ -18,6 +18,7 @@ sequenceDiagram
 ```
 
 Feel free to self host it ~or simply use the deployed version: [here](https://app.v3m.pw)~ (registration is disabled due to heavy bot activity and low volume of actual users)
+You can also see it working in-action by opening a Github issue to this repo by sending an email to 3ka3ec1p [at] v3m.pw
 
 ## Project Structure 
 
