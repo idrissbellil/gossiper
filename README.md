@@ -1,6 +1,6 @@
 # Gossiper
 
-[![Build Status](https://drone.v3m.net/api/badges/idriss/gossiper/status.svg)](https://drone.v3m.net/idriss/gossiper)
+[![status-badge](https://woodpecker.v3m.net/api/badges/1/status.svg)](https://woodpecker.v3m.net/repos/1)
 
 
 ```mermaid
@@ -19,7 +19,8 @@ sequenceDiagram
 
 Feel free to self host it ~or simply use the deployed version: [here](https://app.v3m.pw)~ (registration is disabled due to heavy bot activity and low volume of actual users)
 
-You can also see it working in-action by opening a Github issue to this repo by sending an email to 3ka3ec1p [at] v3m.pw, or by sending me a Telegram msg by emailing: m2039lfi [at] v3m.pw
+I stopped pushing updates to this Github mirror. All the work will keep happening in my Forgejo instance.
+
 
 ## Project Structure 
 
@@ -50,8 +51,7 @@ air
 
 ## Deployment
 
-There is a `.drone` deployment pipeline being used today (not from this repository since
-it's just a mirror to the actual gitea source), so feel free to clone / fork and adjust
+There is a `.drone` deployment pipeline being used today, so feel free to clone / fork and adjust
 to your infrastructure.
 
 
